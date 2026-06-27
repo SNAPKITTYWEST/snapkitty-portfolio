@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ASCII Header — Seems Disengaged</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#0a0a0a;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:40px 20px;
+}
+
+.ascii-block {
+  font-family:'Courier New', Courier, monospace;
+  color:#ff4444;
+  font-size:clamp(7px, 1.1vw, 13px);
+  line-height:1.25;
+  white-space:pre;
+  letter-spacing:.05em;
+  text-align:left;
+  display:inline-block;
+}
+
+.ascii-sub {
+  font-family:'Courier New', monospace;
+  color:#444;
+  font-size:12px;
+  white-space:pre;
+  line-height:1.6;
+  margin-top:12px;
+  text-align:left;
+  display:inline-block;
+}
+
+.ascii-meta {
+  font-family:'Courier New', monospace;
+  color:#8b0000;
+  font-size:11px;
+  white-space:pre;
+  line-height:1.8;
+  margin-top:8px;
+  text-align:left;
+  display:inline-block;
+  letter-spacing:.08em;
+}
+
+.copy-btn {
+  margin-top:32px;
+  background:transparent;
+  border:1px solid #333;
+  color:#666;
+  font-family:'Courier New',monospace;
+  font-size:11px;
+  padding:8px 20px;
+  cursor:pointer;
+  letter-spacing:.1em;
+}
+.copy-btn:hover { border-color:#8b0000; color:#ff4444; }
+
+.wrapper {
+  max-width:900px;
+  width:100%;
+}
+
+.border-top    { color:#333; font-family:'Courier New',monospace; white-space:pre; font-size:13px; }
+.border-bottom { color:#333; font-family:'Courier New',monospace; white-space:pre; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<div class="border-top" id="b-top"></div>
+
+<pre class="ascii-block" id="title-art"></pre>
+
+<pre class="ascii-sub" id="sub-art"></pre>
+
+<pre class="ascii-meta" id="meta-art"></pre>
+
+<div class="border-bottom" id="b-bot"></div>
+
+<button class="copy-btn" onclick="copyAll()">[ COPY RAW ASCII ]</button>
+</div>
+
+<script>
+const TITLE = `
+ ░░░░  ░░░░░ ░░░░░ ░░░░░░  ░░░
+░░     ░░    ░░    ░░  ░░ ░░
+ ░░░░  ░░░░  ░░░░  ░░░░░   ░░░
+    ░░ ░░    ░░    ░░ ░░      ░░
+░░░░░  ░░░░░ ░░░░░ ░░  ░░ ░░░░
+
+
+██████╗ ██╗███████╗███████╗███╗   ██╗ ██████╗  █████╗  ██████╗ ███████╗██████╗
+██╔══██╗██║██╔════╝██╔════╝████╗  ██║██╔════╝ ██╔══██╗██╔════╝ ██╔════╝██╔══██╗
+██║  ██║██║███████╗█████╗  ██╔██╗ ██║██║  ███╗███████║██║  ███╗█████╗  ██║  ██║
+██║  ██║██║╚════██║██╔══╝  ██║╚██╗██║██║   ██║██╔══██║██║   ██║██╔══╝  ██║  ██║
+██████╔╝██║███████║███████╗██║ ╚████║╚██████╔╝██║  ██║╚██████╔╝███████╗██████╔╝
+╚═════╝ ╚═╝╚══════╝╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═════╝`;
+
+const SUB = `
+  ─────────────────────────────────────────────────────────────────────────────
+  The Salesforce case note that became training data.
+  How reentry programs built the system that came after COMPAS.
+  ─────────────────────────────────────────────────────────────────────────────`;
+
+const META = `
+  BEL ESPRIT D'ACCORD TRUST  ·  PUBLIC INTEREST REPORT 001  ·  JUNE 2026
+  EVIDENCE OR SILENCE  ·  WORM SEALED  ·  OPEN DISTRIBUTION`;
+
+const BORDER_W = 79;
+const topLine  = '╔' + '═'.repeat(BORDER_W) + '╗';
+const botLine  = '╚' + '═'.repeat(BORDER_W) + '╝';
+
+document.getElementById('b-top').textContent  = topLine;
+document.getElementById('b-bot').textContent  = botLine;
+document.getElementById('title-art').textContent = TITLE;
+document.getElementById('sub-art').textContent   = SUB;
+document.getElementById('meta-art').textContent  = META;
+
+function copyAll() {
+  const raw = topLine + '\n' + TITLE + SUB + META + '\n' + botLine;
+  navigator.clipboard.writeText(raw).then(() => {
+    document.querySelector('.copy-btn').textContent = '[ COPIED ✓ ]';
+    setTimeout(() => {
+      document.querySelector('.copy-btn').textContent = '[ COPY RAW ASCII ]';
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
