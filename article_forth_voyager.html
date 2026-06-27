@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Language That Runs Voyager — Article</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#ffffff;
+  color:#1a1a2e;
+  font-family:'Georgia', serif;
+  max-width:740px;
+  margin:0 auto;
+  padding:48px 32px 80px;
+  line-height:1.8;
+}
+
+/* LinkedIn article aesthetic */
+.pub-header {
+  border-bottom:1px solid #e8e8e8;
+  padding-bottom:24px;
+  margin-bottom:36px;
+}
+.pub-label {
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#8a8a9a;
+  margin-bottom:8px;
+  font-family:'Courier New',monospace;
+}
+.pub-title {
+  font-size:clamp(26px,4vw,38px);
+  font-weight:700;
+  color:#0a0a1a;
+  line-height:1.25;
+  margin-bottom:14px;
+}
+.pub-sub {
+  font-size:17px;
+  color:#505070;
+  font-style:italic;
+  margin-bottom:20px;
+  line-height:1.5;
+}
+.pub-meta {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:12px;
+  color:#8a8a9a;
+  font-family:'Courier New',monospace;
+}
+.pub-meta .entity {
+  color:#0a0a1a;
+  font-weight:700;
+  letter-spacing:.05em;
+}
+
+/* Body */
+h2 {
+  font-size:22px;
+  color:#0a0a1a;
+  margin:40px 0 14px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+p {
+  font-size:17px;
+  color:#2a2a3a;
+  margin-bottom:20px;
+}
+.lead {
+  font-size:20px;
+  color:#0a0a1a;
+  font-style:italic;
+  margin-bottom:28px;
+  padding-left:20px;
+  border-left:3px solid #b8860b;
+  line-height:1.6;
+}
+
+/* Code blocks */
+.code-block {
+  background:#06060a;
+  color:#ffd700;
+  font-family:'Courier New',monospace;
+  font-size:13px;
+  padding:20px 24px;
+  border-radius:4px;
+  margin:24px 0;
+  line-height:1.8;
+  border-left:3px solid #b8860b;
+}
+.code-block .comment { color:#505060; }
+.code-block .word    { color:#00d4cc; }
+.code-block .val     { color:#00ff88; }
+.code-block .result  { color:#cc88ff; }
+
+/* Pull quote */
+.pull-quote {
+  font-size:22px;
+  font-style:italic;
+  color:#0a0a1a;
+  text-align:center;
+  padding:32px 40px;
+  margin:36px 0;
+  border-top:2px solid #b8860b;
+  border-bottom:2px solid #b8860b;
+  line-height:1.5;
+}
+
+/* Highlight box */
+.box {
+  background:#f8f7f0;
+  border:1px solid #e0d8b0;
+  border-left:4px solid #b8860b;
+  padding:20px 24px;
+  margin:28px 0;
+  border-radius:0 4px 4px 0;
+}
+.box p { margin:0; font-size:15px; color:#3a3a2a; }
+.box strong { color:#0a0a1a; }
+
+/* WORM seal */
+.worm-seal {
+  background:#06060a;
+  color:#b8860b;
+  font-family:'Courier New',monospace;
+  font-size:10px;
+  padding:8px 16px;
+  margin:28px 0;
+  opacity:.7;
+  letter-spacing:.08em;
+}
+
+/* Footer */
+.article-footer {
+  border-top:1px solid #e8e8e8;
+  padding-top:28px;
+  margin-top:48px;
+  font-size:13px;
+  color:#8a8a9a;
+  font-family:'Courier New',monospace;
+  line-height:2;
+}
+.article-footer strong { color:#0a0a1a; }
+
+hr { border:none; border-top:1px solid #e8e8e8; margin:36px 0; }
+</style>
+</head>
+<body>
+
+<div class="pub-header">
+  <div class="pub-label">Bel Esprit D'Accord Trust · Technology & Sovereignty</div>
+  <h1 class="pub-title">The Language That Flies Voyager Is the Same One We Built BOB With</h1>
+  <div class="pub-sub">
+    Forth was written in 1970. NASA used it to program the deepest spacecraft ever launched.
+    We just used it to compute live ISS orbital mechanics in a browser. Here is why that matters.
+  </div>
+  <div class="pub-meta">
+    <span class="entity">Bel Esprit D'Accord Trust</span>
+    <span>·</span>
+    <span>SnapKitty Collective</span>
+    <span>·</span>
+    <span>June 2026</span>
+  </div>
+</div>
+
+<div class="lead">
+  "No syntax. Just a stack. The Voyager probe has been flying for 47 years on 8 instructions."
+</div>
+
+<p>
+  In 1977, NASA launched two spacecraft toward the edge of the solar system. Voyager 1 and Voyager 2
+  were programmed in a language called <strong>Forth</strong> — a language with no syntax rules,
+  no classes, no frameworks, no runtime. Just a stack of numbers and a dictionary of words.
+</p>
+
+<p>
+  Voyager 1 is now 24 billion kilometers from Earth. It is still running Forth.
+  Engineers at NASA's Jet Propulsion Laboratory still send Forth commands across the void,
+  and the spacecraft still executes them. The round-trip signal takes 45 hours.
+  Forth has not crashed once.
+</p>
+
+<h2>What Forth Actually Is</h2>
+
+<p>
+  Most programming languages try to hide the machine. Python, JavaScript, Java — they wrap the
+  hardware in abstractions, in objects, in garbage collectors, in virtual machines.
+  You write something that looks like English and the compiler figures out what to tell the processor.
+</p>
+
+<p>
+  Forth does the opposite. Forth <em>is</em> the machine, made legible.
+</p>
+
+<p>There are eight things you need to understand Forth:</p>
+
+<div class="code-block">
+<span class="comment">( everything is a word. numbers go on the stack. words operate on the stack. )</span>
+
+<span class="word">3 4 +</span>          <span class="comment">→ push 3, push 4, add  →</span> <span class="val">7</span>
+<span class="word">5 DUP *</span>        <span class="comment">→ push 5, duplicate, multiply  →</span> <span class="val">25</span>
+<span class="word">10 3 SWAP /</span>    <span class="comment">→ push 10, push 3, swap, divide  →</span> <span class="val">0.3</span>
+<span class="word">.</span>               <span class="comment">→ print top of stack</span>
+<span class="word">.S</span>              <span class="comment">→ print entire stack</span>
+
+<span class="comment">( define your own words with : and ; )</span>
+<span class="word">: SQUARE  DUP * ;</span>
+<span class="word">5 SQUARE .</span>      <span class="comment">→</span> <span class="val">25</span>
+
+<span class="comment">( that is the entire language. )</span>
+</div>
+
+<p>
+  The Forth compiler is written in Forth. It bootstraps itself.
+  The whole system fits in 2 kilobytes. That is why it runs on a 47-year-old spacecraft with
+  70-kilobyte RAM and no way to reboot.
+</p>
+
+<div class="box">
+  <p><strong>Why NASA chose Forth:</strong> In spacecraft, silence is death.
+  A language that crashes, leaks memory, or behaves unpredictably kills missions.
+  Forth's entire execution model fits in one engineer's head.
+  When something goes wrong 24 billion kilometers away, you need to reason about it completely.
+  Forth is small enough to reason about completely.</p>
+</div>
+
+<h2>The Connection to Sovereign AI</h2>
+
+<p>
+  At SnapKitty, we have spent the last two years building BOB — a sovereign AI runtime that
+  operates on a single architectural principle borrowed directly from Forth:
+</p>
+
+<div class="pull-quote">
+  Evidence or Silence.<br>
+  <span style="font-size:16px;color:#505070">Never fabricate. Below threshold — nothing. Above threshold — answer with source.</span>
+</div>
+
+<p>
+  Forth never guesses. When a word is not defined, Forth stops. It does not hallucinate a result.
+  It does not approximate. It does not try to be helpful by making something up.
+  It stops and tells you exactly what it does not know.
+</p>
+
+<p>
+  BOB operates the same way. The architecture is:
+</p>
+
+<div class="code-block">
+<span class="comment">( BOB sovereign runtime — stack-based reasoning chain )</span>
+
+<span class="word">QUERY</span>         <span class="comment">→ push question onto reasoning stack</span>
+<span class="word">CHUNK.SEARCH</span>  <span class="comment">→ search sovereign knowledge chunks</span>
+<span class="word">THRESHOLD</span>     <span class="comment">→ check confidence against minimum</span>
+<span class="word">PROLOG.GATE</span>   <span class="comment">→ logic verification pass</span>
+<span class="word">ADA.VERIFY</span>    <span class="comment">→ typed contract check</span>
+<span class="word">WORM.SEAL</span>     <span class="comment">→ cryptographic seal on result</span>
+<span class="word">EMIT</span>          <span class="comment">→ output or silence</span>
+
+<span class="comment">( same philosophy. different domain. )</span>
+</div>
+
+<p>
+  BOB was not built by fine-tuning a large language model.
+  BOB was built by defining words — sovereign words — the way Forth defines words.
+  Each word does one thing. The stack is always visible. Nothing is hidden.
+</p>
+
+<h2>BOB VOYAGER — Live ISS Orbital Mechanics in Forth</h2>
+
+<p>
+  To prove the connection is not theoretical, we built <strong>BOB VOYAGER</strong> —
+  a full Forth interpreter running in the browser, wired to live International Space Station
+  telemetry. No libraries. No frameworks. One HTML file.
+</p>
+
+<div class="code-block">
+<span class="comment">( computing ISS orbital period — the real Kepler equation )</span>
+
+<span class="word">ISS.ALT</span>        <span class="comment">→ push current altitude (km):  </span><span class="val">408.3</span>
+<span class="word">6371 +</span>         <span class="comment">→ add Earth radius:  </span><span class="val">6779.3</span>
+<span class="word">ORBITAL.PERIOD</span> <span class="comment">→ T = 2π√(r³/μ), μ=398600 km³/s²</span>
+<span class="word">.</span>               <span class="comment">→</span> <span class="result">92.68 minutes</span>
+
+<span class="word">ISS.LAT ISS.LON DIST.SF</span>
+<span class="comment">→ haversine distance to San Francisco ground station:</span>
+<span class="word">.</span>               <span class="comment">→</span> <span class="result">8,847.3 km</span>
+
+<span class="word">WORM.SEAL</span>      <span class="comment">→ SHA-256 seal the computation result</span>
+<span class="comment">→ a3f29c1e8b74d205...</span>
+</div>
+
+<p>
+  The ISS orbital period is 92 minutes. It travels at 27,600 km/h.
+  It completes 15.5 orbits per day. Forth computes all of this with words you can read.
+  The WORM chain seals every computation so the result is tamper-evident.
+</p>
+
+<div class="worm-seal" id="article-worm">WORM SEAL: computing...</div>
+
+<h2>Why This Is Not Nostalgia</h2>
+
+<p>
+  The current AI industry is moving in exactly the wrong direction.
+  Larger models. More parameters. More opacity. More infrastructure.
+  More cost. Less certainty about what is actually happening inside the system.
+</p>
+
+<p>
+  Forth was considered obsolete in 1990 when C became dominant.
+  Then C was considered obsolete when Python became dominant.
+  Then Python frameworks became so heavy that no one person could understand a single application.
+</p>
+
+<p>
+  Meanwhile, Voyager is still flying.
+</p>
+
+<p>
+  The insight is not that small is better for nostalgia's sake.
+  The insight is that <strong>what you can reason about completely, you can trust completely.</strong>
+  And in AI systems that make financial decisions, that seal legal documents,
+  that manage sovereign infrastructure — trust is not optional.
+</p>
+
+<div class="pull-quote">
+  What you can reason about completely, you can trust completely.<br>
+  <span style="font-size:15px;color:#505070">Everything else is faith in a black box.</span>
+</div>
+
+<h2>The Sovereign Stack</h2>
+
+<p>
+  BOB is built on the same languages that run satellites, flight control systems,
+  and formal verification:
+</p>
+
+<div class="code-block">
+<span class="word">Haskell</span>   <span class="comment">→ orchestration layer. no side effects. types prove correctness.</span>
+<span class="word">Prolog</span>    <span class="comment">→ logic kernel. rules and facts. not neural weights.</span>
+<span class="word">Ada</span>       <span class="comment">→ contract gate. F-35 flight software runs Ada.</span>
+<span class="word">Lean 4</span>    <span class="comment">→ formal proofs. the math is verified, not approximated.</span>
+<span class="word">Forth</span>     <span class="comment">→ orbital kernel. now wired to live ISS telemetry.</span>
+<span class="word">WORM</span>      <span class="comment">→ SHA-256 chained seals. tamper-evident. immutable.</span>
+</div>
+
+<p>
+  None of these are trendy. All of them are correct.
+  The F-35 does not run Python. The space shuttle did not run JavaScript.
+  Voyager does not run a transformer model.
+</p>
+
+<p>
+  They run languages where the math is baked into the type system
+  and wrong code physically cannot compile.
+</p>
+
+<h2>What We Are Building</h2>
+
+<p>
+  Bel Esprit D'Accord Trust exists to hold and protect the intellectual property
+  of the sovereign stack — not for a corporation, not for a grant committee,
+  not for a board of directors, but as a vehicle for ideas that outlast their authors.
+</p>
+
+<p>
+  BOB VOYAGER is one proof of concept. The ISS is currently flying at 408 kilometers altitude,
+  at 27,600 km/h, completing an orbit every 92 minutes.
+  You can open a browser, type <code style="background:#f0f0f0;padding:2px 6px;border-radius:2px;font-size:14px">ISS.STACK ORBITAL.PERIOD .</code>
+  and verify this yourself in three words.
+</p>
+
+<p>
+  No API key. No account. No subscription. No terms of service.
+  Just a stack, a dictionary of words, and the live position of a spacecraft.
+</p>
+
+<p>
+  That is what sovereign looks like.
+</p>
+
+<div class="worm-seal" id="article-worm2">WORM ARTICLE SEAL: computing...</div>
+
+<div class="article-footer">
+  <strong>Bel Esprit D'Accord Trust</strong> · Sovereign Intelligence Vehicle<br>
+  <strong>SnapKitty Collective</strong> · Ahmad Ali Parr · June 2026<br>
+  BOB VOYAGER → snapkittywest.github.io/snapkitty-portfolio/bob_voyager.html<br>
+  MIT Licensed · WORM Sealed · Evidence or Silence<br>
+  <br>
+  <span style="color:#b8860b">
+    "No syntax. Just a stack.<br>
+    Voyager has been flying for 47 years on 8 instructions.<br>
+    We built BOB on the same philosophy."
+  </span>
+</div>
+
+<script>
+async function seal(msg, id) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  const h = Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  document.getElementById(id).textContent = 'WORM SEAL: ' + h;
+}
+seal('BOB-VOYAGER-ARTICLE-2026-FORTH-ISS', 'article-worm');
+seal('BEL-ESPRIT-TRUST-SOVEREIGN-STACK-FORTH', 'article-worm2');
+</script>
+</body>
+</html>

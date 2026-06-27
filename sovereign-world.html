@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KittyVerse — Voxel Civilization Compiler</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:#000;overflow:hidden;font-family:'Space Grotesk',monospace}
+  canvas{display:block;position:fixed;inset:0}
+
+  /* SNAP FLASH */
+  #snap{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:999}
+
+  /* COMPILER TERMINAL — left side */
+  #compiler{
+    position:fixed;top:24px;left:28px;width:340px;z-index:200;pointer-events:none;
+  }
+  #comp-header{
+    font-size:0.55rem;letter-spacing:0.25em;text-transform:uppercase;
+    color:rgba(0,255,136,0.6);margin-bottom:10px;opacity:0;
+    transition:opacity 0.5s;
+  }
+  #comp-phase{
+    font-size:clamp(1rem,2vw,1.5rem);font-weight:900;text-transform:uppercase;
+    letter-spacing:-0.01em;color:#fff;line-height:1;
+    opacity:0;transform:translateX(-20px);
+    transition:opacity 0.5s,transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  #comp-phase .g{color:#00ff88}
+  #comp-log{
+    margin-top:12px;font-size:0.6rem;letter-spacing:0.05em;
+    color:rgba(0,255,136,0.5);line-height:1.8;
+    opacity:0;transition:opacity 0.5s 0.2s;
+    max-height:120px;overflow:hidden;
+  }
+
+  /* CHUNK PROGRESS BAR */
+  #chunk-bar{
+    position:fixed;top:0;left:0;right:0;height:2px;
+    background:rgba(0,255,136,0.1);z-index:300;
+  }
+  #chunk-fill{height:100%;background:#00ff88;width:0%;transition:width 0.3s ease}
+
+  /* LAYER STACK — right side */
+  #layers{
+    position:fixed;top:24px;right:28px;z-index:200;pointer-events:none;
+    opacity:0;transition:opacity 0.8s;
+  }
+  #layers-title{
+    font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;
+    color:rgba(255,255,255,0.3);margin-bottom:10px;text-align:right;
+  }
+  .layer-item{
+    display:flex;align-items:center;justify-content:flex-end;gap:8px;
+    margin-bottom:6px;opacity:0.25;transition:opacity 0.4s;
+  }
+  .layer-item.done{opacity:1}
+  .layer-dot{width:6px;height:6px;flex-shrink:0}
+  .layer-name{font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+  .layer-check{font-size:0.6rem}
+
+  /* DISTRICT TAG — floats over city */
+  .dtag{
+    position:fixed;font-size:0.5rem;font-weight:700;letter-spacing:0.2em;
+    text-transform:uppercase;pointer-events:none;z-index:150;opacity:0;
+    transition:opacity 0.8s;white-space:nowrap;
+  }
+
+  /* BOTTOM STATS */
+  #stats{
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    display:flex;border-top:1px solid rgba(255,255,255,0.06);
+    background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);
+    opacity:0;transition:opacity 1s;pointer-events:none;
+  }
+  .sc{flex:1;padding:12px 14px;text-align:center;border-right:1px solid rgba(255,255,255,0.05)}
+  .sc:last-child{border-right:none}
+  .sn{display:block;font-size:1.1rem;font-weight:900;color:#00ff88;line-height:1}
+  .sl{display:block;font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;
+      color:rgba(255,255,255,0.3);margin-top:3px}
+
+  /* WORLD GRAMMAR OVERLAY (intro) */
+  #grammar{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;z-index:400;
+    pointer-events:none;opacity:0;transition:opacity 0.8s;
+  }
+  #gram-title{
+    font-size:clamp(2.5rem,8vw,6rem);font-weight:900;text-transform:uppercase;
+    letter-spacing:-0.03em;text-align:center;color:#fff;line-height:0.95;
+  }
+  #gram-title span{color:#00ff88}
+  #gram-sub{
+    font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;
+    color:rgba(255,255,255,0.35);margin-top:18px;
+  }
+
+  /* FINAL */
+  #final{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;z-index:500;
+    pointer-events:none;opacity:0;transition:opacity 1.5s;
+  }
+  #final-title{
+    font-size:clamp(3rem,10vw,8rem);font-weight:900;text-transform:uppercase;
+    letter-spacing:-0.04em;color:#fff;line-height:0.9;text-align:center;
+  }
+  #final-title span{color:#c9a84c}
+  #final-sub{
+    display:flex;gap:28px;margin-top:22px;
+    font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;
+    color:rgba(255,255,255,0.35);
+  }
+
+  /* EXPLORE */
+  #explore{
+    position:fixed;bottom:58px;left:50%;transform:translateX(-50%);
+    z-index:300;opacity:0;transition:opacity 0.8s;pointer-events:all;
+    border:1px solid rgba(0,255,136,0.4);background:transparent;
+    color:#00ff88;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;
+    padding:12px 28px;cursor:pointer;font-family:inherit;
+    transition:all 0.3s;
+  }
+  #explore:hover{background:#00ff88;color:#000}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="snap"></div>
+<div id="chunk-bar"><div id="chunk-fill"></div></div>
+
+<!-- COMPILER TERMINAL -->
+<div id="compiler">
+  <div id="comp-header">kittyverse compiler v1.0 · sovereign world os</div>
+  <div id="comp-phase"></div>
+  <div id="comp-log"></div>
+</div>
+
+<!-- LAYER STACK -->
+<div id="layers">
+  <div id="layers-title">Compilation Layers</div>
+  <div class="layer-item" id="l0"><span class="layer-name">Ground Grid</span><div class="layer-dot" style="background:#444"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l1"><span class="layer-name">Road Network</span><div class="layer-dot" style="background:#226"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l2"><span class="layer-name">District Zones</span><div class="layer-dot" style="background:#c9a84c"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l3"><span class="layer-name">Buildings</span><div class="layer-dot" style="background:#4488ff"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l4"><span class="layer-name">Lights Online</span><div class="layer-dot" style="background:#ff8800"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l5"><span class="layer-name">Data Flows</span><div class="layer-dot" style="background:#00ccff"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l6"><span class="layer-name">Agents Active</span><div class="layer-dot" style="background:#00ff88"></div><span class="layer-check">○</span></div>
+  <div class="layer-item" id="l7"><span class="layer-name">Sky Ledger</span><div class="layer-dot" style="background:#cc44ff"></div><span class="layer-check">○</span></div>
+</div>
+
+<!-- GRAMMAR INTRO -->
+<div id="grammar">
+  <div id="gram-title">VOXEL<br><span>CIVILIZATION</span></div>
+  <div id="gram-sub">Chunk · District · Role · Compile</div>
+</div>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="sc"><span class="sn" id="sn-ch">0/0</span><span class="sl">Chunks Built</span></div>
+  <div class="sc"><span class="sn" id="sn-bl">0</span><span class="sl">Buildings</span></div>
+  <div class="sc"><span class="sn">9</span><span class="sl">Districts</span></div>
+  <div class="sc"><span class="sn" id="sn-ag">0</span><span class="sl">Agents Live</span></div>
+  <div class="sc"><span class="sn" id="sn-se">0</span><span class="sl">WORM Seals</span></div>
+</div>
+
+<!-- FINAL -->
+<div id="final">
+  <div id="final-title">KITTY<br><span>VERSE</span></div>
+  <div id="final-sub"><span>BUILD</span><span>VERIFY</span><span>EXECUTE</span></div>
+</div>
+
+<button id="explore">Explore the World →</button>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls }  from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }     from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+// ════════════════════════════════════════════════════════════════════
+//  WORLD GRAMMAR — this is the "compiler spec"
+//  Every district has: role, palette, density, height profile, shape
+// ════════════════════════════════════════════════════════════════════
+const WORLD = {
+  unit:    1.4,        // 1 voxel = 1.4 world units
+  chunk:   8,          // 8×8 voxels per chunk
+  layers:  8,
+};
+
+const DISTRICTS = {
+  // Role → visual identity → building rules
+  CORE: {
+    label:'METATRON · Orchestrator', col:0xddcc88, em:0xc9a84c, ei:2.0,
+    shape:'monolith',   // central tower + 6 satellites
+    hMin:10, hMax:18,  density:0.5,
+    role:'Sovereign orchestrator. All agent decisions route through CORE.',
+  },
+  BOB: {
+    label:'BOB · Mathematical Reasoner', col:0x112244, em:0x4499ff, ei:0.9,
+    shape:'cluster',   // dense low cluster of cubes
+    hMin:2, hMax:7,   density:0.8,
+    role:'Watson+Mamba+Prolog. Riemann Hypothesis. Math kernel.',
+  },
+  SENTINEL: {
+    label:'SENTINEL · Security Boundary', col:0x220044, em:0xcc44ff, ei:0.9,
+    shape:'ring',      // ring of towers around district
+    hMin:4, hMax:9,   density:0.65,
+    role:'Trust deed enforcement. Every agent crosses SENTINEL.',
+  },
+  CARTO: {
+    label:'CARTO · Legal Reasoner', col:0x332200, em:0xffaa00, ei:0.85,
+    shape:'courthouse', // wide flat-topped main building
+    hMin:2, hMax:6,   density:0.75,
+    role:'IRAC FSM. Defeated Claude Opus. NOT GUILTY verdict.',
+  },
+  ENKI: {
+    label:'ENKI · Adversarial Detector', col:0x330011, em:0xff2244, ei:0.85,
+    shape:'irregular', // spike pattern — detection antennae
+    hMin:1, hMax:5,   density:0.6,
+    role:'Deception fingerprinting. Ed25519 + WORM verification.',
+  },
+  WORM: {
+    label:'WORM · Immutable Ledger', col:0x003322, em:0x00ff88, ei:1.0,
+    shape:'vault',     // squat wide structures — storage
+    hMin:4, hMax:8,   density:0.9,
+    role:'Bifrost chain. 1,247 seals. SHA-256. Append-only forever.',
+  },
+  BIFROST: {
+    label:'BIFROST · Bridge Layer', col:0x002233, em:0x00aaff, ei:0.9,
+    shape:'arch',      // tall gateway structures
+    hMin:5, hMax:10,  density:0.7,
+    role:'Inter-agent messaging. Cryptographic handshake. Sealed routing.',
+  },
+  FORGE: {
+    label:'FORGE · Code Factory', col:0x331100, em:0xff6600, ei:0.85,
+    shape:'industrial', // staggered heights — factory feel
+    hMin:3, hMax:7,   density:0.85,
+    role:'Devstral 123B. APL, Haskell, Ada, Rust. White-hat.',
+  },
+  ORACLE: {
+    label:'ORACLE · Prediction Engine', col:0x223300, em:0x88ff00, ei:0.85,
+    shape:'dome',      // central dome + radiating buildings
+    hMin:4, hMax:8,   density:0.7,
+    role:'Probabilistic assessment. Called by every agent.',
+  },
+};
+
+// Grid layout: 9 districts in 3×3 + center
+// World runs from -GMAX to GMAX in grid coords
+const GMAX = 16;
+const CHUNK_SIZE = WORLD.chunk;
+
+// District zone assignment by grid coordinate
+function classify(gx, gz) {
+  const ax = Math.abs(gx), az = Math.abs(gz);
+  // CORE center zone
+  if(ax <= 2 && az <= 2) return 'CORE';
+  // Primary road cross
+  if(ax <= 1 || az <= 1) return null;
+  // Cardinal district strips
+  if(ax <= 4 && gz < -2) return 'WORM';
+  if(ax <= 4 && gz >  2) return 'BIFROST';
+  if(az <= 4 && gx < -2) return 'FORGE';
+  if(az <= 4 && gx >  2) return 'ORACLE';
+  // Inner junction roads
+  if(ax <= 5 && az <= 5) return null;
+  // Outer ring road
+  if(ax === GMAX || az === GMAX) return null;
+  // Corner districts
+  if(gx < -4 && gz < -4) return 'BOB';
+  if(gx >  4 && gz < -4) return 'SENTINEL';
+  if(gx < -4 && gz >  4) return 'CARTO';
+  if(gx >  4 && gz >  4) return 'ENKI';
+  return null;
+}
+
+// Height modifier by district shape
+function getHeight(dk, gx, gz, lx, lz) {
+  const d = DISTRICTS[dk];
+  const base = d.hMin + Math.random()*(d.hMax - d.hMin);
+  switch(d.shape) {
+    case 'monolith':
+      // Tallest at center, falls off
+      return base * (1 - 0.15*Math.sqrt(lx*lx+lz*lz)/4);
+    case 'ring':
+      // Taller on edges
+      return base * (0.6 + 0.4*(Math.abs(lx)+Math.abs(lz))/8);
+    case 'vault':
+      // Uniformly squat
+      return d.hMin + 1 + Math.random()*2;
+    case 'dome':
+      // Central peak
+      const r = Math.sqrt(lx*lx+lz*lz);
+      return base * Math.max(0.3, 1 - r/6);
+    case 'irregular':
+      // Spike pattern
+      return (lx+lz)%3===0 ? d.hMax : d.hMin;
+    default:
+      return base;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  THREE.JS SETUP
+// ════════════════════════════════════════════════════════════════════
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000008, 0.014);
+scene.background = new THREE.Color(0x000008);
+
+const camera = new THREE.PerspectiveCamera(68, innerWidth/innerHeight, 0.1, 800);
+camera.position.set(4, 4, 26);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.88;
+document.body.prepend(renderer.domElement);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 1.5, 0.5, 0.78);
+composer.addPass(bloom);
+
+// Lighting
+scene.add(new THREE.AmbientLight(0x060618, 8));
+const core_light = new THREE.PointLight(0xc9a84c, 8, 35);
+core_light.position.set(0,16,0);
+scene.add(core_light);
+// District rim lights
+[['BOB',0x4499ff],['SENTINEL',0xcc44ff],['CARTO',0xffaa00],['ENKI',0xff2244],
+ ['WORM',0x00ff88],['BIFROST',0x00aaff],['FORGE',0xff6600],['ORACLE',0x88ff00]]
+.forEach(([dk, col]) => {
+  const [cx,cz] = districtCenter(dk);
+  const pl = new THREE.PointLight(col, 4, 20);
+  pl.position.set(cx, 10, cz);
+  scene.add(pl);
+});
+
+function districtCenter(dk) {
+  const map = {
+    CORE:[0,0], WORM:[0,-12], BIFROST:[0,12], FORGE:[-12,0], ORACLE:[12,0],
+    BOB:[-12,-12], SENTINEL:[12,-12], CARTO:[-12,12], ENKI:[12,12]
+  };
+  return map[dk] || [0,0];
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  MATERIALS
+// ════════════════════════════════════════════════════════════════════
+const mats = {};
+Object.entries(DISTRICTS).forEach(([dk,d]) => {
+  mats[dk] = new THREE.MeshStandardMaterial({
+    color:d.col, emissive:d.em, emissiveIntensity:0,  // starts dark
+    roughness:0.65, metalness:0.55
+  });
+});
+const roadMat = new THREE.MeshStandardMaterial({
+  color:0x0a0a1a, emissive:0x000033, emissiveIntensity:0, roughness:0.95
+});
+const gridMat = new THREE.MeshBasicMaterial({
+  color:0x112233, transparent:true, opacity:0, wireframe:true
+});
+
+// ════════════════════════════════════════════════════════════════════
+//  LAYER 0 — GROUND GRID
+// ════════════════════════════════════════════════════════════════════
+const groundGeo = new THREE.PlaneGeometry(GMAX*2*WORLD.unit, GMAX*2*WORLD.unit, GMAX*2, GMAX*2);
+const ground = new THREE.Mesh(groundGeo, gridMat);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = 0;
+scene.add(ground);
+
+// ════════════════════════════════════════════════════════════════════
+//  LAYER 1 — ROAD TILES
+// ════════════════════════════════════════════════════════════════════
+const roadTiles = [];
+const W = WORLD.unit;
+for(let gx=GMIN_VAL(); gx<=GMAX; gx++) {
+  for(let gz=GMIN_VAL(); gz<=GMAX; gz++) {
+    if(classify(gx,gz)===null) {
+      const geo  = new THREE.BoxGeometry(W*0.92, 0.08, W*0.92);
+      const mesh = new THREE.Mesh(geo, roadMat);
+      mesh.position.set(gx*W, 0.04, gz*W);
+      mesh.visible = false;
+      scene.add(mesh);
+      roadTiles.push(mesh);
+    }
+  }
+}
+function GMIN_VAL(){return -GMAX;}
+
+// ════════════════════════════════════════════════════════════════════
+//  LAYER 3 — BUILDINGS (start invisible, grow by chunk)
+// ════════════════════════════════════════════════════════════════════
+const buildings = [];
+const byDistrict = {};
+Object.keys(DISTRICTS).forEach(k=>{byDistrict[k]=[];});
+
+for(let gx=-GMAX; gx<=GMAX; gx++) {
+  for(let gz=-GMAX; gz<=GMAX; gz++) {
+    const dk = classify(gx, gz);
+    if(!dk) continue;
+    if(Math.random() > DISTRICTS[dk].density) continue;
+
+    // Local position within district
+    const [cx,cz] = districtCenter(dk).map(v=>Math.round(v/W));
+    const lx = gx - cx, lz = gz - cz;
+    const tgtH = Math.max(1, Math.round(getHeight(dk, gx, gz, lx, lz)));
+
+    const geo  = new THREE.BoxGeometry(W*0.76, 1, W*0.76);
+    const mesh = new THREE.Mesh(geo, mats[dk]);
+    mesh.position.set(gx*W, -0.5, gz*W);
+    mesh.scale.y = 0.001;
+    mesh.visible = false;
+    mesh.userData = {
+      dk, tgtH,
+      radius: Math.sqrt(gx*gx + gz*gz),
+      built: false, buildStart:-1, floors:0,
+      chunkX: Math.floor((gx+GMAX)/CHUNK_SIZE),
+      chunkZ: Math.floor((gz+GMAX)/CHUNK_SIZE),
+    };
+    scene.add(mesh);
+    buildings.push(mesh);
+    byDistrict[dk].push(mesh);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  CHUNKS — group buildings by chunk index, load center-out
+// ════════════════════════════════════════════════════════════════════
+const chunksTotal = Math.ceil(GMAX*2/CHUNK_SIZE) * Math.ceil(GMAX*2/CHUNK_SIZE);
+const chunkMap = {};
+buildings.forEach(b => {
+  const key = `${b.userData.chunkX}_${b.userData.chunkZ}`;
+  if(!chunkMap[key]) chunkMap[key]=[];
+  chunkMap[key].push(b);
+});
+// Sort chunks center-out
+const chunkKeys = Object.keys(chunkMap).sort((a,b)=>{
+  const [ax,az] = a.split('_').map(Number);
+  const [bx,bz] = b.split('_').map(Number);
+  const cxHalf = Math.ceil(GMAX*2/CHUNK_SIZE)/2;
+  return (Math.abs(ax-cxHalf)+Math.abs(az-cxHalf)) - (Math.abs(bx-cxHalf)+Math.abs(bz-cxHalf));
+});
+let chunkIndex = 0;
+let chunksBuilt = 0;
+
+// ════════════════════════════════════════════════════════════════════
+//  LAYER 5 — INTER-DISTRICT CABLES
+// ════════════════════════════════════════════════════════════════════
+const cableLines = [];
+const CONNECTIONS = [
+  ['CORE','WORM'],['CORE','BIFROST'],['CORE','FORGE'],['CORE','ORACLE'],
+  ['BOB','CORE'],['SENTINEL','CORE'],['CARTO','CORE'],['ENKI','CORE'],
+  ['BOB','WORM'],['SENTINEL','ORACLE'],['CARTO','BIFROST'],['ENKI','FORGE'],
+  ['WORM','BIFROST'],['FORGE','ORACLE'],
+];
+CONNECTIONS.forEach(([a,b]) => {
+  const [ax,az] = districtCenter(a);
+  const [bx,bz] = districtCenter(b);
+  const pts = [];
+  for(let i=0;i<=10;i++){
+    const t=i/10;
+    pts.push(new THREE.Vector3(
+      ax+(bx-ax)*t, 0.5+Math.sin(t*Math.PI)*3, az+(bz-az)*t
+    ));
+  }
+  const dk = a==='CORE' ? b : a;
+  const col = new THREE.Color(DISTRICTS[dk].em);
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({color:col, transparent:true, opacity:0});
+  scene.add(new THREE.Line(geo, mat));
+  cableLines.push(mat);
+});
+
+// ════════════════════════════════════════════════════════════════════
+//  LAYER 6 — AGENT CUBES (inhabitants)
+// ════════════════════════════════════════════════════════════════════
+const AGENT_DEFS = [
+  {n:'BOB',      c:0x4499ff,  r:7,  s:0.006},
+  {n:'SENTINEL', c:0xcc44ff,  r:8,  s:0.005},
+  {n:'CARTO',    c:0xffaa00,  r:9,  s:0.007},
+  {n:'ENKI',     c:0xff2244,  r:6,  s:0.008},
+  {n:'WORM',     c:0x00ff88,  r:5,  s:0.005},
+  {n:'BIFROST',  c:0x00aaff,  r:10, s:0.004},
+  {n:'FORGE',    c:0xff6600,  r:11, s:0.006},
+  {n:'ORACLE',   c:0x88ff00,  r:8,  s:0.007},
+  {n:'META',     c:0xffffff,  r:3,  s:0.01},
+  {n:'CIPHER',   c:0xffcc44,  r:13, s:0.004},
+  {n:'ATLAS',    c:0x44ffdd,  r:14, s:0.003},
+  {n:'HERALD',   c:0xff44aa,  r:6,  s:0.009},
+];
+const agentGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+const agentMeshes = AGENT_DEFS.map((def,i) => {
+  const mat  = new THREE.MeshStandardMaterial({
+    color:def.c, emissive:def.c, emissiveIntensity:1.8
+  });
+  const mesh = new THREE.Mesh(agentGeo, mat);
+  mesh.visible = false;
+  mesh.userData = {t: Math.random(), r:def.r, s:def.s, phase:i*0.5, variant:i%4};
+  scene.add(mesh);
+  return mesh;
+});
+
+function agentTrack(ud, t) {
+  const a = t*Math.PI*2 + ud.phase;
+  const {r, variant} = ud;
+  if(variant===0) return [Math.cos(a)*r, 0.6, Math.sin(a)*r];
+  if(variant===1) return [Math.cos(a)*r, 0.6, Math.sin(a*2)*r*0.5];
+  if(variant===2) return [Math.sin(a)*r, 0.6, Math.cos(a*0.7)*r];
+  return [Math.cos(a*1.3)*r, 0.6, Math.sin(a*0.8)*r];
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  LAYER 7 — STAR / HASH SKY
+// ════════════════════════════════════════════════════════════════════
+const skyGeo = new THREE.BufferGeometry();
+const skyPos = new Float32Array(8000);
+for(let i=0;i<skyPos.length;i+=3){
+  skyPos[i  ] = (Math.random()-0.5)*400;
+  skyPos[i+1] = 30 + Math.random()*100;
+  skyPos[i+2] = (Math.random()-0.5)*400;
+}
+skyGeo.setAttribute('position', new THREE.BufferAttribute(skyPos,3));
+const skyMesh = new THREE.Points(skyGeo,
+  new THREE.PointsMaterial({color:0x334466, size:0.25, transparent:true, opacity:0}));
+scene.add(skyMesh);
+
+// ════════════════════════════════════════════════════════════════════
+//  FLASH EFFECT
+// ════════════════════════════════════════════════════════════════════
+const flashGeo = new THREE.BoxGeometry(W*1.3, 0.2, W*1.3);
+const flashMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0});
+const flashMesh= new THREE.Mesh(flashGeo, flashMat);
+scene.add(flashMesh);
+let flashT = 0;
+let flashX = 0, flashY = 0, flashZ = 0;
+
+const snapEl = document.getElementById('snap');
+function SNAP() {
+  snapEl.style.transition='none'; snapEl.style.opacity='1';
+  setTimeout(()=>{snapEl.style.transition='opacity 0.5s'; snapEl.style.opacity='0';}, 60);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  COMPILER HUD
+// ════════════════════════════════════════════════════════════════════
+const compHeader = document.getElementById('comp-header');
+const compPhase  = document.getElementById('comp-phase');
+const compLog    = document.getElementById('comp-log');
+
+const LOG_LINES = [];
+function log(line) {
+  LOG_LINES.push('> '+line);
+  if(LOG_LINES.length > 6) LOG_LINES.shift();
+  compLog.innerHTML = LOG_LINES.join('<br>');
+}
+function setPhase(html, sub) {
+  compPhase.style.opacity='0'; compPhase.style.transform='translateX(-20px)';
+  compLog.style.opacity='0';
+  setTimeout(()=>{
+    compPhase.innerHTML = html;
+    compPhase.style.opacity='1'; compPhase.style.transform='translateX(0)';
+    compLog.style.opacity='1';
+    if(sub) log(sub);
+  }, 350);
+}
+function layerDone(i) {
+  const el = document.getElementById('l'+i);
+  if(el){ el.classList.add('done'); el.querySelector('.layer-check').textContent='✓'; }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  CAMERA KEYFRAMES
+// ════════════════════════════════════════════════════════════════════
+const KEYS = [
+  [0,     [4,  4,  27],  [0, 5, 0],  68],
+  [5000,  [14, 6,  22],  [0, 5, 0],  64],
+  [10000, [22, 14, 18],  [0, 3, 0],  56],
+  [18000, [24, 26, 16],  [0, 2, 0],  50],
+  [24000, [0,  34, 30],  [0, 1, 0],  46],
+  [30000, [-30,34, 0],   [0, 1, 0],  46],
+  [36000, [-6, 6, -8],   [0, 6, 0],  64],
+  [40000, [8,  4, 10],   [0, 5, 0],  68],
+  [44000, [0,  100,0],   [0, 0, 0],  40],
+  [56000, [0,  100,0],   [0, 0, 0],  40],
+];
+function camAt(ms) {
+  const last = KEYS[KEYS.length-1];
+  if(ms >= last[0]) return {p:new THREE.Vector3(...last[1]),t:new THREE.Vector3(...last[2]),fov:last[3]};
+  for(let i=1;i<KEYS.length;i++){
+    const [t0,p0,l0,f0]=KEYS[i-1], [t1,p1,l1,f1]=KEYS[i];
+    if(ms>=t0&&ms<=t1){
+      let u=(ms-t0)/(t1-t0);
+      u=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+      return{
+        p:new THREE.Vector3(...p0).lerp(new THREE.Vector3(...p1),u),
+        t:new THREE.Vector3(...l0).lerp(new THREE.Vector3(...l1),u),
+        fov:f0+(f1-f0)*u
+      };
+    }
+  }
+  return{p:new THREE.Vector3(...KEYS[0][1]),t:new THREE.Vector3(...KEYS[0][2]),fov:KEYS[0][3]};
+}
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enabled=false; controls.enableDamping=true; controls.dampingFactor=0.05;
+let camFree = false;
+
+document.getElementById('explore').addEventListener('click',()=>{
+  camFree=true; controls.enabled=true; controls.target.set(0,4,0);
+  camera.position.set(30,20,30); camera.fov=58; camera.updateProjectionMatrix();
+  document.getElementById('explore').style.opacity='0';
+  document.getElementById('explore').style.pointerEvents='none';
+  document.getElementById('final').style.opacity='0';
+});
+
+// ════════════════════════════════════════════════════════════════════
+//  ANIMATION LOOP
+// ════════════════════════════════════════════════════════════════════
+const flags={};
+let t0=null, buildRadius=0, builtTotal=0, sealCount=0;
+const CHUNK_INTERVAL = 600; // ms between chunk releases
+
+function animate(now) {
+  requestAnimationFrame(animate);
+  if(!t0) t0=now;
+  const ms = now-t0;
+  const sec = ms*0.001;
+
+  // ─── SEQUENCE ────────────────────────────────────────────────────
+
+  // GRAMMAR INTRO
+  if(ms<600 && !flags.gramIn){
+    flags.gramIn=true;
+    document.getElementById('grammar').style.opacity='1';
+  }
+  if(ms>2400 && !flags.gramOut){
+    flags.gramOut=true;
+    document.getElementById('grammar').style.opacity='0';
+  }
+
+  // LAYER 0 — GROUND GRID
+  if(ms>1500 && !flags.l0){
+    flags.l0=true;
+    compHeader.style.opacity='1';
+    setPhase('<span class="g">LAYER 0</span> · GROUND GRID','Voxel grid contract: unit=1.4 chunk=8 height_levels=[0,4,8,16,32]');
+    gridMat.opacity=0.12;
+    layerDone(0);
+    log('terrain.generate() → 32×32 chunk grid initialized');
+    document.getElementById('layers').style.opacity='1';
+  }
+
+  // LAYER 1 — ROADS
+  if(ms>3000 && !flags.l1){
+    flags.l1=true;
+    setPhase('<span class="g">LAYER 1</span> · ROAD NETWORK','roads.self_route() → center cross + district corridors');
+    roadTiles.forEach((t,i)=>setTimeout(()=>{t.visible=true; roadMat.emissiveIntensity=0.4;},i*6));
+    layerDone(1);
+    log('roads.route() → 847 tiles placed · 6 corridors active');
+  }
+
+  // LAYER 2 — DISTRICT ZONES + start building
+  if(ms>5000 && !flags.l2){
+    flags.l2=true;
+    setPhase('<span class="g">LAYER 2</span> · DISTRICT ZONES','ARCHITECT agent: district.assign() → 9 zones · 0 buildings');
+    layerDone(2);
+    log('districts.compile() → BOB · SENTINEL · CARTO · ENKI');
+    log('WORM · BIFROST · FORGE · ORACLE · CORE');
+    document.getElementById('stats').style.opacity='1';
+    document.getElementById('logo-name') && (document.querySelector('#compiler')&&null);
+  }
+
+  // LAYER 3 — BUILDINGS (chunk-by-chunk)
+  if(ms>6000 && !flags.l3started){
+    flags.l3started=true;
+    setPhase('<span class="g">LAYER 3</span> · BUILDINGS EXTRUDING','BUILDER agent: voxel.extrude() → center-out chunk wave');
+    layerDone(3);
+    log('builder.start() → releasing chunks center-out');
+  }
+
+  // Release next chunk every CHUNK_INTERVAL ms
+  if(ms>6000 && chunkIndex < chunkKeys.length) {
+    const chunksDue = Math.floor((ms-6000)/CHUNK_INTERVAL);
+    while(chunkIndex < chunksDue && chunkIndex < chunkKeys.length) {
+      const key = chunkKeys[chunkIndex];
+      chunkMap[key].forEach(b => {
+        b.visible = true;
+        b.userData.buildStart = ms;
+      });
+      chunkIndex++;
+    }
+  }
+
+  // LAYER 4 — LIGHTS
+  if(ms>14000 && !flags.l4){
+    flags.l4=true;
+    setPhase('<span class="g">LAYER 4</span> · LIGHTS ONLINE','LIGHTING agent: emissive.activate() → district palettes');
+    Object.values(mats).forEach((m,i)=>setTimeout(()=>{ m.emissiveIntensity = DISTRICTS[Object.keys(DISTRICTS)[i]].ei; },i*200));
+    roadMat.emissiveIntensity=0.6;
+    layerDone(4);
+    log('lights.online() → 9 district palettes · bloom calibrated');
+    SNAP();
+  }
+
+  // LAYER 5 — CABLES
+  if(ms>18000 && !flags.l5){
+    flags.l5=true;
+    setPhase('<span class="g">LAYER 5</span> · DATA FLOWS','BIFROST agent: cable.connect() → inter-district routing');
+    cableLines.forEach((m,i)=>setTimeout(()=>{m.opacity=0.3;},i*100));
+    layerDone(5);
+    skyMesh.material.opacity=0.4;
+    log('data.flow() → 14 inter-district connections lit');
+    log('hash.propagate() → WORM chain active');
+  }
+
+  // LAYER 6 — AGENTS
+  if(ms>22000 && !flags.l6){
+    flags.l6=true;
+    setPhase('<span class="g">LAYER 6</span> · AGENTS AWAKENING','12 sovereign agents online · patrol paths initialized');
+    agentMeshes.forEach((a,i)=>setTimeout(()=>{a.visible=true;},i*300));
+    layerDone(6);
+    log('agents.wake() → BOB SENTINEL CARTO ENKI WORM BIFROST');
+    log('FORGE ORACLE META CIPHER ATLAS HERALD → ALL ONLINE');
+    SNAP();
+  }
+
+  // LAYER 7 — SKY LEDGER
+  if(ms>28000 && !flags.l7){
+    flags.l7=true;
+    setPhase('<span class="g">LAYER 7</span> · SKY LEDGER','Hashes as constellations. Distributed infrastructure overhead.');
+    skyMesh.material.opacity=0.7; skyMesh.material.color.set(0x4466cc);
+    skyMesh.material.size=0.3;
+    layerDone(7);
+    log('ledger.sky() → hash topology rendering overhead');
+    log('WORLD COMPILATION COMPLETE');
+    SNAP();
+  }
+
+  // FINAL REVEAL
+  if(ms>46000 && !flags.final){
+    flags.final=true;
+    document.getElementById('final').style.opacity='1';
+    document.getElementById('explore').style.opacity='1';
+    setPhase('<span class="g">KITTYVERSE</span> · ONLINE','Sovereign World OS · 9 Districts · 12 Agents · Eternal WORM');
+  }
+
+  // ─── BUILDINGS GROW (floor by floor) ────────────────────────────
+  buildings.forEach(b=>{
+    const ud = b.userData;
+    if(!b.visible || ud.built || ud.buildStart<0) return;
+    const age = (ms - ud.buildStart)*0.001;
+    const floors = Math.min(ud.tgtH, Math.floor(age*4));
+    if(floors > ud.floors) {
+      if(ud.floors < 3) { // flash first few floors
+        flashMesh.position.set(b.position.x, floors+0.2, b.position.z);
+        flashT=0.12;
+      }
+      ud.floors = floors;
+      b.scale.y = floors;
+      b.position.y = floors*0.5 - 0.5;
+    }
+    if(floors >= ud.tgtH && age > ud.tgtH/4) {
+      b.scale.y = ud.tgtH; b.position.y = ud.tgtH*0.5-0.5;
+      ud.built = true; builtTotal++; sealCount++;
+      if(chunkIndex < chunkKeys.length)
+        chunksBuilt = Math.floor(builtTotal/Math.max(1,buildings.length/chunkKeys.length));
+    }
+  });
+
+  // Flash fade
+  if(flashT>0){ flashT-=0.016; flashMat.opacity=Math.max(0,flashT/0.12); }
+
+  // ─── AGENTS MOVE ────────────────────────────────────────────────
+  agentMeshes.forEach(a=>{
+    if(!a.visible) return;
+    a.userData.t=(a.userData.t+a.userData.s)%1;
+    const [x,y,z]=agentTrack(a.userData, a.userData.t);
+    a.position.set(x,y,z); a.rotation.y+=0.05;
+  });
+
+  // ─── CABLES PULSE ───────────────────────────────────────────────
+  if(flags.l5) cableLines.forEach((m,i)=>{ m.opacity=0.15+Math.sin(sec*2.5+i*0.6)*0.15; });
+
+  // ─── CORE PULSE ─────────────────────────────────────────────────
+  core_light.intensity=7+Math.sin(sec*1.8)*3;
+
+  // ─── STATS ──────────────────────────────────────────────────────
+  document.getElementById('sn-bl').textContent = builtTotal.toLocaleString();
+  document.getElementById('sn-se').textContent = sealCount.toLocaleString();
+  document.getElementById('sn-ag').textContent = agentMeshes.filter(a=>a.visible).length;
+  document.getElementById('sn-ch').textContent = `${Math.min(chunkIndex,chunkKeys.length)}/${chunkKeys.length}`;
+  document.getElementById('chunk-fill').style.width = Math.min(chunkIndex/chunkKeys.length*100,100)+'%';
+
+  // ─── CAMERA ─────────────────────────────────────────────────────
+  if(!camFree){
+    const c = camAt(ms);
+    camera.position.lerp(c.p, 0.035);
+    camera.lookAt(c.t);
+    if(Math.abs(camera.fov-c.fov)>0.1){
+      camera.fov += (c.fov-camera.fov)*0.03;
+      camera.updateProjectionMatrix();
+    }
+  } else { controls.update(); }
+
+  composer.render();
+}
+
+animate(0);
+
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+  composer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>

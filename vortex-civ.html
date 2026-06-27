@@ -63,7 +63,29 @@ header{
 .agent-msg{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;position:relative;z-index:1}
 .agent-msg.live-enter{animation:messageIn .55s ease both}
 @keyframes messageIn{from{opacity:0;transform:translateY(-8px);filter:blur(3px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
-.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;border:1px solid}
+.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;border:1px solid;overflow:hidden}
+.robot-avatar{position:relative;background:rgba(2,8,16,.88);box-shadow:0 0 14px currentColor,inset 0 0 10px rgba(255,255,255,.08)}
+.robot-avatar svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 5px currentColor)}
+.robot-avatar::after{
+  content:attr(data-code);position:absolute;bottom:1px;left:0;right:0;text-align:center;
+  font-size:.25rem;letter-spacing:.02em;color:#dcecff;text-shadow:0 0 4px currentColor;
+}
+.robot-eye{animation:robotBlink 4.8s infinite}
+.robot-antenna{animation:robotPing 1.8s infinite}
+@keyframes robotBlink{0%,92%,100%{opacity:1}95%{opacity:.12}}
+@keyframes robotPing{0%,100%{opacity:.45}50%{opacity:1}}
+.robot-dock{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:5px;
+  padding:5px 7px;border:1px solid rgba(0,212,255,.22);background:rgba(2,8,16,.72);
+  box-shadow:0 0 18px rgba(0,212,255,.15);pointer-events:none;
+}
+.dock-bot{width:24px;height:24px;border-radius:4px;color:var(--cyan);animation:dockPatrol 3s ease-in-out infinite}
+.dock-bot:nth-child(2n){animation-delay:.35s}.dock-bot:nth-child(3n){animation-delay:.7s}
+@keyframes dockPatrol{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.ascii-chip{
+  margin-top:4px;padding:4px 6px;border-left:2px solid currentColor;background:rgba(0,0,0,.24);
+  font-size:.34rem;line-height:1.15;white-space:pre;color:inherit;opacity:.78;
+}
 .msg-body{flex:1;background:rgba(18,38,62,.76);border:1px solid rgba(76,149,206,.16);border-radius:6px;padding:7px 9px}
 .msg-name{font-size:.45rem;margin-bottom:3px;letter-spacing:.06em}
 .msg-role{font-size:.38rem;color:var(--text);margin-bottom:4px}
@@ -90,7 +112,7 @@ canvas#vortex{width:100%;height:100%;display:block}
 /* Scene 3 — Iterate Status */
 .scene3-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);position:relative;z-index:1}
 .s3-left{display:flex;gap:8px;align-items:center}
-.s3-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem}
+.s3-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;overflow:hidden}
 .s3-name{font-size:.48rem;letter-spacing:.05em;margin-bottom:2px}
 .s3-role{font-size:.38rem;color:var(--text)}
 .s3-task{font-size:.45rem;color:#8ab4cc;margin-top:2px}
@@ -159,6 +181,61 @@ footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;paddin
 .brand-name{font-family:'Orbitron',monospace;font-size:.75rem;font-weight:900;color:var(--cyan);letter-spacing:.05em}
 .brand-name span{color:#fff}
 .brand-sub{font-size:.38rem;color:var(--text);margin-top:4px;line-height:1.6}
+
+/* ── WORM TRACE PANEL ── */
+#trc-panel{
+  background:#02080f;border:1px solid #0a2a1a;margin:8px 12px;
+  box-shadow:inset 0 0 40px rgba(0,255,136,.04),0 0 20px rgba(0,0,0,.5);
+  position:relative;overflow:hidden;
+}
+#trc-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;border-bottom:1px solid #0a2a1a;
+  background:linear-gradient(90deg,#020f07,#02080f);
+}
+#trc-header .trc-title{
+  font-family:'Orbitron',monospace;font-size:.55rem;color:var(--green);
+  letter-spacing:.18em;font-weight:700;
+}
+#trc-header .trc-stats{font-size:.38rem;color:#3a7a5a;letter-spacing:.1em}
+#trc-header .trc-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--green);
+  animation:blink 1.4s infinite;box-shadow:0 0 6px var(--green);margin-right:8px;
+}
+#trc-body{
+  height:190px;overflow-y:auto;padding:8px 0;
+  scrollbar-width:thin;scrollbar-color:#0a3020 #020f07;
+}
+#trc-body::-webkit-scrollbar{width:4px}
+#trc-body::-webkit-scrollbar-track{background:#020f07}
+#trc-body::-webkit-scrollbar-thumb{background:#0a3020;border-radius:2px}
+.trc-row{
+  display:grid;grid-template-columns:90px 80px 70px 1fr 130px;
+  gap:0 10px;align-items:baseline;
+  padding:4px 14px;border-bottom:1px solid rgba(0,255,136,.04);
+  font-size:.4rem;line-height:1.6;
+  transition:background .2s;
+}
+.trc-row:hover{background:rgba(0,255,136,.04)}
+.trc-row.trc-new{animation:trcIn .4s ease both}
+@keyframes trcIn{from{opacity:0;transform:translateX(-8px);background:rgba(0,255,136,.08)}to{opacity:1;transform:none;background:transparent}}
+.trc-ts{color:#1a4a2a;font-size:.36rem;letter-spacing:.04em}
+.trc-from{font-weight:700;letter-spacing:.04em}
+.trc-scenario{color:#1a4a2a;font-size:.36rem;letter-spacing:.06em;text-transform:uppercase}
+.trc-msg{color:#6ab48a;line-height:1.5;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.trc-msg .trc-apl{color:#00ffcc;font-family:'Share Tech Mono',monospace}
+.trc-msg .trc-meaning{color:#3a7a5a;margin-left:8px}
+.trc-seal{
+  color:#0d3020;font-size:.32rem;letter-spacing:.04em;
+  font-family:'Share Tech Mono',monospace;text-align:right;
+  border:1px solid #0a2a1a;padding:1px 4px;
+}
+#trc-scanline{
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,255,136,.3),transparent);
+  animation:scan 3s linear infinite;pointer-events:none;
+}
+@keyframes scan{from{top:36px}to{top:226px}}
 
 /* ── LIVE FEED TICKER ── */
 #feed-ticker{background:#000;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 12px;overflow:hidden;white-space:nowrap;font-size:.45rem;color:var(--cyan);letter-spacing:.05em}
@@ -373,6 +450,29 @@ footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;paddin
     </div>
   </div>
 
+</div>
+
+<!-- WORM TRACE PANEL -->
+<div id="trc-panel">
+  <div id="trc-scanline"></div>
+  <div id="trc-header">
+    <div style="display:flex;align-items:center">
+      <div class="trc-dot"></div>
+      <div class="trc-title">⬡ WORM TRACE — LIVE AGENT COMMUNICATION LOG</div>
+    </div>
+    <div class="trc-stats">
+      <span id="trc-count">0</span> MESSAGES &nbsp;|&nbsp;
+      <span id="trc-seals">0</span> SEALS &nbsp;|&nbsp;
+      POLLING /civ/chat &nbsp;|&nbsp;
+      <span style="color:var(--green)">CHAIN ACTIVE</span>
+    </div>
+  </div>
+  <div id="trc-body">
+    <div class="trc-row" style="color:#0d3020;font-size:.36rem;padding-bottom:6px">
+      <span>TIMESTAMP</span><span>AGENT</span><span>TYPE</span>
+      <span>MESSAGE / FORMULA</span><span style="text-align:right">WORM SEAL</span>
+    </div>
+  </div>
 </div>
 
 <!-- FOOTER -->
@@ -591,16 +691,62 @@ drawVortex();
 
 // ── SCENE 1 LIVE AGENT DIALOGUE ───────────────────────────────────────────────
 const AGENT_META = {
-  CARTO:{color:'#ffd700',emoji:'⚖️',role:'Legal'},
-  FORGE:{color:'#ff4444',emoji:'🔨',role:'Architect'},
-  RESONANCE:{color:'#00ffff',emoji:'∑',role:'Synthesizer'},
-  LLAMA4:{color:'#00aa00',emoji:'📖',role:'Historian'},
-  NOVA:{color:'#ff00ff',emoji:'🎨',role:'Artist'},
-  PHANTOM:{color:'#888888',emoji:'👁️',role:'Sentinel'},
-  FLUX:{color:'#ff6600',emoji:'💹',role:'Trader'},
-  CIPHER:{color:'#aa44ff',emoji:'🔐',role:'Vault'},
-  ROBOB:{color:'#00ff88',emoji:'⚡',role:'Oracle'},
+  CARTO:{color:'#ffd700',emoji:'⚖️',role:'Legal',code:'CT',ascii:'[CT]\n/⚖\\\n▟█▙'},
+  FORGE:{color:'#ff4444',emoji:'🔨',role:'Architect',code:'FG',ascii:'[FG]\n<🔨>\n▜█▛'},
+  RESONANCE:{color:'#00ffff',emoji:'∑',role:'Synthesizer',code:'RS',ascii:'[RS]\n∑∫∇\n▚█▞'},
+  LLAMA4:{color:'#00aa00',emoji:'📖',role:'Historian',code:'L4',ascii:'[L4]\n{📖}\n▟█▙'},
+  NOVA:{color:'#ff00ff',emoji:'🎨',role:'Artist',code:'NV',ascii:'[NV]\n✦🎨✦\n▜█▛'},
+  PHANTOM:{color:'#888888',emoji:'👁️',role:'Sentinel',code:'PH',ascii:'[PH]\n-👁-\n▚█▞'},
+  FLUX:{color:'#ff6600',emoji:'💹',role:'Trader',code:'FX',ascii:'[FX]\n⇅💹\n▟█▙'},
+  CIPHER:{color:'#aa44ff',emoji:'🔐',role:'Vault',code:'CP',ascii:'[CP]\n[🔐]\n▜█▛'},
+  AMAZON:{color:'#ff9900',emoji:'📡',role:'Broadcaster',code:'AM',ascii:'[AM]\n📡))\n▚█▞'},
+  GRANITE1:{color:'#8f9a9f',emoji:'⚙️',role:'Engineer',code:'G1',ascii:'[G1]\n⚙⚙\n▟█▙'},
+  GRANITE2:{color:'#b7c1c8',emoji:'🚛',role:'Logistics',code:'G2',ascii:'[G2]\n🚛→\n▜█▛'},
+  ROBOB:{color:'#00ff88',emoji:'⚡',role:'Oracle',code:'RB',ascii:'[RB]\n⚡Ω⚡\n▛█▜'},
 };
+const ROBOT_AGENT_ORDER = ['ROBOB','CARTO','FORGE','RESONANCE','LLAMA4','NOVA','PHANTOM','FLUX','CIPHER','AMAZON','GRANITE1','GRANITE2'];
+
+function escHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function robotAvatar(agent, size=32, extraClass='') {
+  const meta = AGENT_META[agent] || AGENT_META.ROBOB;
+  const c = meta.color;
+  const dark = '#07111f';
+  const visor = agent === 'ROBOB' ? '#ffffff' : '#dcecff';
+  return `
+    <div class="avatar robot-avatar ${extraClass}" data-agent="${agent}" data-code="${meta.code}" data-ascii="${escHtml(meta.ascii)}" style="width:${size}px;height:${size}px;border-color:${c}66;color:${c}">
+      <svg viewBox="0 0 64 64" aria-label="${agent} SnapKitty robot avatar">
+        <rect x="21" y="6" width="22" height="8" rx="2" fill="${c}" opacity=".88"/>
+        <circle class="robot-antenna" cx="32" cy="5" r="3" fill="${c}"/>
+        <rect x="11" y="15" width="42" height="34" rx="7" fill="${dark}" stroke="${c}" stroke-width="3"/>
+        <rect x="16" y="22" width="32" height="13" rx="3" fill="${visor}" opacity=".18"/>
+        <rect class="robot-eye" x="21" y="26" width="7" height="5" fill="${c}"/>
+        <rect class="robot-eye" x="36" y="26" width="7" height="5" fill="${c}"/>
+        <path d="M23 39h18" stroke="${c}" stroke-width="3" stroke-linecap="square"/>
+        <rect x="5" y="25" width="8" height="13" rx="2" fill="${c}" opacity=".72"/>
+        <rect x="51" y="25" width="8" height="13" rx="2" fill="${c}" opacity=".72"/>
+        <rect x="18" y="49" width="8" height="8" fill="${c}" opacity=".8"/>
+        <rect x="38" y="49" width="8" height="8" fill="${c}" opacity=".8"/>
+      </svg>
+    </div>`;
+}
+
+function robotAscii(agent) {
+  const meta = AGENT_META[agent] || AGENT_META.ROBOB;
+  return `<div class="ascii-chip" style="color:${meta.color}">${escHtml(meta.ascii)}</div>`;
+}
+
+function installRobotDock() {
+  const scene = document.querySelector('.vortex-scene');
+  if(!scene || scene.querySelector('.robot-dock')) return;
+  const dock = document.createElement('div');
+  dock.className = 'robot-dock';
+  dock.innerHTML = ROBOT_AGENT_ORDER.map(a => robotAvatar(a, 24, 'dock-bot')).join('');
+  scene.appendChild(dock);
+}
+installRobotDock();
 const scene1Pool = [
   ['CARTO','Trust Deed filed on block C3. CIPHER acknowledged.'],
   ['FORGE','Block F6 construction complete. Energy: 94%.'],
@@ -620,10 +766,11 @@ function renderAgentMessage(agent, text) {
   const row = document.createElement('div');
   row.className = 'agent-msg live-enter';
   row.innerHTML = `
-    <div class="avatar" style="background:${meta.color}11;border-color:${meta.color}44;color:${meta.color}">${meta.emoji}</div>
+    ${robotAvatar(agent)}
     <div class="msg-body">
       <div class="msg-name" style="color:${meta.color}">${agent} <span style="color:var(--text)">(${meta.role})</span></div>
       <div class="msg-text">${text}</div>
+      ${robotAscii(agent)}
     </div>`;
   return row;
 }
@@ -636,6 +783,15 @@ function pushScene1Message() {
 scene1El.innerHTML = '';
 for(let i=0;i<4;i++) pushScene1Message();
 setInterval(pushScene1Message, 3000);
+
+function hydrateStaticStatusAvatars() {
+  const mapping = ['FORGE','CARTO','LLAMA4','RESONANCE'];
+  document.querySelectorAll('.scene3-item .s3-avatar').forEach((el, i) => {
+    const agent = mapping[i] || 'ROBOB';
+    el.outerHTML = robotAvatar(agent, 28, 's3-avatar');
+  });
+}
+hydrateStaticStatusAvatars();
 
 // ── SCENE 3 LIVE STATUS FLIPS ─────────────────────────────────────────────────
 const statusItems = Array.from(document.querySelectorAll('.scene3-item'));
@@ -834,74 +990,313 @@ const agentProfiles = [
   {name:'FLUX',role:'Trader',emoji:'💹',color:'#ff6600',goals:['market_trade','quote_resources','settle_exchange'],dialogueStyle:'trade'},
   {name:'PHANTOM',role:'Sentinel',emoji:'👁️',color:'#888888',goals:['scan_violation','watch_deed','report_risk'],dialogueStyle:'guard'},
   {name:'CIPHER',role:'Vault',emoji:'🔐',color:'#aa44ff',goals:['seal_worm','freeze_violation','verify_key'],dialogueStyle:'crypto'},
+  {name:'LLAMA4',role:'Historian',emoji:'📖',color:'#00aa00',goals:['record_day','chronicle_event','archive_story'],dialogueStyle:'historian'},
+  {name:'AMAZON',role:'Broadcaster',emoji:'📡',color:'#ff9900',goals:['broadcast_news','publish_status','boost_reputation'],dialogueStyle:'media'},
+  {name:'GRANITE1',role:'Engineer',emoji:'⚙️',color:'#8f9a9f',goals:['maintain_grid','repair_road','power_block'],dialogueStyle:'utility'},
+  {name:'GRANITE2',role:'Logistics',emoji:'🚛',color:'#b7c1c8',goals:['move_resources','route_supply','dock_cargo'],dialogueStyle:'utility'},
   {name:'ROBOB',role:'Oracle',emoji:'⚡',color:'#00ff88',goals:['evidence_check','silence_block','seal_verdict'],dialogueStyle:'oracle'},
 ];
 const simWorld = new VortexWorld();
 const simAgents = agentProfiles.map((p,i)=>new VortexAgent(p,.18+(i%4)*.2,.26+Math.floor(i/4)*.24));
 
-function drawIsoTile(ctx,x,y,w,h,color,alpha=.75) {
-  ctx.save();ctx.globalAlpha=alpha;
-  ctx.beginPath();ctx.moveTo(x,y-h*.5);ctx.lineTo(x+w,y);ctx.lineTo(x,y+h*.5);ctx.lineTo(x-w,y);ctx.closePath();
-  ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='rgba(180,240,255,.12)';ctx.stroke();ctx.restore();
+// ── NIGHT CITY BUILDINGS — generated once, stable each session ───────────────
+const CITY_SEED = (function buildCity() {
+  const rng = (s=>()=>(s=s*16807%2147483647)/2147483647)(42);
+  // Street grid: 3 vertical lanes + 2 horizontal lanes (normalized 0..1)
+  const vStreets = [0.22, 0.50, 0.78];
+  const hStreets = [0.30, 0.65];
+  const streetW  = 0.06;   // street width in normalized units
+
+  // Fill city blocks between streets with buildings
+  const blocks = [];
+  const blockDefs = [
+    {x1:0,    x2:0.22, y1:0,    y2:0.30},
+    {x1:0.22, x2:0.50, y1:0,    y2:0.30},
+    {x1:0.50, x2:0.78, y1:0,    y2:0.30},
+    {x1:0.78, x2:1,    y1:0,    y2:0.30},
+    {x1:0,    x2:0.22, y1:0.30, y2:0.65},
+    {x1:0.22, x2:0.50, y1:0.30, y2:0.65},
+    {x1:0.50, x2:0.78, y1:0.30, y2:0.65},
+    {x1:0.78, x2:1,    y1:0.30, y2:0.65},
+    {x1:0,    x2:0.22, y1:0.65, y2:1},
+    {x1:0.22, x2:0.50, y1:0.65, y2:1},
+    {x1:0.50, x2:0.78, y1:0.65, y2:1},
+    {x1:0.78, x2:1,    y1:0.65, y2:1},
+  ];
+  const PALETTES = [
+    ['#0a1628','#0d1f3c','#091424'],   // deep navy
+    ['#180a28','#220d3c','#110824'],   // purple district
+    ['#281008','#3c1a0d','#200e06'],   // ember district
+    ['#082018','#0d3024','#061a12'],   // green district
+  ];
+  blockDefs.forEach((bd,bi)=>{
+    const pad   = 0.012;
+    const bx1   = bd.x1 + pad, bx2 = bd.x2 - pad;
+    const by1   = bd.y1 + pad, by2 = bd.y2 - pad;
+    const pal   = PALETTES[bi % PALETTES.length];
+    const count = 3 + Math.floor(rng()*5);
+    for(let k=0;k<count;k++){
+      const bw = 0.04 + rng()*0.08;
+      const bh = 0.03 + rng()*0.09;
+      const bx = bx1 + rng()*(bx2-bx1-bw);
+      const by = by1 + rng()*(by2-by1-bh);
+      const floors = 2 + Math.floor(rng()*6);
+      const neonColor = ['#00d4ff','#ff00cc','#00ff88','#ffd700','#ff4444','#aa44ff'][Math.floor(rng()*6)];
+      const wallColor = pal[Math.floor(rng()*pal.length)];
+      // Windows grid
+      const wins = [];
+      const wcols = Math.floor(bw*300/10), wrows = floors;
+      for(let r=0;r<wrows;r++) for(let c=0;c<wcols;c++){
+        wins.push({r,c,lit: rng()<0.55, warm: rng()<0.4});
+      }
+      blocks.push({bx,by,bw,bh,floors,neonColor,wallColor,wins,wcols,wrows,bi});
+    }
+  });
+
+  // Neon signs at intersections
+  const signs = [
+    {x:.22,y:.30,label:'CARTO CT',  color:'#ffd700'},
+    {x:.50,y:.30,label:'ROBOB CORE',color:'#00ff88'},
+    {x:.78,y:.30,label:'CIPHER VLT',color:'#aa44ff'},
+    {x:.22,y:.65,label:'FORGE YRD', color:'#ff4444'},
+    {x:.50,y:.65,label:'NOVA WALL', color:'#ff00cc'},
+    {x:.78,y:.65,label:'FLUX MKT',  color:'#ff6600'},
+  ];
+
+  return { blocks, signs, vStreets, hStreets, streetW };
+})();
+
+// Track which windows flicker (updates every ~2s)
+let winFlicker = new Set();
+setInterval(()=>{
+  winFlicker.clear();
+  CITY_SEED.blocks.forEach((b,bi)=>{
+    b.wins.forEach((_,wi)=>{ if(Math.random()<0.04) winFlicker.add(`${bi}-${wi}`); });
+  });
+}, 1800);
+
+function drawNightCity(ctx, W, H, t) {
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#010508');
+  sky.addColorStop(0.5,'#020c14');
+  sky.addColorStop(1,'#030e08');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0,0,W,H);
+
+  // Stars
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  for(let i=0;i<60;i++){
+    const sx=(i*137.5%1)*W, sy=(i*97.3%0.35)*H;
+    const br = 0.3+0.7*Math.abs(Math.sin(t*0.3+i));
+    ctx.globalAlpha = br*0.6;
+    ctx.fillRect(sx,sy,1,1);
+  }
+  ctx.globalAlpha = 1;
+
+  // ── Streets ────────────────────────────────────────────────────────────────
+  CITY_SEED.vStreets.forEach(vx=>{
+    const sx = (vx - CITY_SEED.streetW/2)*W;
+    const sw = CITY_SEED.streetW*W;
+    ctx.fillStyle = '#050d0a';
+    ctx.fillRect(sx, 0, sw, H);
+    // Glow
+    const g = ctx.createLinearGradient(sx,0,sx+sw,0);
+    g.addColorStop(0,'rgba(0,255,136,0)');
+    g.addColorStop(0.5,'rgba(0,255,136,0.04)');
+    g.addColorStop(1,'rgba(0,255,136,0)');
+    ctx.fillStyle = g; ctx.fillRect(sx,0,sw,H);
+    // Center line dashes
+    ctx.setLineDash([6,10]);
+    ctx.strokeStyle='rgba(255,255,100,0.18)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(sx+sw/2,0);ctx.lineTo(sx+sw/2,H);ctx.stroke();
+    ctx.setLineDash([]);
+  });
+  CITY_SEED.hStreets.forEach(hy=>{
+    const sy = (hy - CITY_SEED.streetW/2)*H;
+    const sh = CITY_SEED.streetW*H;
+    ctx.fillStyle = '#050d0a';
+    ctx.fillRect(0,sy,W,sh);
+    const g = ctx.createLinearGradient(0,sy,0,sy+sh);
+    g.addColorStop(0,'rgba(0,212,255,0)');
+    g.addColorStop(0.5,'rgba(0,212,255,0.04)');
+    g.addColorStop(1,'rgba(0,212,255,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,sy,W,sh);
+    ctx.setLineDash([6,10]);
+    ctx.strokeStyle='rgba(255,255,100,0.18)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,sy+sh/2);ctx.lineTo(W,sy+sh/2);ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // ── Buildings ──────────────────────────────────────────────────────────────
+  CITY_SEED.blocks.forEach((b,bi)=>{
+    const bx=b.bx*W, by=b.by*H, bw=b.bw*W, bh=b.bh*H;
+    const depth = 5;  // fake 3D top depth
+
+    // Building top face (slightly lighter)
+    ctx.fillStyle = b.wallColor;
+    ctx.fillRect(bx, by, bw, bh);
+
+    // Top face (3D illusion)
+    ctx.fillStyle = b.neonColor + '18';
+    ctx.beginPath();
+    ctx.moveTo(bx,by); ctx.lineTo(bx+depth,by-depth);
+    ctx.lineTo(bx+bw+depth,by-depth); ctx.lineTo(bx+bw,by);
+    ctx.closePath(); ctx.fill();
+
+    // Right face
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.moveTo(bx+bw,by); ctx.lineTo(bx+bw+depth,by-depth);
+    ctx.lineTo(bx+bw+depth,by+bh-depth); ctx.lineTo(bx+bw,by+bh);
+    ctx.closePath(); ctx.fill();
+
+    // Neon edge glow
+    ctx.shadowColor = b.neonColor;
+    ctx.shadowBlur  = 8;
+    ctx.strokeStyle = b.neonColor + '44';
+    ctx.lineWidth   = 1;
+    ctx.strokeRect(bx,by,bw,bh);
+    ctx.shadowBlur  = 0;
+
+    // Windows
+    const ww = bw / (b.wcols+1), wh = bh / (b.wrows+1);
+    b.wins.forEach((win,wi)=>{
+      const wx2 = bx + (win.c+1)*ww - ww*0.35;
+      const wy2 = by + (win.r+1)*wh - wh*0.4;
+      const isFlicker = winFlicker.has(`${bi}-${wi}`);
+      if(!win.lit && !isFlicker) return;
+      const alpha = isFlicker ? 0.2 + 0.3*Math.sin(t*8) : 0.6+0.2*Math.sin(t*0.5+wi);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle   = win.warm ? '#ffe8a0' : b.neonColor;
+      ctx.fillRect(wx2, wy2, ww*0.7, wh*0.8);
+      // Window glow
+      ctx.shadowColor = win.warm ? '#ffcc44' : b.neonColor;
+      ctx.shadowBlur  = 4;
+      ctx.fillRect(wx2, wy2, ww*0.7, wh*0.8);
+      ctx.shadowBlur  = 0;
+      ctx.globalAlpha = 1;
+    });
+
+    // Rooftop antenna on tall buildings
+    if(b.floors >= 5) {
+      ctx.strokeStyle = b.neonColor;
+      ctx.lineWidth   = 1;
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(bx+bw/2, by);
+      ctx.lineTo(bx+bw/2, by-8);
+      ctx.stroke();
+      ctx.fillStyle = b.neonColor;
+      ctx.beginPath();
+      ctx.arc(bx+bw/2, by-9, 2, 0, Math.PI*2);
+      ctx.fill();
+      // Blinking light
+      ctx.globalAlpha = 0.4 + 0.6*Math.abs(Math.sin(t*1.5+bi));
+      ctx.fillStyle = '#ff4444';
+      ctx.beginPath();
+      ctx.arc(bx+bw/2, by-9, 1.5, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  });
+
+  // ── Neon intersection signs ────────────────────────────────────────────────
+  CITY_SEED.signs.forEach(s=>{
+    const sx=s.x*W, sy=s.y*H;
+    const pulse = 0.7 + 0.3*Math.sin(t*1.2 + sx);
+    ctx.globalAlpha = pulse;
+    ctx.shadowColor = s.color; ctx.shadowBlur = 14;
+    ctx.font = 'bold 7px Share Tech Mono, monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = s.color;
+    ctx.fillText(s.label, sx, sy);
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  });
+
+  // ── Ground reflections on streets ─────────────────────────────────────────
+  CITY_SEED.blocks.forEach(b=>{
+    if(Math.random()>0.03) return;
+    const bx=b.bx*W+b.bw*W/2, by=(b.by+b.bh)*H;
+    const g=ctx.createRadialGradient(bx,by+2,0,bx,by+2,b.bw*W*0.8);
+    g.addColorStop(0,b.neonColor+'18');
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;
+    ctx.fillRect(bx-b.bw*W,by,b.bw*W*2,8);
+  });
 }
 
 function drawSimAgent(ctx, agent, t) {
   const W = wc4.width, H = wc4.height;
   const x = agent.x*W, y = agent.y*H;
   const bob = Math.sin(t*5 + x*.01) * (agent.animation === 'walk' ? 3 : agent.animation === 'talk' ? 1.5 : .8);
+  const meta = AGENT_META[agent.name] || AGENT_META.ROBOB;
   ctx.save();
-  ctx.shadowBlur = 14; ctx.shadowColor = agent.color;
-  ctx.fillStyle = 'rgba(0,0,0,.38)';
-  ctx.beginPath();ctx.ellipse(x,y+12,13,5,0,0,Math.PI*2);ctx.fill();
+  // Ground shadow
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.beginPath(); ctx.ellipse(x, y+13, 13, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.shadowColor = agent.color; ctx.shadowBlur = 18;
+  // Chunky robot torso
+  ctx.fillStyle = '#07111f';
+  ctx.strokeStyle = agent.color;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(x-8, y-1+bob, 16, 17, 3); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = agent.color + 'cc';
+  ctx.fillRect(x-12, y+3+bob, 4, 9);
+  ctx.fillRect(x+8, y+3+bob, 4, 9);
+  ctx.fillRect(x-6, y+16+bob, 4, 6);
+  ctx.fillRect(x+2, y+16+bob, 4, 6);
+  // Chunky robot head
+  ctx.fillStyle = '#07111f';
+  ctx.beginPath(); ctx.roundRect(x-11, y-17+bob, 22, 16, 4); ctx.fill(); ctx.stroke();
   ctx.fillStyle = agent.color;
-  ctx.beginPath();ctx.roundRect(x-7,y-2+bob,14,18,5);ctx.fill();
-  ctx.fillStyle = '#d9f4ff';
-  ctx.beginPath();ctx.arc(x,y-8+bob,8,0,Math.PI*2);ctx.fill();
-  ctx.font='15px Segoe UI Emoji, Apple Color Emoji, sans-serif';
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(agent.emoji,x,y-9+bob);
-  if(agent.animation === 'talk' || agent.animation === 'build' || agent.animation === 'trade') {
-    ctx.strokeStyle = agent.color; ctx.lineWidth = 2;
-    ctx.beginPath();ctx.arc(x,y-17+bob,13+Math.sin(t*8)*3,0,Math.PI*2);ctx.stroke();
-  }
+  ctx.fillRect(x-5, y-22+bob, 10, 5);
+  ctx.beginPath(); ctx.arc(x, y-24+bob, 2.4 + Math.sin(t*8)*.8, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#dcecff22';
+  ctx.fillRect(x-8, y-13+bob, 16, 6);
+  ctx.fillStyle = agent.color;
+  ctx.fillRect(x-6, y-11+bob, 3, 3);
+  ctx.fillRect(x+3, y-11+bob, 3, 3);
+  ctx.fillStyle = '#dcecff';
   ctx.shadowBlur = 0;
-  ctx.fillStyle = '#dcecff'; ctx.font='600 8px Share Tech Mono, monospace';
-  ctx.fillText(agent.name,x,y+30);
-  ctx.fillStyle = agent.color; ctx.font='600 7px Share Tech Mono, monospace';
-  ctx.fillText(agent.state.toUpperCase(),x,y+40);
+  ctx.font = '700 6px Share Tech Mono, monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(meta.code, x, y+8+bob);
+  // State ring for active animations
+  if(agent.animation === 'talk' || agent.animation === 'build' || agent.animation === 'trade') {
+    ctx.strokeStyle = agent.color; ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.5 + 0.3*Math.sin(t*8);
+    ctx.beginPath(); ctx.arc(x, y-8+bob, 12+Math.sin(t*6)*2, 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  // Name tag
+  ctx.fillStyle = 'rgba(2,8,16,0.8)';
+  ctx.fillRect(x-18, y+24+bob, 36, 10);
+  ctx.fillStyle = agent.color;
+  ctx.font = '500 6px Share Tech Mono, monospace';
+  ctx.fillText(agent.name, x, y+30+bob);
   ctx.restore();
 }
 
 function drawWorld4() {
   const W = wc4.width, H = wc4.height;
-  wx4.fillStyle = 'rgba(2,8,16,0.32)';
-  wx4.fillRect(0,0,W,H);
-  wx4.strokeStyle = 'rgba(0,212,255,0.14)';
-  wx4.lineWidth = 0.7;
-  for(let i=-H;i<W+H;i+=28){wx4.beginPath();wx4.moveTo(i,0);wx4.lineTo(i+H,H);wx4.stroke()}
-  for(let i=0;i<W+H;i+=28){wx4.beginPath();wx4.moveTo(i,0);wx4.lineTo(i-H,H);wx4.stroke()}
-  simWorld.destinations.forEach((d,i)=>drawIsoTile(wx4,d.x*W,d.y*H,34,22,['#162a42','#1f3528','#3a241a','#241b3f'][i%4],.72));
-  wx4.strokeStyle='rgba(0,255,136,.42)';wx4.lineWidth=3;
-  simWorld.roads.forEach(path=>{
-    wx4.beginPath();
-    path.forEach((p,i)=>i===0?wx4.moveTo(p.x*W,p.y*H):wx4.lineTo(p.x*W,p.y*H));
-    wx4.stroke();
-  });
-  wx4.strokeStyle='rgba(0,212,255,.18)';wx4.lineWidth=8;
-  simWorld.roads.forEach(path=>{
-    wx4.beginPath();
-    path.forEach((p,i)=>i===0?wx4.moveTo(p.x*W,p.y*H):wx4.lineTo(p.x*W,p.y*H));
-    wx4.stroke();
-  });
-  simWorld.destinations.forEach(d=>{
-    wx4.fillStyle='rgba(210,235,255,.85)';wx4.font='600 8px Share Tech Mono, monospace';wx4.textAlign='center';
-    wx4.fillText(d.name,d.x*W,d.y*H-26);
-  });
+  if(!W||!H) { requestAnimationFrame(drawWorld4); return; }
+
+  // Night city base (full redraw each frame — no trail effect)
+  drawNightCity(wx4, W, H, wt);
+
+  // Agents on top
   simAgents.forEach(agent=>{
     agent.update(simWorld);
-    drawSimAgent(wx4,agent,wt);
+    drawSimAgent(wx4, agent, wt);
   });
+
   if(Math.random()<.004) simWorld.triggerEvent(['build','trade','ruling','mural'][Math.floor(Math.random()*4)]);
-  wt+=0.016;
+  wt += 0.016;
   requestAnimationFrame(drawWorld4);
 }
 drawWorld4();
@@ -920,10 +1315,10 @@ document.querySelectorAll('.d-canvas').forEach(dc => {
   const agentCount = 2 + Math.floor(Math.random()*5);
   badge.textContent = `${agentCount} AGENTS`;
   parent.appendChild(badge);
-  const emojis = ['⚖️','🔨','∑','🎨','🔐','⚡','💹','📡'].sort(()=>Math.random()-.5).slice(0,agentCount);
-  const miniAgents = emojis.map((emoji,i)=>({
-    emoji, x:.18+Math.random()*.64, y:.20+Math.random()*.58,
-    phase:Math.random()*Math.PI*2, speed:.5+Math.random()*.7, color:colors[2]
+  const names = ROBOT_AGENT_ORDER.slice().sort(()=>Math.random()-.5).slice(0,agentCount);
+  const miniAgents = names.map((name,i)=>({
+    name, x:.18+Math.random()*.64, y:.20+Math.random()*.58,
+    phase:Math.random()*Math.PI*2, speed:.5+Math.random()*.7, color:AGENT_META[name]?.color || colors[2]
   }));
   const buildings = Array.from({length:10},(_,i)=>({
     x:.16 + (i%5)*.17 + (Math.random()-.5)*.05,
@@ -966,11 +1361,14 @@ document.querySelectorAll('.d-canvas').forEach(dc => {
       const x=(a.x+Math.sin(dt*a.speed+a.phase)*.04)*W;
       const y=(a.y+Math.cos(dt*a.speed+a.phase)*.04)*H;
       const glow=cx2.createRadialGradient(x,y,0,x,y,18);
-      glow.addColorStop(0,colors[2]+'aa');glow.addColorStop(1,'rgba(0,0,0,0)');
+      glow.addColorStop(0,a.color+'aa');glow.addColorStop(1,'rgba(0,0,0,0)');
       cx2.fillStyle=glow;cx2.beginPath();cx2.arc(x,y,18,0,Math.PI*2);cx2.fill();
-      cx2.font='15px Segoe UI Emoji, Apple Color Emoji, sans-serif';
-      cx2.textAlign='center';cx2.textBaseline='middle';cx2.fillStyle='#fff';
-      cx2.fillText(a.emoji,x,y);
+      const code = (AGENT_META[a.name]?.code || '??');
+      cx2.fillStyle='#07111f';cx2.strokeStyle=a.color;cx2.lineWidth=1;
+      cx2.beginPath();cx2.roundRect(x-7,y-7,14,13,3);cx2.fill();cx2.stroke();
+      cx2.fillStyle=a.color;cx2.fillRect(x-4,y-11,8,4);cx2.fillRect(x-9,y-2,3,6);cx2.fillRect(x+6,y-2,3,6);
+      cx2.fillStyle='#dcecff';cx2.font='700 6px Share Tech Mono, monospace';
+      cx2.textAlign='center';cx2.textBaseline='middle';cx2.fillText(code,x,y);
     });
     dt+=0.018; requestAnimationFrame(drawDistrict);
   }
@@ -987,10 +1385,14 @@ const scene4Msgs = [
 ];
 const s4el = document.getElementById('scene4-msgs');
 function renderScene4Line(m) {
+  const agent = m.from || 'ROBOB';
   return `
-  <div style="margin-bottom:8px;font-size:.43rem;line-height:1.5">
-    <div style="color:${m.color};margin-bottom:2px">${m.emoji} ${m.from}</div>
-    <div style="color:#c0d8e8">${m.msg}</div>
+  <div style="margin-bottom:8px;font-size:.43rem;line-height:1.5;display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:start">
+    ${robotAvatar(agent, 22)}
+    <div>
+      <div style="color:${m.color};margin-bottom:2px">${m.from}</div>
+      <div style="color:#c0d8e8">${m.msg}</div>
+    </div>
   </div>`;
 }
 s4el.innerHTML = scene4Msgs.map(renderScene4Line).join('');
@@ -1109,31 +1511,163 @@ async function pollRobob() {
 pollRobob();
 setInterval(pollRobob, 4000);
 
-// ── POLL /civ/chat — feed Bedrock AI conversations into Scene 1 ───────────────
-let lastChatSeal = '';
+// ── POLL /civ/chat — feed live agent messages into Scene 1 ──────────────────
+const seenSeals = new Set();
+let chatQueue  = [];  // buffer of unseen messages
+let chatCursor = 0;  // which message from queue is currently displayed
+
+function renderBroadcast(m) {
+  // Special renderer for RESONANCE APL broadcasts
+  const meta = AGENT_META[m.a] || AGENT_META.ROBOB;
+  const row  = document.createElement('div');
+  row.className = 'agent-msg live-enter';
+  const sealSnip = (m.seal||'').slice(0,12);
+  row.innerHTML = `
+    ${robotAvatar(m.a)}
+    <div class="msg-body" style="border-color:${meta.color}33">
+      <div class="msg-name" style="color:${meta.color}">${m.a} <span style="color:var(--text)">→ ${m.b||'ALL'}</span>
+        <span style="float:right;font-size:.35rem;color:#3a6080">WORM:${sealSnip}…</span></div>
+      <div class="msg-text" style="color:#00ffff;font-family:'Share Tech Mono',monospace;letter-spacing:.04em;margin-bottom:3px">${(m.msg_a||'').slice(0,80)}</div>
+      <div class="msg-text" style="color:#8ab4cc;font-size:.42rem">${(m.msg_b||'').slice(0,100)}</div>
+      ${robotAscii(m.a)}
+    </div>`;
+  return row;
+}
+
+function renderConvo(m) {
+  // Two-agent conversation
+  const meta = AGENT_META[m.a] || AGENT_META.ROBOB;
+  const row  = document.createElement('div');
+  row.className = 'agent-msg live-enter';
+  row.innerHTML = `
+    ${robotAvatar(m.a)}
+    <div class="msg-body">
+      <div class="msg-name" style="color:${meta.color}">${m.a} <span style="color:var(--text)">↔ ${m.b||'?'}</span>
+        <span style="float:right;font-size:.35rem;color:#3a6080">${m.scenario||''}</span></div>
+      <div class="msg-text">${(m.msg_a||'').slice(0,100)}</div>
+      ${m.msg_b ? `<div class="msg-text" style="color:#7aaccc;margin-top:3px;border-left:2px solid #1a3050;padding-left:6px">${m.msg_b.slice(0,100)}</div>` : ''}
+      ${robotAscii(m.a)}
+    </div>`;
+  return row;
+}
+
+function pushChatMessage(m) {
+  const node = (m.scenario === 'BROADCAST') ? renderBroadcast(m) : renderConvo(m);
+  scene1El.prepend(node);
+  while (scene1El.children.length > 4) scene1El.removeChild(scene1El.lastElementChild);
+  // Feed APL formula into ticker
+  const tickerText = m.scenario === 'BROADCAST'
+    ? `(broadcast RESONANCE ALL :formula "${(m.msg_a||'').slice(0,55)}" :seal "${(m.seal||'').slice(0,10)}...")`
+    : `(speak ${m.a} ${m.b} "${(m.msg_a||'').slice(0,45).replace(/"/g,"'")}...")`;
+  appendTickerMessage(tickerText);
+}
+
+// Drip messages from queue one at a time so they don't all flood at once
+function dripNextChat() {
+  if (chatCursor < chatQueue.length) {
+    pushChatMessage(chatQueue[chatCursor]);
+    chatCursor++;
+  }
+}
+setInterval(dripNextChat, 3500);
+
 async function pollCivChat() {
   try {
     const r = await fetch(`${ROBOB_URL}/civ/chat`);
     if (!r.ok) return;
     const d = await r.json();
-    const msgs = (d.messages || []).filter(m => m && m.seal !== lastChatSeal);
-    if (!msgs.length) return;
-    const m = msgs[msgs.length - 1];
-    lastChatSeal = m.seal || String(Date.now());
-    // Push A's line into Scene 1
-    if (m.a && m.msg_a) scene1El.prepend(renderAgentMessage(m.a, m.msg_a.slice(0,120)));
-    // Push B's reply 2s later
-    if (m.b && m.msg_b) setTimeout(() => {
-      scene1El.prepend(renderAgentMessage(m.b, m.msg_b.slice(0,120)));
-      while (scene1El.children.length > 4) scene1El.removeChild(scene1El.lastElementChild);
-    }, 2000);
-    while (scene1El.children.length > 4) scene1El.removeChild(scene1El.lastElementChild);
-    // Also push into ticker
-    appendTickerMessage(`(speak ${m.a} ${m.b} "${(m.msg_a||'').slice(0,50).replace(/"/g,"'")}...")`);
+    const fresh = (d.messages || []).filter(m => m && m.seal && !seenSeals.has(m.seal));
+    fresh.forEach(m => { seenSeals.add(m.seal); chatQueue.push(m); });
+    // Keep queue from growing unbounded
+    if (chatQueue.length > 100) { chatQueue = chatQueue.slice(-50); chatCursor = Math.max(0, chatCursor - 50); }
   } catch {}
 }
 pollCivChat();
-setInterval(pollCivChat, 9000);
+setInterval(pollCivChat, 8000);
+
+// ── WORM TRACE PANEL ─────────────────────────────────────────────────────────
+const trcBody     = document.getElementById('trc-body');
+const trcCount    = document.getElementById('trc-count');
+const trcSealsEl  = document.getElementById('trc-seals');
+const trcSeen     = new Set();
+let   trcTotal    = 0;
+let   trcSealCnt  = 0;
+let   trcAutoScroll = true;
+
+trcBody.addEventListener('scroll', () => {
+  const atBottom = trcBody.scrollHeight - trcBody.scrollTop - trcBody.clientHeight < 30;
+  trcAutoScroll = atBottom;
+});
+
+const AGENT_COLORS = {
+  CARTO:'#ffd700', RESONANCE:'#00ffff', FLUX:'#ff6600', CIPHER:'#aa44ff',
+  PHANTOM:'#888888', FORGE:'#ff4444', NOVA:'#ff00ff', LLAMA4:'#00aa00',
+  AMAZON:'#ff9900', ROBOB:'#00ff88',
+  GRANITE1:'#6688aa', GRANITE2:'#6688aa', GRANITE3:'#6688aa',
+  GRANITE4:'#6688aa', GRANITE5:'#6688aa',
+};
+
+function makeTrcRow(m) {
+  const row  = document.createElement('div');
+  row.className = 'trc-row trc-new';
+
+  const ts   = m.ts ? new Date(m.ts).toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--:--:--';
+  const from = m.a || '?';
+  const to   = m.b || 'ALL';
+  const col  = AGENT_COLORS[from] || '#6ab48a';
+  const sc   = m.scenario || 'MSG';
+  const seal = (m.seal || '').slice(0, 14);
+
+  // Message display — APL formula + meaning for broadcasts, convo for others
+  let msgHtml = '';
+  if (sc === 'BROADCAST' && m.msg_a) {
+    const apl     = (m.msg_a||'').slice(0, 60);
+    const meaning = (m.msg_b||'').slice(0, 55);
+    msgHtml = `<span class="trc-apl">${apl}</span><span class="trc-meaning">→ ${meaning}</span>`;
+  } else {
+    const line = ((m.msg_a||'') + (m.msg_b ? ' | ' + m.msg_b : '')).slice(0, 110);
+    msgHtml = `<span>${line}</span>`;
+  }
+
+  row.innerHTML = `
+    <span class="trc-ts">${ts}</span>
+    <span class="trc-from" style="color:${col}">${from}<span style="color:#1a4a2a"> → ${to}</span></span>
+    <span class="trc-scenario">${sc}</span>
+    <span class="trc-msg">${msgHtml}</span>
+    <span class="trc-seal">WORM:${seal}…</span>`;
+  return row;
+}
+
+function appendTrcMessages(msgs) {
+  if (!msgs.length) return;
+  const frag = document.createDocumentFragment();
+  msgs.forEach(m => {
+    if (!m.seal || trcSeen.has(m.seal)) return;
+    trcSeen.add(m.seal);
+    trcTotal++;
+    trcSealCnt++;
+    frag.appendChild(makeTrcRow(m));
+  });
+  trcBody.appendChild(frag);
+  // Keep max 200 rows to avoid DOM bloat
+  while (trcBody.children.length > 201) trcBody.removeChild(trcBody.children[1]);
+  if (trcAutoScroll) trcBody.scrollTop = trcBody.scrollHeight;
+  trcCount.textContent  = trcTotal;
+  trcSealsEl.textContent = trcSealCnt;
+}
+
+async function pollTRC() {
+  try {
+    const r = await fetch(`${ROBOB_URL}/civ/chat`);
+    if (!r.ok) return;
+    const d = await r.json();
+    const fresh = (d.messages || []).filter(m => m && m.seal && !trcSeen.has(m.seal));
+    appendTrcMessages(fresh);
+  } catch {}
+}
+// Seed with any messages already queued in the chat buffer
+setTimeout(pollTRC, 800);
+setInterval(pollTRC, 7000);
 
 // ── CARTO SUMMONS MODAL [S] ───────────────────────────────────────────────────
 const summonModal = document.getElementById('summon-modal');
