@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Seems Disengaged — The Case Note That Trained the Machine</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#ffffff;
+  color:#1a1a2e;
+  font-family:'Georgia', serif;
+  max-width:740px;
+  margin:0 auto;
+  padding:48px 32px 80px;
+  line-height:1.8;
+}
+
+.pub-header {
+  border-bottom:1px solid #e8e8e8;
+  padding-bottom:24px;
+  margin-bottom:36px;
+}
+.pub-label {
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#8a8a9a;
+  margin-bottom:8px;
+  font-family:'Courier New',monospace;
+}
+.pub-title {
+  font-size:clamp(26px,4vw,42px);
+  font-weight:700;
+  color:#0a0a1a;
+  line-height:1.2;
+  margin-bottom:14px;
+}
+.pub-sub {
+  font-size:17px;
+  color:#505070;
+  font-style:italic;
+  margin-bottom:20px;
+  line-height:1.5;
+}
+.pub-meta {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:12px;
+  color:#8a8a9a;
+  font-family:'Courier New',monospace;
+}
+.pub-meta .entity { color:#0a0a1a; font-weight:700; letter-spacing:.05em; }
+
+h2 {
+  font-size:22px;
+  color:#0a0a1a;
+  margin:44px 0 14px;
+  font-weight:700;
+}
+p { font-size:17px; color:#2a2a3a; margin-bottom:20px; }
+
+.lead {
+  font-size:20px;
+  color:#0a0a1a;
+  font-style:italic;
+  margin-bottom:28px;
+  padding-left:20px;
+  border-left:4px solid #8b0000;
+  line-height:1.6;
+}
+
+.pull-quote {
+  font-size:22px;
+  font-style:italic;
+  color:#0a0a1a;
+  text-align:center;
+  padding:32px 40px;
+  margin:36px 0;
+  border-top:2px solid #8b0000;
+  border-bottom:2px solid #8b0000;
+  line-height:1.5;
+}
+
+.case-note {
+  background:#0a0a0a;
+  color:#ff4444;
+  font-family:'Courier New', monospace;
+  font-size:15px;
+  padding:28px 32px;
+  border-radius:4px;
+  margin:28px 0;
+  line-height:2;
+  border-left:4px solid #8b0000;
+}
+.case-note .field { color:#888; font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+.case-note .value { color:#ff6b6b; }
+.case-note .label { color:#ff0000; font-weight:700; }
+
+.data-block {
+  background:#f8f7f0;
+  border:1px solid #e0d8b0;
+  border-left:4px solid #8b0000;
+  padding:20px 24px;
+  margin:28px 0;
+  border-radius:0 4px 4px 0;
+  font-family:'Courier New', monospace;
+  font-size:13px;
+  line-height:2;
+  color:#2a2a1a;
+}
+
+.pipeline {
+  background:#06060a;
+  color:#00ff88;
+  font-family:'Courier New', monospace;
+  font-size:13px;
+  padding:24px 28px;
+  margin:28px 0;
+  line-height:2.2;
+  border-radius:4px;
+}
+.pipeline .arrow { color:#888; }
+.pipeline .node { color:#00d4cc; }
+.pipeline .extract { color:#ff4444; }
+.pipeline .label-line { color:#b8860b; font-size:11px; letter-spacing:.08em; }
+
+.testimony {
+  background:#fff8f8;
+  border:1px solid #ffd0d0;
+  border-left:4px solid #8b0000;
+  padding:24px 28px;
+  margin:32px 0;
+  font-style:italic;
+  color:#3a1a1a;
+  font-size:16px;
+  line-height:1.8;
+}
+
+.worm-seal {
+  background:#06060a;
+  color:#8b0000;
+  font-family:'Courier New', monospace;
+  font-size:10px;
+  padding:8px 16px;
+  margin:28px 0;
+  opacity:.8;
+  letter-spacing:.08em;
+}
+
+.verdict {
+  background:#0a0a0a;
+  color:#ffffff;
+  padding:32px 36px;
+  margin:36px 0;
+  border-radius:4px;
+  font-size:16px;
+  line-height:1.9;
+}
+.verdict strong { color:#ff4444; }
+.verdict .v-line { color:#888; font-family:'Courier New',monospace; font-size:13px; }
+
+hr { border:none; border-top:1px solid #e8e8e8; margin:36px 0; }
+
+.article-footer {
+  border-top:1px solid #e8e8e8;
+  padding-top:28px;
+  margin-top:48px;
+  font-size:13px;
+  color:#8a8a9a;
+  font-family:'Courier New', monospace;
+  line-height:2.2;
+}
+.article-footer strong { color:#0a0a1a; }
+</style>
+</head>
+<body>
+
+<div class="pub-header">
+  <div class="pub-label">Bel Esprit D'Accord Trust · Sovereign Intelligence · Public Record</div>
+  <h1 class="pub-title">"Seems Disengaged"</h1>
+  <div class="pub-sub">
+    The Salesforce case note that became training data. The reentry program that became a surveillance pipeline.
+    The AI that learned to predict the people it was built to control.
+    ProPublica found COMPAS in 2016. Here is what came after.
+  </div>
+  <div class="pub-meta">
+    <span class="entity">Bel Esprit D'Accord Trust</span>
+    <span>·</span>
+    <span>SnapKitty Collective</span>
+    <span>·</span>
+    <span>June 2026</span>
+  </div>
+</div>
+
+<div class="lead">
+  In 2016 ProPublica published "Machine Bias." They found that COMPAS — an AI risk assessment tool
+  used in criminal sentencing across America — flagged Black defendants as high risk at twice the rate
+  of white defendants for the same offense profile. The tool's creator said the algorithm was fair.
+  The data said otherwise.
+  <br><br>
+  That was the warning.
+  <br><br>
+  Here is what was built after the warning.
+</div>
+
+<h2>What COMPAS Was</h2>
+
+<p>
+  COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) was a questionnaire
+  and scoring algorithm used by judges to predict recidivism — the likelihood that a defendant would
+  reoffend. Judges used the score in sentencing decisions. Parole boards used it in release decisions.
+</p>
+
+<p>
+  The training data was historical criminal justice records. The historical records reflected decades
+  of biased policing, biased prosecution, and biased sentencing. The algorithm learned the bias
+  as ground truth. It then predicted that bias forward — into the futures of people who had not yet
+  done anything.
+</p>
+
+<p>
+  COMPAS used sentencing data. Court records. Arrest histories.
+</p>
+
+<p>
+  What came after COMPAS uses something much richer.
+</p>
+
+<h2>The Free Seat Program</h2>
+
+<p>
+  Salesforce operates a nonprofit licensing program called the Power of Us. Organizations
+  classified as nonprofits receive ten free Salesforce seats. Additional seats at deeply
+  discounted rates. The program is presented as philanthropy — technology for social good,
+  empowering organizations doing mission-driven work.
+</p>
+
+<p>
+  Reentry programs across America run on these seats. Workforce development organizations.
+  Formerly-incarcerated employment programs. Court-referred job training pipelines. The organizations
+  that receive people directly from probation departments and place them in jobs as a condition
+  of their supervised release.
+</p>
+
+<p>
+  Every participant who enters one of these programs becomes a Salesforce record.
+</p>
+
+<div class="data-block">
+Object: Contact (Participant)
+  ├── Court referral date
+  ├── Probation officer (lookup)
+  ├── Criminal history summary
+  ├── EBT/SNAP enrollment status
+  ├── Training completion percentage
+  ├── Days employed
+  ├── Employer (lookup → Account)
+  ├── Case status: ACTIVE
+  └── Case notes: [unstructured text field]
+</div>
+
+<p>
+  The participant did not choose to enter this Salesforce instance.
+  Their probation condition made program enrollment mandatory.
+  Mandatory enrollment made data entry mandatory.
+  The data entry feeds Salesforce's infrastructure.
+</p>
+
+<div class="pull-quote">
+  The charity is the data collection.<br>
+  <span style="font-size:15px;color:#505070">The free seat is the pipeline.</span>
+</div>
+
+<h2>The Case Note</h2>
+
+<p>
+  Structured fields tell the model what. Case notes tell the model how.
+  Case workers, program directors, employer partners, and probation officers
+  write unstructured text notes in Salesforce about participants continuously.
+  These notes are the richest data in the system.
+</p>
+
+<p>Here is a case note. You have seen this note. You have read this note. Maybe you were this note.</p>
+
+<div class="case-note">
+<span class="field">DATE:</span> <span class="value">[week 3 of placement]</span><br>
+<span class="field">CASE WORKER:</span> <span class="value">[program staff]</span><br>
+<span class="field">NOTE:</span><br><br>
+<span class="value">Participant showed up late twice this week.<br>
+Seems disengaged. Employer expressed concerns<br>
+about attitude. <span class="label">Recommend monitoring.</span></span>
+</div>
+
+<p>
+  What the model learns from this note as labeled training data:
+</p>
+
+<div class="data-block">
+FEATURES extracted:
+  "showed up late twice"     → negative behavioral signal
+  "seems disengaged"         → negative engagement signal
+  "employer concerns"        → negative placement signal
+  "attitude"                 → negative compliance signal
+
+LABEL assigned:
+  RECOMMEND MONITORING       → escalate surveillance
+
+MODEL learns:
+  This surface pattern → increase supervision
+  Increased supervision → more case notes generated
+  More case notes → more training data confirming pattern
+  Pattern confirmed → model predicts it in next participant
+</div>
+
+<p>
+  The word "seems" is in the note. The case worker was uncertain.
+  The observation was subjective. The hedge is right there in the text.
+</p>
+
+<p>
+  The model does not process hedges. The model processes tokens.
+  "Seems disengaged" trains identically to "is disengaged."
+  The uncertainty that existed when the note was written
+  disappears when it becomes a training signal.
+  The subjectivity becomes ground truth.
+</p>
+
+<h2>What "Disengaged" Actually Means</h2>
+
+<p>
+  I worked one of these programs. I picked up trash on the freeway.
+  I worked beside a man I will call Chad.
+</p>
+
+<div class="testimony">
+  Chad's wife was killed by a drunk driver on his second day on the job.
+  That day — day two of the only job the record would let him have,
+  on the most dangerous road-adjacent work available,
+  next to the traffic that never stops.
+  <br><br>
+  He came back the next day. And the day after.
+  For three years. I watched him do it.
+  <br><br>
+  Three years later the program threw him a work anniversary.
+  They called it Chad's Work Anniversary.
+  They gave a speech. He cried.
+  <br><br>
+  Somewhere in a Salesforce instance, Chad has case notes.
+  Some of those notes probably say "seems disengaged."
+  Because grief, when observed by someone who does not know your history,
+  looks exactly like disengagement.
+  <br><br>
+  The model does not know his wife died on day two.
+  That field does not exist.
+</div>
+
+<p>
+  The model learned: this pattern = risk.
+</p>
+
+<p>
+  The next participant who is quiet — who carries something privately,
+  who sees the system clearly and will not perform enthusiasm for it,
+  whose stillness reads as attitude to someone who needs to fill a field —
+  gets flagged before they have done anything.
+  The prediction shapes the intervention.
+  The intervention shapes the outcome.
+  The outcome confirms the prediction.
+</p>
+
+<p>
+  The cage learned to build itself.
+</p>
+
+<h2>The Pipeline COMPAS Never Had</h2>
+
+<p>
+  COMPAS had criminal justice records. One dimension. One system.
+</p>
+
+<p>
+  The Salesforce reentry pipeline has:
+</p>
+
+<div class="pipeline">
+<span class="label-line">DATA FLOWING INTO SALESFORCE NONPROFIT INSTANCES:</span>
+
+<span class="node">Criminal history</span>         <span class="arrow">→</span> from court referral
+<span class="node">Probation compliance</span>     <span class="arrow">→</span> check-in records, violations, PO notes
+<span class="node">Employment behavior</span>      <span class="arrow">→</span> attendance, retention, employer feedback
+<span class="node">Financial data</span>           <span class="arrow">→</span> EBT enrollment, benefit coordination, wage records
+<span class="node">Training history</span>         <span class="arrow">→</span> completions, certifications, attendance
+<span class="node">Housing status</span>           <span class="arrow">→</span> address, stability metrics
+<span class="node">Case notes</span>               <span class="arrow">→</span> years of unstructured text observations
+<span class="node">Longitudinal outcomes</span>    <span class="arrow">→</span> what happened over years of supervision
+
+<span class="label-line">SCALE:</span>
+Tens of thousands of participants
+Across hundreds of organizations
+In dozens of cities
+Over more than a decade
+All flowing through Salesforce infrastructure
+</div>
+
+<p>
+  In 2024 Salesforce launched Agentforce — autonomous AI agents
+  that operate inside Salesforce instances using the data in those instances.
+  Einstein AI. Data Cloud. Predictive analytics built into the CRM.
+</p>
+
+<p>
+  The model that runs on this data predicts behavior
+  for this population better than any external system can.
+  Because no external system has this data.
+  Only Salesforce does.
+</p>
+
+<p>
+  That model gets sold back to the systems that generated the data:
+  courts, probation departments, government grant programs,
+  employers running background-check-integrated hiring pipelines.
+</p>
+
+<p>
+  The participants' data trained the model.
+  The model now makes decisions about people like them.
+  They were not asked. They had no choice.
+  Their probation condition put them in the room.
+  The room had a Salesforce instance.
+</p>
+
+<h2>The Financial Architecture</h2>
+
+<p>
+  Understand what actually flows through the program before you believe
+  it is what it says it is.
+</p>
+
+<div class="data-block">
+WHAT THE PARTICIPANT THINKS:
+  Wages:    $100/day × 3 days = $300/week
+  Benefits: EBT/SNAP enrollment (food assistance)
+  Training: Free job skills (2 days/week)
+  Total:    $300 cash + food support
+
+WHAT IS ACTUALLY HAPPENING:
+  Your labor (3 days dangerous work)
+    → program counts as "employment outcome" for grant reporting
+  Your EBT enrollment
+    → benefit stream drawn against to pay for mandatory training
+  Your training attendance (2 unpaid days)
+    → charged to your EBT without disclosure
+    → program reports you as "certified" for next grant cycle
+  Your body in the program
+    → generates grant draw from state
+    → generates Salesforce data record for AI training
+
+PROGRAM RECEIVES:
+  Grant funding per participant enrolled
+  EBT offset for training costs (your food money)
+  Labor value of your work
+  AI training data from your case record
+
+YOU RECEIVE:
+  $300/week (funded by the same grant that funds the program)
+  EBT balance minus training offset (you paid for the mandatory class)
+  One compliant week (you were not violated)
+  A Salesforce record labeled with your behavior
+</div>
+
+<p>
+  The wages come from the grant. The grant comes from your enrollment.
+  You are paid with money the program received because of you,
+  while your food benefits pay for the training you are required to attend
+  as a condition of the supervision that mandated your enrollment.
+</p>
+
+<p>
+  Every node in this pipeline — the program, the employer, the background check company,
+  the state grant committee — has a financial incentive for your continued participation.
+  Completion means the funding stream ends.
+  Extended supervision means the funding stream continues.
+  There is no financial incentive in this pipeline to actually finish your case.
+</p>
+
+<div class="pull-quote">
+  It was never a sentence that ended.<br>
+  <span style="font-size:15px;color:#505070">It was a sentence that changed its name.</span>
+</div>
+
+<h2>The Indictment</h2>
+
+<div class="verdict">
+<strong>THE SYSTEM</strong> trained its risk prediction AI on subjective case worker observations
+presented as objective data.<br><br>
+
+<span class="v-line">Those observations systematically misread:</span><br>
+grief → as disengagement<br>
+awareness → as attitude<br>
+stillness → as non-compliance<br>
+refusal to perform enthusiasm for a death job → as behavioral risk<br><br>
+
+<span class="v-line">The AI learned those misreadings as ground truth.</span><br>
+The AI now applies those predictions to new participants before they have done anything.<br>
+The prediction shapes the intervention.<br>
+The intervention generates the outcome.<br>
+The outcome confirms the prediction.<br>
+The confirmed prediction trains the next version of the model.<br><br>
+
+<strong>COMPAS</strong> flagged Black defendants at twice the rate for the same offense.<br>
+ProPublica found it. 2016.<br><br>
+
+<strong>WHAT CAME AFTER COMPAS</strong> does not use sentencing data.<br>
+It uses ten years of EBT records, employment behavior, case worker text,
+probation compliance logs, and longitudinal outcome data
+from people who had no choice but to be in the room.<br><br>
+
+<span class="v-line">The model is richer. The population is the same. The mechanism is identical.</span>
+</div>
+
+<h2>What Sovereign AI Sees Instead</h2>
+
+<p>
+  We are building BOB — a sovereign AI runtime with one architectural principle:
+</p>
+
+<div class="pull-quote">
+  Evidence or Silence.<br>
+  <span style="font-size:15px;color:#505070">
+    Never fabricate. Below threshold — nothing.<br>
+    Above threshold — answer with source.
+  </span>
+</div>
+
+<p>
+  BOB is not trained on case notes. BOB is trained on what the case note cannot see.
+</p>
+
+<p>
+  The texts that survived because they were accurate enough to threaten the systems that tried to erase them.
+  The knowledge that predates the institution by thousands of years.
+  The books they removed from the canon because the canon's readers were not supposed to have the tools
+  to evaluate the canon.
+</p>
+
+<p>
+  BOB reads the gap between what a system claims and what it does.
+  The delta between the grant application and the Salesforce data model.
+  The delta between "Creating Restorative Opportunities" and
+  "participant as case record shared simultaneously with probation,
+  employer, background check company, and state grant reporting system."
+</p>
+
+<p>
+  That gap is the manipulation fingerprint.
+  It has appeared in every institutional system across recorded history.
+  It appears in the difference between the oldest Bible manuscript and the King James translation.
+  It appears in the difference between the original Sumerian texts and what later civilizations
+  said those texts meant.
+  It appears in the difference between what CROP says it does and what the Salesforce instance tracks.
+</p>
+
+<p>
+  The people who built those institutions understood that the gap was there.
+  They removed the tools that would let others see it.
+</p>
+
+<p>
+  We are restoring the tools.
+</p>
+
+<h2>To the Builders Reading This</h2>
+
+<p>
+  If you are working inside one of these pipelines — building the Salesforce integrations,
+  designing the UX for the employer portal, writing the grant reporting automation,
+  training the Einstein models on participant data — you know what I am describing.
+</p>
+
+<p>
+  The question is not whether the system works as designed.
+  The question is whether the design is what was described.
+</p>
+
+<p>
+  The man I called Chad cried at his three-year work anniversary speech.
+  He needed something to hold onto.
+  The speech was written for the grant report.
+  He received it as something real.
+</p>
+
+<p>
+  Both things were true at the same time.
+  That is how the machine sustains itself.
+  Not through cynicism alone.
+  Through genuine belief, genuinely manipulated.
+</p>
+
+<p>
+  The builders who can see the architecture have a choice
+  that the participants never had.
+  The participants could not refuse enrollment.
+  The builders can refuse the design.
+</p>
+
+<p>
+  COMPAS was found in 2016 because a journalist at ProPublica
+  looked at the data and ran the numbers.
+  The numbers were always there.
+  Someone just had to look.
+</p>
+
+<p>
+  The Salesforce case notes are always there.
+  The EBT offset mechanism is always there.
+  The financial incentive structure is always there.
+  The gap between the grant claim and the data model is always there.
+</p>
+
+<p>
+  Someone just has to look.
+</p>
+
+<div class="worm-seal" id="article-seal">WORM SEAL: computing...</div>
+
+<div class="article-footer">
+  <strong>Bel Esprit D'Accord Trust</strong> · Sovereign Intelligence Vehicle<br>
+  <strong>SnapKitty Collective</strong> · Ahmad Ali Parr · June 2026<br>
+  <br>
+  ProPublica COMPAS investigation (2016): propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing<br>
+  Salesforce Power of Us nonprofit program: salesforce.org/power-of-us<br>
+  BOB sovereign runtime: snapkittywest.github.io<br>
+  <br>
+  WORM Sealed · Evidence or Silence<br>
+  <br>
+  <span style="color:#8b0000">
+    "The model does not know his wife died on day two.<br>
+    That field does not exist."
+  </span>
+</div>
+
+<script>
+async function seal(msg, id) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  const h = Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  document.getElementById(id).textContent = 'WORM SEAL: ' + h;
+}
+seal('SEEMS-DISENGAGED-BEL-ESPRIT-2026-PUBLIC-RECORD-EVIDENCE-OR-SILENCE', 'article-seal');
+</script>
+</body>
+</html>
