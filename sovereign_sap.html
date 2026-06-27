@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sovereign SAP - ERP Command Center</title>
+<style>
+  :root {
+    --bg: #061018;
+    --panel: #0a1722;
+    --panel-2: #0d1f2e;
+    --line: #17364a;
+    --line-bright: #2f6f92;
+    --text: #d8edf4;
+    --muted: #7ea5b4;
+    --dim: #436473;
+    --teal: #00d4cc;
+    --green: #6fffa8;
+    --gold: #ffd166;
+    --red: #ff5a6a;
+    --blue: #67a8ff;
+    --violet: #b28cff;
+    --shadow: 0 16px 48px rgba(0, 0, 0, .34);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(0,212,204,.06) 1px, transparent 1px) 0 0 / 64px 64px,
+      linear-gradient(0deg, rgba(0,212,204,.04) 1px, transparent 1px) 0 0 / 64px 64px,
+      radial-gradient(circle at 72% 18%, rgba(103,168,255,.16), transparent 32%),
+      radial-gradient(circle at 18% 82%, rgba(0,212,204,.12), transparent 34%);
+    opacity: .72;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.028) 0 1px, transparent 1px 4px);
+    mix-blend-mode: screen;
+    opacity: .35;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+  }
+  .app {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-rows: 58px 1fr 32px;
+  }
+  .topbar {
+    display: grid;
+    grid-template-columns: 310px 1fr 390px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    background: rgba(5, 14, 22, .92);
+    backdrop-filter: blur(12px);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 18px;
+    min-width: 0;
+  }
+  .mark {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(0,212,204,.65);
+    display: grid;
+    place-items: center;
+    color: var(--teal);
+    box-shadow: inset 0 0 18px rgba(0,212,204,.16), 0 0 18px rgba(0,212,204,.16);
+  }
+  .brand h1 {
+    font-size: 15px;
+    margin: 0;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+  .brand small {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .1em;
+    margin-top: 3px;
+  }
+  .global-search {
+    height: 34px;
+    border: 1px solid var(--line);
+    background: rgba(9, 26, 39, .88);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 12px;
+    min-width: 0;
+  }
+  .global-search span:last-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .top-status {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    height: 100%;
+    border-left: 1px solid var(--line);
+  }
+  .metric {
+    padding: 9px 12px 0;
+    border-left: 1px solid rgba(23,54,74,.7);
+    min-width: 0;
+  }
+  .metric:first-child { border-left: none; }
+  .metric label {
+    display: block;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .metric strong {
+    display: block;
+    font-size: 16px;
+    margin-top: 4px;
+    color: var(--green);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .workspace {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 238px 1fr 350px;
+  }
+  .rail, .right {
+    min-height: 0;
+    background: rgba(6, 17, 26, .86);
+    border-right: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .right {
+    border-right: 0;
+    border-left: 1px solid var(--line);
+  }
+  .rail-head, .panel-head {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .module-list {
+    height: calc(100% - 42px);
+    overflow: auto;
+    padding: 8px;
+  }
+  .module-btn {
+    width: 100%;
+    min-height: 58px;
+    display: grid;
+    grid-template-columns: 38px 1fr 18px;
+    gap: 9px;
+    align-items: center;
+    text-align: left;
+    padding: 8px;
+    margin-bottom: 6px;
+    border: 1px solid transparent;
+    background: rgba(10, 28, 42, .72);
+    cursor: pointer;
+  }
+  .module-btn:hover,
+  .module-btn.active {
+    border-color: var(--line-bright);
+    background: rgba(13, 43, 61, .96);
+    box-shadow: inset 3px 0 0 var(--teal);
+  }
+  .module-icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(0,212,204,.24);
+    background: #07121b;
+    color: var(--teal);
+    font-size: 18px;
+  }
+  .module-copy b {
+    display: block;
+    font-size: 12px;
+    letter-spacing: .03em;
+  }
+  .module-copy span {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.25;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+  }
+  .dot.warn { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+  .main {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: 248px 1fr;
+    overflow: hidden;
+  }
+  .hero {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 1.3fr .7fr;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .module-detail,
+  .process-map,
+  .table-panel,
+  .feed-panel,
+  .contract-panel {
+    border: 1px solid var(--line);
+    background: rgba(8, 22, 34, .88);
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+  .module-detail {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr 210px;
+    gap: 18px;
+  }
+  .detail-kicker {
+    color: var(--teal);
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+  .module-detail h2 {
+    margin: 8px 0 8px;
+    font-size: clamp(23px, 3vw, 42px);
+    line-height: 1.05;
+    letter-spacing: .02em;
+  }
+  .module-detail p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 780px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 15px;
+  }
+  .chip {
+    border: 1px solid rgba(0,212,204,.28);
+    background: rgba(0,212,204,.07);
+    color: #bdfaf6;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+  }
+  .action-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .action {
+    height: 34px;
+    padding: 0 13px;
+    border: 1px solid var(--line-bright);
+    background: rgba(0,212,204,.1);
+    color: var(--text);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .action.primary {
+    background: var(--teal);
+    color: #021012;
+    font-weight: 700;
+  }
+  .score-box {
+    border-left: 1px solid var(--line);
+    padding-left: 16px;
+    display: grid;
+    align-content: center;
+    gap: 12px;
+  }
+  .score-box label {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+  .score {
+    font-size: 38px;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .mini-bar {
+    height: 8px;
+    background: #07121b;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .mini-fill {
+    display: block;
+    height: 100%;
+    width: var(--w, 72%);
+    background: linear-gradient(90deg, var(--teal), var(--green));
+  }
+  .process-map {
+    padding: 12px;
+    overflow: hidden;
+  }
+  .map-title {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--line);
+  }
+  .node-grid {
+    height: calc(100% - 28px);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-content: center;
+  }
+  .node {
+    min-height: 52px;
+    border: 1px solid rgba(47,111,146,.72);
+    background: rgba(0,212,204,.06);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 8px;
+    color: var(--text);
+    font-size: 11px;
+    line-height: 1.25;
+    position: relative;
+  }
+  .node::after {
+    content: "";
+    position: absolute;
+    right: -9px;
+    top: 50%;
+    width: 9px;
+    height: 1px;
+    background: var(--line-bright);
+  }
+  .node:nth-child(3n)::after { display: none; }
+  .lower {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  .table-panel {
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 42px 1fr;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(23,54,74,.72);
+    white-space: nowrap;
+  }
+  th {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    background: rgba(8, 22, 34, .92);
+  }
+  td:nth-child(2) { color: var(--teal); }
+  .status {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--green);
+  }
+  .status.warn { color: var(--gold); }
+  .status.alert { color: var(--red); }
+  .feed-panel {
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 42px 1fr;
+  }
+  .feed {
+    overflow: hidden;
+    padding: 10px 12px;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .event {
+    border-left: 2px solid var(--teal);
+    padding: 7px 0 7px 10px;
+    color: #b9d8e2;
+    animation: eventIn .45s ease both;
+  }
+  .event small {
+    display: block;
+    color: var(--dim);
+    margin-top: 3px;
+  }
+  @keyframes eventIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .right {
+    display: grid;
+    grid-template-rows: 286px 1fr;
+    min-width: 0;
+  }
+  .contract-panel {
+    margin: 12px 12px 0;
+    overflow: hidden;
+  }
+  .contract-body {
+    padding: 12px;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    color: #b9d8e2;
+    line-height: 1.55;
+  }
+  .contract-body code {
+    display: block;
+    white-space: pre-wrap;
+  }
+  .graph-panel {
+    margin: 12px;
+    border: 1px solid var(--line);
+    background: rgba(8, 22, 34, .88);
+    overflow: hidden;
+    min-height: 0;
+  }
+  .system-graph {
+    height: calc(100% - 42px);
+    position: relative;
+  }
+  .orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 220px;
+    border: 1px solid rgba(0,212,204,.24);
+    border-radius: 50%;
+    animation: spin 28s linear infinite;
+  }
+  .orbit.o2 { width: 152px; height: 152px; animation-duration: 18s; animation-direction: reverse; }
+  .core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 92px;
+    height: 92px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--teal);
+    background: rgba(0,212,204,.08);
+    color: var(--teal);
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    box-shadow: 0 0 28px rgba(0,212,204,.22);
+  }
+  .sat {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    background: #07121b;
+    border: 1px solid var(--line-bright);
+    color: var(--text);
+    font-size: 16px;
+  }
+  .sat.s1 { left: 28px; top: -17px; }
+  .sat.s2 { right: -17px; top: 78px; }
+  .sat.s3 { left: 55px; bottom: -17px; }
+  .sat.s4 { left: -17px; top: 94px; }
+  .sat.s5 { right: 18px; bottom: -14px; }
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .footer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 14px;
+    border-top: 1px solid var(--line);
+    background: rgba(5, 14, 22, .95);
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 0 12px;
+  }
+  .ticker {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: ticker 34s linear infinite;
+  }
+  @keyframes ticker {
+    to { transform: translateX(-100%); }
+  }
+  @media (max-width: 980px) {
+    html, body { overflow: auto; }
+    .app { position: relative; min-height: 100vh; grid-template-rows: auto auto auto; }
+    .topbar, .workspace, .hero, .lower, .right { grid-template-columns: 1fr; }
+    .topbar { gap: 10px; padding: 10px; }
+    .brand { padding-left: 0; }
+    .top-status { border-left: 0; grid-template-columns: repeat(2, 1fr); }
+    .workspace { min-height: auto; }
+    .rail, .right, .main { overflow: visible; }
+    .module-list { height: auto; max-height: 360px; }
+    .module-detail { grid-template-columns: 1fr; }
+    .score-box { border-left: 0; border-top: 1px solid var(--line); padding: 14px 0 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">S</div>
+      <div>
+        <h1>Sovereign SAP</h1>
+        <small>enterprise resource autonomy layer</small>
+      </div>
+    </div>
+    <div class="global-search">
+      <span>⌕</span>
+      <span id="commandText">Search object, trust deed, supplier, invoice, trip, worker, ledger entry, API event...</span>
+    </div>
+    <div class="top-status">
+      <div class="metric"><label>Tick</label><strong id="tick">0001</strong></div>
+      <div class="metric"><label>WORM</label><strong id="worm">a3f7...</strong></div>
+      <div class="metric"><label>Evidence</label><strong id="evidence">98.4%</strong></div>
+      <div class="metric"><label>Agents</label><strong>15 ACTIVE</strong></div>
+    </div>
+  </header>
+
+  <section class="workspace">
+    <nav class="rail">
+      <div class="rail-head"><span>Meta Modules</span><span>SOA</span></div>
+      <div id="moduleList" class="module-list"></div>
+    </nav>
+
+    <main class="main">
+      <section class="hero">
+        <article class="module-detail">
+          <div>
+            <div class="detail-kicker" id="moduleFamily">Core ERP</div>
+            <h2 id="moduleName">Sovereign Core 4</h2>
+            <p id="moduleDesc">Finance, procurement, inventory, sales, manufacturing, asset accounting, and projects run as evidence-gated records. Every transaction resolves to a WORM-sealed object before execution.</p>
+            <div id="moduleChips" class="chips"></div>
+            <div class="action-row">
+              <button class="action primary" id="executeBtn">Execute Evidence Run</button>
+              <button class="action" id="contractBtn">View Backend Contract</button>
+              <button class="action" id="sealBtn">Seal Snapshot</button>
+            </div>
+          </div>
+          <aside class="score-box">
+            <div>
+              <label>Operational Integrity</label>
+              <div class="score" id="integrity">99</div>
+            </div>
+            <div>
+              <label>Automation Coverage</label>
+              <div class="mini-bar"><span id="coverage" class="mini-fill" style="--w: 84%"></span></div>
+            </div>
+            <div>
+              <label>Risk Queue</label>
+              <div id="riskText" style="color:var(--gold);font-size:13px;">3 approvals pending</div>
+            </div>
+          </aside>
+        </article>
+        <aside class="process-map">
+          <div class="map-title"><span id="mapTitle">Evidence Process Map</span><span id="mapState">ONLINE</span></div>
+          <div id="nodeGrid" class="node-grid"></div>
+        </aside>
+      </section>
+
+      <section class="lower">
+        <article class="table-panel">
+          <div class="panel-head"><span>Open Business Objects</span><span id="objectCount">6 records</span></div>
+          <div style="overflow:auto;">
+            <table>
+              <thead><tr><th>Object</th><th>Module</th><th>Owner</th><th>Value</th><th>Status</th></tr></thead>
+              <tbody id="objectRows"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="feed-panel">
+          <div class="panel-head"><span>Live Event Bus</span><span>ROBOB READY</span></div>
+          <div id="feed" class="feed"></div>
+        </article>
+      </section>
+    </main>
+
+    <aside class="right">
+      <section class="contract-panel">
+        <div class="panel-head"><span>Backend Contract</span><span id="contractModule">core</span></div>
+        <div class="contract-body"><code id="contractCode"></code></div>
+      </section>
+      <section class="graph-panel">
+        <div class="panel-head"><span>Sovereign Mesh</span><span>meta-orchestrated</span></div>
+        <div class="system-graph">
+          <div class="orbit">
+            <div class="sat s1">₿</div><div class="sat s2">⌘</div><div class="sat s3">Σ</div><div class="sat s4">◇</div><div class="sat s5">↯</div>
+          </div>
+          <div class="orbit o2">
+            <div class="sat s1">FI</div><div class="sat s2">MM</div><div class="sat s3">HR</div><div class="sat s4">API</div>
+          </div>
+          <div class="core">ROBOB<br>ORACLE</div>
+        </div>
+      </section>
+    </aside>
+  </section>
+
+  <footer class="footer">
+    <div class="ticker"><span id="tickerText">(invoke ROBOB "validate invoice 830-ACME") · (seal WORM "PO-C3-4481") · (route FIELDGLASS-LIKE worker timesheet) · (expense CONCUR-LIKE receipt approved) ·</span></div>
+    <div>SOVEREIGN ERP · ORIGINAL FRONTEND · NO PROPRIETARY SAP CODE</div>
+    <div style="text-align:right;" id="clock">--:--:--</div>
+  </footer>
+</div>
+
+<script>
+const modules = [
+  {
+    id: "core4",
+    icon: "◆",
+    name: "Sovereign Core 4",
+    family: "Core ERP / S4-style",
+    short: "Finance, sales, procurement, manufacturing.",
+    desc: "Finance, procurement, inventory, sales, manufacturing, asset accounting, and projects run as evidence-gated records. Every transaction resolves to a WORM-sealed object before execution.",
+    chips: ["general ledger", "AP/AR", "sales order", "inventory", "MRP", "asset accounting", "project systems"],
+    nodes: ["Request", "ROBOB Evidence", "Budget Check", "Ledger Draft", "Approval", "WORM Seal"],
+    integrity: 99,
+    coverage: 84,
+    risk: "3 approvals pending",
+    endpoint: "/api/sovereign/core4/transactions",
+    payload: { object_type: "ledger_entry", evidence_required: true, seal: "worm" }
+  },
+  {
+    id: "market",
+    icon: "⌁",
+    name: "Sovereign Market",
+    family: "Supplier Network / Ariba-style",
+    short: "Sourcing, contracts, suppliers, POs.",
+    desc: "Supplier onboarding, sourcing events, contract clauses, purchase orders, auctions, and supplier-risk scoring share a sovereign evidence trail.",
+    chips: ["supplier risk", "sourcing event", "contract workspace", "PO", "catalog", "invoice match"],
+    nodes: ["Need", "Sourcing Event", "Supplier Evidence", "Award", "PO", "Invoice Match"],
+    integrity: 96,
+    coverage: 78,
+    risk: "7 suppliers under review",
+    endpoint: "/api/sovereign/market/sourcing-events",
+    payload: { event_type: "source_to_pay", supplier_evidence: true, contract_hash: "required" }
+  },
+  {
+    id: "expense",
+    icon: "◫",
+    name: "Sovereign Expense",
+    family: "Travel + Expense / Concur-style",
+    short: "Trips, receipts, cards, reimbursements.",
+    desc: "Travel requests, receipts, card transactions, per-diem rules, exceptions, and reimbursements become sealed expense objects with policy proof.",
+    chips: ["travel request", "receipt OCR", "card feed", "policy check", "reimbursement", "audit packet"],
+    nodes: ["Trip Plan", "Receipt", "Policy Proof", "Manager Review", "Pay Run", "Audit Seal"],
+    integrity: 94,
+    coverage: 71,
+    risk: "12 exceptions waiting",
+    endpoint: "/api/sovereign/expense/claims",
+    payload: { receipt_id: "required", policy_version: "current", reimburse_when: "evidence" }
+  },
+  {
+    id: "fieldforce",
+    icon: "▣",
+    name: "Sovereign Fieldforce",
+    family: "External Workforce / Fieldglass-style",
+    short: "Contractors, services, timesheets.",
+    desc: "Contingent labor, service orders, statements of work, onboarding, time capture, and offboarding are tracked without losing worker agency.",
+    chips: ["worker profile", "SOW", "service entry", "timesheet", "rate card", "offboarding"],
+    nodes: ["Service Need", "Worker Evidence", "SOW", "Time Entry", "Approval", "Access Revoke"],
+    integrity: 92,
+    coverage: 69,
+    risk: "5 expiring SOWs",
+    endpoint: "/api/sovereign/fieldforce/work-orders",
+    payload: { worker_ref: "pseudonymous", sow_hash: "required", access_expiry: "enforced" }
+  },
+  {
+    id: "people",
+    icon: "◎",
+    name: "Sovereign People",
+    family: "HXM / SuccessFactors-style",
+    short: "Org, payroll, learning, performance.",
+    desc: "Org structure, payroll, learning, skills, goals, benefits, and performance signals stay governed by trust deeds and explicit consent gates.",
+    chips: ["org chart", "skills", "learning", "payroll", "benefits", "consent"],
+    nodes: ["Consent", "Profile", "Skill Proof", "Learning", "Payroll", "Retention"],
+    integrity: 97,
+    coverage: 76,
+    risk: "2 consent renewals",
+    endpoint: "/api/sovereign/people/profiles",
+    payload: { consent_gate: true, pii_mode: "minimal", trust_deed: "required" }
+  },
+  {
+    id: "chain",
+    icon: "⛓",
+    name: "Sovereign Chain",
+    family: "SCM / IBP / EWM / TM",
+    short: "Planning, warehouse, transport.",
+    desc: "Demand planning, supply planning, warehouse tasks, freight, yard, track-and-trace, and exception management operate as a sealed logistics graph.",
+    chips: ["IBP", "EWM", "TM", "ATP", "yard", "freight settlement", "track trace"],
+    nodes: ["Forecast", "Supply Plan", "Warehouse Task", "Freight", "Exception", "Proof of Delivery"],
+    integrity: 95,
+    coverage: 81,
+    risk: "9 route disruptions",
+    endpoint: "/api/sovereign/chain/events",
+    payload: { event_type: "logistics", route_evidence: true, delivery_proof: "hash" }
+  },
+  {
+    id: "customer",
+    icon: "◇",
+    name: "Sovereign Customer",
+    family: "CX / Commerce / CRM",
+    short: "Sales, service, commerce, identity.",
+    desc: "Customer identity, offers, sales pipeline, service cases, commerce carts, subscriptions, and consent preferences converge without dark-pattern tracking.",
+    chips: ["lead", "quote", "commerce", "service case", "subscription", "consent"],
+    nodes: ["Signal", "Consent", "Quote", "Order", "Service", "Renewal"],
+    integrity: 93,
+    coverage: 74,
+    risk: "18 open cases",
+    endpoint: "/api/sovereign/customer/cases",
+    payload: { customer_ref: "consented", case_context: "minimal", evidence: true }
+  },
+  {
+    id: "platform",
+    icon: "⌘",
+    name: "Sovereign Platform",
+    family: "BTP / Integration / Extension",
+    short: "APIs, queues, events, automations.",
+    desc: "Integration flows, event mesh, API contracts, workflow automation, identity, extensions, and robot execution provide the backend-ready surface.",
+    chips: ["API gateway", "event mesh", "workflow", "robot", "identity", "extension"],
+    nodes: ["API Call", "AuthZ", "Evidence", "Workflow", "Robot", "Seal"],
+    integrity: 98,
+    coverage: 88,
+    risk: "1 robot retry",
+    endpoint: "/api/sovereign/platform/execute",
+    payload: { process: "required", actor: "required", oracle: "ROBOB" }
+  },
+  {
+    id: "data",
+    icon: "Σ",
+    name: "Sovereign Data Cloud",
+    family: "HANA / Datasphere / Analytics",
+    short: "Models, metrics, lakehouse, AI.",
+    desc: "Operational data, analytics models, semantic metrics, AI features, lineage, and audit trails are separated into evidence-first data products.",
+    chips: ["column store", "semantic layer", "lineage", "dashboard", "feature store", "AI audit"],
+    nodes: ["Ingest", "Lineage", "Metric", "Feature", "Model", "Audit"],
+    integrity: 97,
+    coverage: 83,
+    risk: "4 lineage gaps",
+    endpoint: "/api/sovereign/data/products",
+    payload: { lineage: "mandatory", model_update: "sealed", pii: "masked" }
+  },
+  {
+    id: "risk",
+    icon: "⚖",
+    name: "Sovereign Risk",
+    family: "GRC / Security / Compliance",
+    short: "Access, controls, audit, policy.",
+    desc: "Access control, segregation of duties, control testing, policy exceptions, audit evidence, and legal holds route through CARTO governance.",
+    chips: ["SoD", "IAM", "control", "audit", "legal hold", "policy"],
+    nodes: ["Policy", "Access", "Control Test", "Exception", "CARTO Rule", "Seal"],
+    integrity: 100,
+    coverage: 79,
+    risk: "0 critical violations",
+    endpoint: "/api/sovereign/risk/controls",
+    payload: { control_id: "required", evidence_packet: true, legal_hold: "optional" }
+  }
+];
+
+const objectPool = [
+  ["INV-8301", "Core 4", "CIPHER", "$48,100", "posted"],
+  ["SRC-C3-221", "Market", "FLUX", "$1.2M", "supplier review"],
+  ["EXP-0188", "Expense", "NOVA", "$842", "policy hold"],
+  ["SOW-779A", "Fieldforce", "CARTO", "$94/hr", "active"],
+  ["TRN-APL-44", "People", "RESONANCE", "15 agents", "learning"],
+  ["FRT-5520", "Chain", "GRANITE", "3 lanes", "delayed"],
+  ["CASE-294", "Customer", "PHANTOM", "P1", "monitoring"],
+  ["API-ROB-7475", "Platform", "ROBOB", "online", "executing"],
+  ["METRIC-337", "Data Cloud", "LLAMA4", "0.847", "sealed"],
+  ["CTRL-SOD-14", "Risk", "CARTO", "clean", "passed"]
+];
+
+const feedPool = [
+  '(oracle ROBOB "validate supplier award SRC-C3-221") -> EVIDENCE',
+  '(seal WORM "INV-8301-POSTED") -> a3f7c0de',
+  '(route CARTO "policy exception EXP-0188") -> HEARING',
+  '(robot PLATFORM "execute reimbursement batch") -> QUEUED',
+  '(chain SCM "freight delay FRT-5520") -> REROUTE',
+  '(risk GRC "segregation of duties") -> PASS',
+  '(data CLOUD "model update metric 337") -> SEALED',
+  '(fieldforce SOW-779A "access renewal") -> CONSENT REQUIRED',
+  '(market SUPPLIER "risk score changed") -> REVIEW',
+  '(people HXM "learning proof TRN-APL-44") -> VERIFIED'
+];
+
+let activeModule = modules[0];
+let tick = 1;
+let feedIndex = 0;
+
+const $ = (id) => document.getElementById(id);
+
+function renderModules() {
+  $("moduleList").innerHTML = modules.map((m) => `
+    <button class="module-btn ${m.id === activeModule.id ? "active" : ""}" data-module="${m.id}">
+      <span class="module-icon">${m.icon}</span>
+      <span class="module-copy"><b>${m.name}</b><span>${m.short}</span></span>
+      <span class="dot ${m.integrity < 95 ? "warn" : ""}"></span>
+    </button>
+  `).join("");
+  document.querySelectorAll(".module-btn").forEach((btn) => {
+    btn.addEventListener("click", () => selectModule(btn.dataset.module));
+  });
+}
+
+function renderModule() {
+  $("moduleFamily").textContent = activeModule.family;
+  $("moduleName").textContent = activeModule.name;
+  $("moduleDesc").textContent = activeModule.desc;
+  $("moduleChips").innerHTML = activeModule.chips.map((chip) => `<span class="chip">${chip}</span>`).join("");
+  $("integrity").textContent = activeModule.integrity;
+  $("coverage").style.setProperty("--w", `${activeModule.coverage}%`);
+  $("riskText").textContent = activeModule.risk;
+  $("contractModule").textContent = activeModule.id;
+  $("nodeGrid").innerHTML = activeModule.nodes.map((node) => `<div class="node">${node}</div>`).join("");
+  $("mapTitle").textContent = `${activeModule.name} workflow`;
+  $("contractCode").textContent = buildContract(activeModule);
+  renderRows();
+}
+
+function renderRows() {
+  const rows = objectPool
+    .filter((_, i) => i % 2 === tick % 2 || Math.random() > .35)
+    .slice(0, 6);
+  $("objectCount").textContent = `${rows.length} records`;
+  $("objectRows").innerHTML = rows.map((r) => {
+    const s = r[4].includes("hold") || r[4].includes("delayed") ? "warn" : r[4].includes("monitoring") ? "alert" : "";
+    return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${s}">${r[4]}</span></td></tr>`;
+  }).join("");
+}
+
+function buildContract(m) {
+  return `POST ${m.endpoint}
+Content-Type: application/json
+X-Agent-Name: ROBOB
+X-WORM-Seal: required
+
+${JSON.stringify(m.payload, null, 2)}
+
+response:
+{
+  "verdict": "EVIDENCE | SILENCE",
+  "module": "${m.id}",
+  "seal": "sha256:worm-chain-head",
+  "effects": ["ui_event", "ledger_object", "audit_packet"]
+}`;
+}
+
+function selectModule(id) {
+  activeModule = modules.find((m) => m.id === id) || modules[0];
+  renderModules();
+  renderModule();
+  pushFeed(`(select MODULE "${activeModule.id}") -> ${activeModule.family.toUpperCase()}`);
+}
+
+function pushFeed(text) {
+  const feed = $("feed");
+  const stamp = new Date().toLocaleTimeString();
+  const el = document.createElement("div");
+  el.className = "event";
+  el.innerHTML = `${text}<small>${stamp} · WORM candidate · backend-ready</small>`;
+  feed.prepend(el);
+  while (feed.children.length > 9) feed.lastElementChild.remove();
+}
+
+function executeAction(kind) {
+  const map = {
+    run: `(execute ${activeModule.id.toUpperCase()} "evidence run") -> ROBOB QUERY`,
+    contract: `(contract ${activeModule.id.toUpperCase()} "${activeModule.endpoint}") -> OPEN`,
+    seal: `(seal WORM "${activeModule.id}-${String(tick).padStart(4, "0")}") -> QUEUED`
+  };
+  pushFeed(map[kind]);
+}
+
+function advance() {
+  tick += 1;
+  $("tick").textContent = String(tick).padStart(4, "0");
+  $("worm").textContent = `${Math.random().toString(16).slice(2, 6)}...${Math.random().toString(16).slice(2, 6)}`;
+  $("evidence").textContent = `${(94 + Math.random() * 5).toFixed(1)}%`;
+  $("clock").textContent = new Date().toLocaleTimeString();
+  pushFeed(feedPool[feedIndex % feedPool.length]);
+  feedIndex += 1;
+  if (tick % 3 === 0) renderRows();
+}
+
+$("executeBtn").addEventListener("click", () => executeAction("run"));
+$("contractBtn").addEventListener("click", () => executeAction("contract"));
+$("sealBtn").addEventListener("click", () => executeAction("seal"));
+
+renderModules();
+renderModule();
+feedPool.slice(0, 5).reverse().forEach(pushFeed);
+setInterval(advance, 3200);
+setInterval(() => {
+  const phrases = [
+    "Search object, trust deed, supplier, invoice, trip, worker, ledger entry, API event...",
+    "Command: /oracle validate purchase-order --evidence --seal",
+    "Command: /risk run-sod --agent CARTO --scope enterprise",
+    "Command: /platform execute-robot --process reimbursement-batch"
+  ];
+  $("commandText").textContent = phrases[tick % phrases.length];
+}, 4300);
+</script>
+</body>
+</html>
