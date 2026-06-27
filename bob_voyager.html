@@ -1,43 +1,76 @@
 <!DOCTYPE html>
+<!--
+  BOB VOYAGER — Forth ISS Orbital Oracle
+  Apache License 2.0 — Copyright (c) 2026 Ahmad Ali Parr / SnapKitty Collective
+  NORAD 25544 · ISS ZARYA · Live Telemetry · WORM Sealed
+  snapkittywest.github.io
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BOB VOYAGER — Forth ISS Oracle</title>
+<meta name="description" content="Live ISS orbital telemetry via Forth stack machine. WORM sealed. Apache 2.0.">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html,body { width:100%; height:100vh; background:#020204; color:#ffd700;
   font-family:'Courier New',monospace; overflow:hidden; display:flex; flex-direction:column; }
 
-/* scanlines */
 body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.15) 3px,rgba(0,0,0,.15) 4px); }
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px); }
 
 /* ── top bar ── */
-#topbar { display:flex; align-items:center; justify-content:space-between;
-  padding:8px 16px; border-bottom:1px solid #0e0e14; background:#020204; flex-shrink:0; }
+#topbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  padding:6px 16px; border-bottom:1px solid #0e0e14; background:#020204; flex-shrink:0; gap:8px; }
 #topbar .title { font-size:13px; letter-spacing:.2em; color:#ffd700; font-weight:bold; }
-#topbar .sub   { font-size:9px; color:#505060; letter-spacing:.15em; }
+#topbar .sub   { font-size:9px; color:#505060; letter-spacing:.12em; }
+.tb-right { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+.tb-badge { font-size:9px; letter-spacing:.1em; padding:2px 8px;
+  border:1px solid #1c1c24; color:#505060; }
+.tb-badge.active { border-color:#00ff88; color:#00ff88; }
+#top-worm { font-size:8px; color:#b8860b; opacity:.6; }
+#eclipse-badge { font-size:9px; padding:2px 8px; border:1px solid #1c1c24; color:#505060; }
+#eclipse-badge.sunlit { border-color:#ffd700; color:#ffd700; }
+#eclipse-badge.eclipse { border-color:#505060; color:#505060; }
 
 /* ── main layout ── */
-#main { display:grid; grid-template-columns:1fr 420px; flex:1; overflow:hidden; }
+#main { display:grid; grid-template-columns:1fr 440px; flex:1; overflow:hidden; }
 
-/* ── globe canvas ── */
+/* ── globe ── */
 #globe-pane { position:relative; background:#02020a; overflow:hidden; }
 canvas#globe { width:100%; height:100%; display:block; }
+
 #iss-hud {
   position:absolute; top:12px; left:12px;
-  background:rgba(0,0,0,.85); border:1px solid #1c1c24;
-  padding:12px 16px; font-size:10px; line-height:2;
-  min-width:220px;
+  background:rgba(2,2,4,.92); border:1px solid #1c1c24;
+  padding:12px 16px; font-size:10px; line-height:2; min-width:240px;
 }
-#iss-hud .lbl { color:#505060; letter-spacing:.1em; }
+#iss-hud .section { color:#b8860b; font-size:8px; letter-spacing:.2em;
+  text-transform:uppercase; border-bottom:1px solid #1c1c24; margin-bottom:4px; padding-bottom:2px; }
+#iss-hud .lbl { color:#505060; letter-spacing:.08em; }
 #iss-hud .val { color:#00ff88; font-weight:bold; }
+#iss-hud .val-warn { color:#ff6600; font-weight:bold; }
+#iss-hud .val-dim { color:#b8860b; }
+
+#orbit-hud {
+  position:absolute; top:12px; right:12px;
+  background:rgba(2,2,4,.92); border:1px solid #1c1c24;
+  padding:10px 14px; font-size:10px; line-height:1.9; min-width:200px;
+}
+#orbit-hud .section { color:#b8860b; font-size:8px; letter-spacing:.2em;
+  border-bottom:1px solid #1c1c24; margin-bottom:4px; padding-bottom:2px; }
+
 #forth-stack-display {
   position:absolute; bottom:12px; left:12px;
-  background:rgba(0,0,0,.85); border:1px solid #1c1c24;
-  padding:10px 14px; font-size:10px; min-width:200px;
+  background:rgba(2,2,4,.92); border:1px solid #1c1c24;
+  padding:10px 14px; font-size:10px; min-width:200px; max-height:160px;
 }
-#forth-stack-display .stitle { color:#b8860b; letter-spacing:.15em; margin-bottom:6px; }
+#forth-stack-display .stitle { color:#b8860b; letter-spacing:.15em; margin-bottom:6px; font-size:9px; }
 #stack-cells { display:flex; flex-direction:column-reverse; gap:2px; }
 .stack-cell {
   background:#06060a; border:1px solid #1c1c24;
@@ -46,12 +79,22 @@ canvas#globe { width:100%; height:100%; display:block; }
 }
 .stack-cell .spos { color:#505060; font-size:9px; }
 
+#gs-legend {
+  position:absolute; bottom:12px; right:12px;
+  background:rgba(2,2,4,.92); border:1px solid #1c1c24;
+  padding:8px 12px; font-size:9px; line-height:1.9;
+}
+#gs-legend .gt { color:#b8860b; font-size:8px; letter-spacing:.15em; margin-bottom:3px; }
+.gs-dot { display:inline-block; width:7px; height:7px; border-radius:50%;
+  margin-right:5px; vertical-align:middle; }
+
 /* ── Forth terminal ── */
 #forth-pane { display:flex; flex-direction:column; border-left:1px solid #0e0e14; background:#030305; }
-
-#forth-header { padding:8px 14px; border-bottom:1px solid #0e0e14; flex-shrink:0; }
+#forth-header { padding:8px 14px; border-bottom:1px solid #0e0e14; flex-shrink:0;
+  display:flex; justify-content:space-between; align-items:flex-start; }
 #forth-header h2 { font-size:11px; letter-spacing:.2em; color:#b8860b; }
 #forth-header p  { font-size:9px; color:#2a2a35; margin-top:2px; }
+#met-display { font-size:9px; color:#505060; letter-spacing:.1em; text-align:right; }
 
 #forth-output {
   flex:1; overflow-y:auto; padding:12px 14px;
@@ -65,10 +108,25 @@ canvas#globe { width:100%; height:100%; display:block; }
 .fo-val   { color:#ffd700; }
 .fo-err   { color:#ff3c3c; }
 .fo-word  { color:#00d4cc; }
-.fo-worm  { color:#b8860b; font-size:9px; opacity:.6; }
+.fo-worm  { color:#b8860b; font-size:9px; opacity:.7; }
 .fo-iss   { color:#00ff88; }
 .fo-def   { color:#cc88ff; }
 .fo-prompt{ color:#ffd700; }
+.fo-warn  { color:#ff6600; }
+.fo-sys   { color:#505060; font-size:9px; }
+
+#quick-words {
+  padding:5px 14px; border-top:1px solid #0e0e14;
+  display:flex; flex-wrap:wrap; gap:3px; flex-shrink:0;
+}
+.qw {
+  font-size:9px; letter-spacing:.06em; padding:2px 6px;
+  border:1px solid #1c1c24; color:#505060; cursor:pointer;
+  background:transparent; font-family:'Courier New',monospace; transition:all .12s;
+}
+.qw:hover { border-color:#b8860b; color:#ffd700; }
+.qw.aero { border-color:#001a2a; color:#004466; }
+.qw.aero:hover { border-color:#00d4cc; color:#00d4cc; }
 
 #forth-input-row {
   display:flex; align-items:center; border-top:1px solid #0e0e14;
@@ -77,36 +135,28 @@ canvas#globe { width:100%; height:100%; display:block; }
 #forth-input-row span { color:#b8860b; font-size:11px; white-space:nowrap; }
 #forth-input {
   flex:1; background:transparent; border:none; outline:none;
-  color:#ffd700; font-family:'Courier New',monospace; font-size:12px;
-  caret-color:#ffd700;
+  color:#ffd700; font-family:'Courier New',monospace; font-size:12px; caret-color:#ffd700;
 }
 
-/* ── quick words ── */
-#quick-words {
-  padding:6px 14px; border-top:1px solid #0e0e14;
-  display:flex; flex-wrap:wrap; gap:4px; flex-shrink:0;
-}
-.qw {
-  font-size:9px; letter-spacing:.1em; padding:2px 8px;
-  border:1px solid #1c1c24; color:#505060; cursor:pointer;
-  background:transparent; font-family:'Courier New',monospace;
-  transition:all .15s;
-}
-.qw:hover { border-color:#b8860b; color:#ffd700; }
-
-/* ── worm bar ── */
 #worm-bar { padding:3px 14px; border-top:1px solid #0e0e14;
-  font-size:8px; color:#b8860b; opacity:.4; flex-shrink:0; }
+  font-size:8px; color:#b8860b; opacity:.4; flex-shrink:0;
+  display:flex; justify-content:space-between; }
 </style>
 </head>
 <body>
 
 <div id="topbar">
   <div>
-    <div class="title">⬡ BOB VOYAGER — FORTH ISS ORACLE</div>
-    <div class="sub">NO SYNTAX · JUST A STACK · NASA RUNS FORTH · SO DOES BOB</div>
+    <div class="title">⬡ BOB VOYAGER — FORTH ISS ORBITAL ORACLE</div>
+    <div class="sub">NO SYNTAX · JUST A STACK · NASA RUNS FORTH · SO DOES BOB · APACHE 2.0</div>
   </div>
-  <div style="font-size:9px;color:#505060" id="top-worm">WORM: initializing...</div>
+  <div class="tb-right">
+    <div class="tb-badge active">NORAD 25544</div>
+    <div class="tb-badge active">ISS ZARYA</div>
+    <div class="tb-badge" id="eclipse-badge">SUNLIT</div>
+    <div class="tb-badge" id="revcount-badge">REV —</div>
+    <div id="top-worm">WORM: initializing...</div>
+  </div>
 </div>
 
 <div id="main">
@@ -115,47 +165,91 @@ canvas#globe { width:100%; height:100%; display:block; }
   <div id="globe-pane">
     <canvas id="globe"></canvas>
 
+    <!-- TELEMETRY HUD -->
     <div id="iss-hud">
-      <div><span class="lbl">LAT  </span><span class="val" id="h-lat">---</span></div>
-      <div><span class="lbl">LON  </span><span class="val" id="h-lon">---</span></div>
-      <div><span class="lbl">ALT  </span><span class="val" id="h-alt">--- km</span></div>
-      <div><span class="lbl">VEL  </span><span class="val" id="h-vel">--- km/h</span></div>
-      <div><span class="lbl">PERIOD</span><span class="val" id="h-per">--- min</span></div>
-      <div><span class="lbl">WORM </span><span class="val" id="h-worm" style="color:#b8860b;font-size:9px">---</span></div>
+      <div class="section">ORBITAL TELEMETRY · LIVE</div>
+      <div><span class="lbl">LAT       </span><span class="val" id="h-lat">---</span></div>
+      <div><span class="lbl">LON       </span><span class="val" id="h-lon">---</span></div>
+      <div><span class="lbl">ALT       </span><span class="val" id="h-alt">--- km</span></div>
+      <div><span class="lbl">VELOCITY  </span><span class="val" id="h-vel">--- km/h</span></div>
+      <div><span class="lbl">PERIOD    </span><span class="val" id="h-per">--- min</span></div>
+      <div><span class="lbl">INCLINATION</span><span class="val-dim" id="h-inc">51.6°</span></div>
+      <div><span class="lbl">FOOTPRINT </span><span class="val-dim" id="h-foot">--- km</span></div>
+      <div class="section" style="margin-top:6px">WORM SEAL</div>
+      <div><span class="val" id="h-worm" style="color:#b8860b;font-size:9px">---</span></div>
     </div>
 
+    <!-- ORBITAL ELEMENTS HUD -->
+    <div id="orbit-hud">
+      <div class="section">KEPLERIAN ELEMENTS</div>
+      <div><span class="lbl" style="color:#505060">SEMI-MAJOR  </span><span id="h-sma" style="color:#00d4cc;font-size:10px">--- km</span></div>
+      <div><span class="lbl" style="color:#505060">VIS-VIVA    </span><span id="h-vv" style="color:#00d4cc;font-size:10px">--- km/s</span></div>
+      <div><span class="lbl" style="color:#505060">MEAN MOTION </span><span id="h-mm" style="color:#00d4cc;font-size:10px">--- rev/day</span></div>
+      <div><span class="lbl" style="color:#505060">APOGEE      </span><span id="h-apogee" style="color:#00d4cc;font-size:10px">--- km</span></div>
+      <div><span class="lbl" style="color:#505060">PERIGEE     </span><span id="h-perigee" style="color:#00d4cc;font-size:10px">--- km</span></div>
+      <div class="section" style="margin-top:4px">GROUND DIST</div>
+      <div><span class="lbl" style="color:#505060">SF JSC MOS  </span></div>
+      <div><span id="h-sf" style="color:#00d4cc;font-size:9px">---</span></div>
+      <div><span id="h-jsc" style="color:#00d4cc;font-size:9px">---</span></div>
+      <div><span id="h-mos" style="color:#00d4cc;font-size:9px">---</span></div>
+    </div>
+
+    <!-- FORTH STACK DISPLAY -->
     <div id="forth-stack-display">
       <div class="stitle">FORTH STACK ↓</div>
       <div id="stack-cells"><div class="stack-cell" style="color:#2a2a35"><span>empty</span><span class="spos">—</span></div></div>
+    </div>
+
+    <!-- GROUND STATION LEGEND -->
+    <div id="gs-legend">
+      <div class="gt">GROUND STATIONS</div>
+      <div><span class="gs-dot" style="background:#00d4cc"></span>SF · SAN FRANCISCO</div>
+      <div><span class="gs-dot" style="background:#ff6600"></span>JSC · HOUSTON TX</div>
+      <div><span class="gs-dot" style="background:#cc88ff"></span>TsUP · MOSCOW</div>
+      <div><span class="gs-dot" style="background:#ffd700"></span>JAXA · TSUKUBA</div>
     </div>
   </div>
 
   <!-- ── FORTH TERMINAL ── -->
   <div id="forth-pane">
     <div id="forth-header">
-      <h2>BOB FORTH — ORBITAL KERNEL</h2>
-      <p>Voyager probe runs Forth. ISS telemetry on the stack. Type words below.</p>
+      <div>
+        <h2>BOB FORTH — AEROSPACE KERNEL v2.0</h2>
+        <p>NORAD 25544 · ISS telemetry on the stack · Apache 2.0 · SnapKitty Collective</p>
+      </div>
+      <div id="met-display">MET<br><span id="met-val">T+00:00:00</span></div>
     </div>
 
-    <div id="forth-output" id="fo"></div>
+    <div id="forth-output"></div>
 
     <div id="quick-words">
       <button class="qw" onclick="runWord('ISS.LAT')">ISS.LAT</button>
       <button class="qw" onclick="runWord('ISS.LON')">ISS.LON</button>
       <button class="qw" onclick="runWord('ISS.ALT')">ISS.ALT</button>
       <button class="qw" onclick="runWord('ISS.VEL')">ISS.VEL</button>
-      <button class="qw" onclick="runWord('ORBITAL.PERIOD')">ORBITAL.PERIOD</button>
-      <button class="qw" onclick="runWord('.S')">  .S</button>
-      <button class="qw" onclick="runWord('.')">   .</button>
+      <button class="qw" onclick="runWord('ISS.STACK')">ISS.STACK</button>
+      <button class="qw aero" onclick="runWord('ORBITAL.PERIOD')">ORBITAL.PERIOD</button>
+      <button class="qw aero" onclick="runWord('VIS.VIVA')">VIS.VIVA</button>
+      <button class="qw aero" onclick="runWord('SEMI.MAJOR')">SEMI.MAJOR</button>
+      <button class="qw aero" onclick="runWord('MEAN.MOTION')">MEAN.MOTION</button>
+      <button class="qw aero" onclick="runWord('FOOTPRINT')">FOOTPRINT</button>
+      <button class="qw aero" onclick="runWord('ECLIPSE')">ECLIPSE</button>
+      <button class="qw aero" onclick="runWord('DELTA.V')">DELTA.V</button>
+      <button class="qw aero" onclick="runWord('DIST.SF')">DIST.SF</button>
+      <button class="qw aero" onclick="runWord('DIST.JSC')">DIST.JSC</button>
+      <button class="qw aero" onclick="runWord('DIST.TSUP')">DIST.TSUP</button>
+      <button class="qw aero" onclick="runWord('ELEV.SF')">ELEV.SF</button>
+      <button class="qw" onclick="runWord('.S')">.S</button>
+      <button class="qw" onclick="runWord('.')"> . </button>
       <button class="qw" onclick="runWord('DUP')">DUP</button>
       <button class="qw" onclick="runWord('SWAP')">SWAP</button>
       <button class="qw" onclick="runWord('DROP')">DROP</button>
-      <button class="qw" onclick="runWord('+')">  +</button>
-      <button class="qw" onclick="runWord('-')">  -</button>
-      <button class="qw" onclick="runWord('*')">  *</button>
-      <button class="qw" onclick="runWord('/')">  /</button>
+      <button class="qw" onclick="runWord('+')"> + </button>
+      <button class="qw" onclick="runWord('-')"> - </button>
+      <button class="qw" onclick="runWord('*')"> * </button>
+      <button class="qw" onclick="runWord('/')"> / </button>
+      <button class="qw" onclick="runWord('SQRT')">SQRT</button>
       <button class="qw" onclick="runWord('WORM.SEAL')">WORM.SEAL</button>
-      <button class="qw" onclick="runWord('ISS.STACK')">ISS.STACK</button>
       <button class="qw" onclick="runWord('WORDS')">WORDS</button>
       <button class="qw" onclick="runWord('CLEAR')">CLEAR</button>
     </div>
@@ -166,46 +260,68 @@ canvas#globe { width:100%; height:100%; display:block; }
              placeholder="type words separated by spaces..." />
     </div>
 
-    <div id="worm-bar" id="worm-line">WORM CHAIN: initializing...</div>
+    <div id="worm-bar">
+      <span id="worm-line">WORM CHAIN: initializing...</span>
+      <span id="worm-count">seals: 0</span>
+    </div>
   </div>
 
 </div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// BOB FORTH ENGINE
+// BOB FORTH AEROSPACE KERNEL v2.0
+// Apache License 2.0 — SnapKitty Collective 2026
+// NORAD 25544 · ISS ZARYA
 // ═══════════════════════════════════════════════════════════════
 
 const stack = [];
-const returnStack = [];
 const dictionary = {};
 let compiling = false;
 let compileWord = null;
 let compileBody = [];
 
+// ISS constants
+const MU      = 398600.4418;   // km³/s²  — Earth gravitational parameter
+const R_EARTH = 6371;          // km
+const OMEGA_E = 7.2921150e-5;  // rad/s   — Earth rotation rate
+const ISS_INC = 51.6;          // deg     — ISS orbital inclination
+const ISS_ECC = 0.0001698;     // ISS near-circular eccentricity
+
 // Live ISS state
-const iss = { lat:0, lon:0, alt:408, vel:27600, timestamp:0 };
+const iss = { lat:0, lon:0, alt:408, vel:27600, timestamp:0, fetched:false };
+
+// Ground stations
+const GS = {
+  SF:   { name:'SF',    lat:37.7749,  lon:-122.4194, color:'#00d4cc' },
+  JSC:  { name:'JSC',   lat:29.5583,  lon:-95.0894,  color:'#ff6600' },
+  TSUP: { name:'TsUP',  lat:55.7558,  lon:37.6173,   color:'#cc88ff' },
+  JAXA: { name:'JAXA',  lat:36.0466,  lon:140.1229,  color:'#ffd700' },
+};
 
 // WORM chain
-let wormPrev = 'GENESIS';
+let wormPrev = 'GENESIS_BOB_VOYAGER_v2';
+let wormCount = 0;
+const bootTime = Date.now();
+
 async function wormSeal(evt) {
-  const msg = `${wormPrev}|${evt}`;
+  const msg = `${wormPrev}|${evt}|${Date.now()}`;
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
   wormPrev = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  document.getElementById('top-worm').textContent = 'WORM: ' + wormPrev.slice(0,16)+'...';
-  document.getElementById('worm-bar').textContent  = 'WORM CHAIN: ' + wormPrev;
-  document.getElementById('h-worm').textContent    = wormPrev.slice(0,12)+'...';
+  wormCount++;
+  document.getElementById('top-worm').textContent   = 'WORM: ' + wormPrev.slice(0,16)+'...';
+  document.getElementById('worm-line').textContent  = 'WORM CHAIN: ' + wormPrev;
+  document.getElementById('h-worm').textContent     = wormPrev.slice(0,14)+'...';
+  document.getElementById('worm-count').textContent = 'seals: '+wormCount;
+  try { localStorage.setItem('bobvoyager_worm', JSON.stringify({hash:wormPrev,count:wormCount,ts:Date.now()})); } catch(_){}
   return wormPrev;
 }
 
 // Output
 const fo = document.getElementById('forth-output');
 function emit(text, cls='fo-ok') {
-  const d = document.createElement('div');
-  d.className = cls;
-  d.textContent = text;
-  fo.appendChild(d);
-  fo.scrollTop = fo.scrollHeight;
+  const d = document.createElement('div'); d.className = cls; d.textContent = text;
+  fo.appendChild(d); fo.scrollTop = fo.scrollHeight;
 }
 
 // Stack display
@@ -217,106 +333,211 @@ function renderStack() {
   }
   el.innerHTML = '';
   for (let i = stack.length-1; i >= 0; i--) {
-    const d = document.createElement('div');
-    d.className = 'stack-cell';
-    d.innerHTML = `<span>${stack[i].toFixed(4)}</span><span class="spos">TOS-${stack.length-1-i}</span>`;
+    const d = document.createElement('div'); d.className = 'stack-cell';
+    d.innerHTML = `<span>${Number.isInteger(stack[i])?stack[i]:stack[i].toFixed(6)}</span><span class="spos">TOS-${stack.length-1-i}</span>`;
     el.appendChild(d);
   }
 }
 
-// ── Built-in words ───────────────────────────────────────────
+// ── Word definitions ─────────────────────────────────────────
 function def(name, fn) { dictionary[name.toUpperCase()] = fn; }
 
 // Arithmetic
-def('+',    () => { const b=stack.pop(),a=stack.pop(); stack.push(a+b); });
-def('-',    () => { const b=stack.pop(),a=stack.pop(); stack.push(a-b); });
-def('*',    () => { const b=stack.pop(),a=stack.pop(); stack.push(a*b); });
-def('/',    () => { const b=stack.pop(),a=stack.pop(); if(b===0) throw 'DIV/0'; stack.push(a/b); });
-def('MOD',  () => { const b=stack.pop(),a=stack.pop(); stack.push(a%b); });
-def('ABS',  () => { stack.push(Math.abs(stack.pop())); });
-def('SQRT', () => { stack.push(Math.sqrt(stack.pop())); });
-def('SIN',  () => { stack.push(Math.sin(stack.pop()*Math.PI/180)); });
-def('COS',  () => { stack.push(Math.cos(stack.pop()*Math.PI/180)); });
-def('PI',   () => { stack.push(Math.PI); });
-def('2*',   () => { stack.push(stack.pop()*2); });
-def('2/',   () => { stack.push(stack.pop()/2); });
-def('NEGATE',()=> { stack.push(-stack.pop()); });
+def('+',        () => { const b=stack.pop(),a=stack.pop(); stack.push(a+b); });
+def('-',        () => { const b=stack.pop(),a=stack.pop(); stack.push(a-b); });
+def('*',        () => { const b=stack.pop(),a=stack.pop(); stack.push(a*b); });
+def('/',        () => { const b=stack.pop(),a=stack.pop(); if(!b) throw 'DIV/0'; stack.push(a/b); });
+def('MOD',      () => { const b=stack.pop(),a=stack.pop(); stack.push(a%b); });
+def('ABS',      () => { stack.push(Math.abs(stack.pop())); });
+def('SQRT',     () => { stack.push(Math.sqrt(stack.pop())); });
+def('SIN',      () => { stack.push(Math.sin(stack.pop()*Math.PI/180)); });
+def('COS',      () => { stack.push(Math.cos(stack.pop()*Math.PI/180)); });
+def('ATAN2',    () => { const b=stack.pop(),a=stack.pop(); stack.push(Math.atan2(a,b)*180/Math.PI); });
+def('PI',       () => { stack.push(Math.PI); });
+def('2*',       () => { stack.push(stack.pop()*2); });
+def('2/',       () => { stack.push(stack.pop()/2); });
+def('NEGATE',   () => { stack.push(-stack.pop()); });
+def('MAX',      () => { const b=stack.pop(),a=stack.pop(); stack.push(Math.max(a,b)); });
+def('MIN',      () => { const b=stack.pop(),a=stack.pop(); stack.push(Math.min(a,b)); });
+def('FLOOR',    () => { stack.push(Math.floor(stack.pop())); });
+def('ROUND',    () => { stack.push(Math.round(stack.pop())); });
 
 // Stack ops
-def('DUP',  () => { const a=stack[stack.length-1]; stack.push(a); });
-def('DROP', () => { stack.pop(); });
-def('SWAP', () => { const b=stack.pop(),a=stack.pop(); stack.push(b); stack.push(a); });
-def('OVER', () => { stack.push(stack[stack.length-2]); });
-def('ROT',  () => { const c=stack.pop(),b=stack.pop(),a=stack.pop(); stack.push(b);stack.push(c);stack.push(a); });
-def('NIP',  () => { const a=stack.pop(); stack.pop(); stack.push(a); });
-def('TUCK', () => { const b=stack.pop(),a=stack.pop(); stack.push(b);stack.push(a);stack.push(b); });
-def('DEPTH',() => { stack.push(stack.length); });
-def('CLEAR',() => { stack.length=0; emit('stack cleared','fo-ok'); });
+def('DUP',      () => { const a=stack[stack.length-1]; stack.push(a); });
+def('DROP',     () => { stack.pop(); });
+def('SWAP',     () => { const b=stack.pop(),a=stack.pop(); stack.push(b); stack.push(a); });
+def('OVER',     () => { stack.push(stack[stack.length-2]); });
+def('ROT',      () => { const c=stack.pop(),b=stack.pop(),a=stack.pop(); stack.push(b);stack.push(c);stack.push(a); });
+def('NIP',      () => { const a=stack.pop(); stack.pop(); stack.push(a); });
+def('TUCK',     () => { const b=stack.pop(),a=stack.pop(); stack.push(b);stack.push(a);stack.push(b); });
+def('DEPTH',    () => { stack.push(stack.length); });
+def('CLEAR',    () => { stack.length=0; emit('stack cleared','fo-ok'); });
+def('2DUP',     () => { const b=stack[stack.length-1],a=stack[stack.length-2]; stack.push(a);stack.push(b); });
 
 // Output
-def('.',    () => {
-  const v = stack.pop();
-  emit('  → ' + (Number.isInteger(v)?v:v.toFixed(6)), 'fo-val');
+def('.',  () => { const v=stack.pop(); emit('  → '+(Number.isInteger(v)?v:v.toFixed(6)),'fo-val'); });
+def('.S', () => {
+  if (!stack.length) { emit('  < empty >','fo-ok'); return; }
+  emit('  < '+stack.map((v,i)=>`[${i}]:${Number.isInteger(v)?v:v.toFixed(4)}`).join('  ')+'  >','fo-val');
 });
-def('.S',   () => {
-  if (stack.length===0) { emit('  < empty >', 'fo-ok'); return; }
-  emit('  < '+stack.map((v,i)=>`[${i}]:${Number.isInteger(v)?v:v.toFixed(4)}`).join('  ')+'  >', 'fo-val');
-});
-def('CR',   () => { emit('', 'fo-ok'); });
+def('CR', () => { emit('','fo-ok'); });
 
-// ── ISS words ────────────────────────────────────────────────
-def('ISS.LAT',  () => { stack.push(iss.lat);  emit(`  ISS.LAT → ${iss.lat.toFixed(4)}°`, 'fo-iss'); });
-def('ISS.LON',  () => { stack.push(iss.lon);  emit(`  ISS.LON → ${iss.lon.toFixed(4)}°`, 'fo-iss'); });
-def('ISS.ALT',  () => { stack.push(iss.alt);  emit(`  ISS.ALT → ${iss.alt.toFixed(2)} km`, 'fo-iss'); });
-def('ISS.VEL',  () => { stack.push(iss.vel);  emit(`  ISS.VEL → ${iss.vel.toFixed(0)} km/h`, 'fo-iss'); });
-
-def('ORBITAL.PERIOD', () => {
-  // T = 2π√(r³/μ), r = R_earth + alt (km), μ = 398600.4418 km³/s²
-  const R = 6371 + iss.alt;
-  const mu = 398600.4418;
-  const T = 2*Math.PI*Math.sqrt(Math.pow(R,3)/mu) / 60; // minutes
-  stack.push(T);
-  emit(`  ORBITAL.PERIOD → ${T.toFixed(2)} min`, 'fo-iss');
-});
+// ── ISS telemetry words ──────────────────────────────────────
+def('ISS.LAT',  () => { stack.push(iss.lat);  emit(`  ISS.LAT  → ${iss.lat.toFixed(4)}°`,'fo-iss'); });
+def('ISS.LON',  () => { stack.push(iss.lon);  emit(`  ISS.LON  → ${iss.lon.toFixed(4)}°`,'fo-iss'); });
+def('ISS.ALT',  () => { stack.push(iss.alt);  emit(`  ISS.ALT  → ${iss.alt.toFixed(2)} km`,'fo-iss'); });
+def('ISS.VEL',  () => { stack.push(iss.vel);  emit(`  ISS.VEL  → ${iss.vel.toFixed(0)} km/h`,'fo-iss'); });
+def('ISS.INC',  () => { stack.push(ISS_INC);  emit(`  INCLINATION → ${ISS_INC}°  (polar orbit coverage)`,'fo-iss'); });
+def('NORAD.ID', () => { stack.push(25544);    emit(`  NORAD 25544 — ISS ZARYA (catalogued 1998-11-20)`,'fo-iss'); });
 
 def('ISS.STACK', () => {
-  dictionary['ISS.LAT']();
-  dictionary['ISS.LON']();
-  dictionary['ISS.ALT']();
-  dictionary['ISS.VEL']();
-  emit('  ISS state pushed (LAT LON ALT VEL)', 'fo-iss');
+  dictionary['ISS.LAT'](); dictionary['ISS.LON']();
+  dictionary['ISS.ALT'](); dictionary['ISS.VEL']();
+  emit('  ISS state pushed [ LAT LON ALT VEL ]','fo-iss');
 });
 
-// Orbital helpers
+// ── Orbital mechanics ─────────────────────────────────────────
+def('ORBITAL.PERIOD', () => {
+  const r = R_EARTH + iss.alt;
+  const T = 2*Math.PI*Math.sqrt(r**3/MU)/60;
+  stack.push(T);
+  emit(`  ORBITAL.PERIOD → ${T.toFixed(2)} min  (${(T/60).toFixed(3)} hr)`,'fo-iss');
+});
+
+def('VIS.VIVA', () => {
+  // v² = μ(2/r - 1/a), circular ⇒ a≈r
+  const r = (R_EARTH + iss.alt);
+  const v = Math.sqrt(MU/r);
+  stack.push(v);
+  emit(`  VIS-VIVA → ${v.toFixed(4)} km/s  (${(v*3600).toFixed(0)} km/h)`,'fo-iss');
+});
+
+def('SEMI.MAJOR', () => {
+  const a = R_EARTH + iss.alt;
+  stack.push(a);
+  emit(`  SEMI-MAJOR AXIS → ${a.toFixed(2)} km`,'fo-iss');
+});
+
+def('MEAN.MOTION', () => {
+  const a = R_EARTH + iss.alt;
+  const T = 2*Math.PI*Math.sqrt(a**3/MU);  // seconds
+  const n = 86400/T;  // rev/day
+  stack.push(n);
+  emit(`  MEAN MOTION → ${n.toFixed(4)} rev/day`,'fo-iss');
+});
+
+def('APOGEE', () => {
+  const apogee = iss.alt * (1 + ISS_ECC);
+  stack.push(apogee);
+  emit(`  APOGEE → ${apogee.toFixed(2)} km`,'fo-iss');
+});
+
+def('PERIGEE', () => {
+  const perigee = iss.alt * (1 - ISS_ECC);
+  stack.push(perigee);
+  emit(`  PERIGEE → ${perigee.toFixed(2)} km`,'fo-iss');
+});
+
+def('FOOTPRINT', () => {
+  // Horizon circle radius on Earth surface
+  const r = R_EARTH + iss.alt;
+  const fp = R_EARTH * Math.acos(R_EARTH/r);  // radians × R
+  const fpKm = fp * R_EARTH / R_EARTH * (180/Math.PI) * 111.32;
+  // Simpler: angular radius = acos(Re/r), footprint radius = Re × angle
+  const ang = Math.acos(R_EARTH/r);
+  const fkm = R_EARTH * ang;
+  stack.push(fkm);
+  emit(`  FOOTPRINT RADIUS → ${fkm.toFixed(0)} km  (area: ${(Math.PI*fkm**2/1e6).toFixed(2)}M km²)`,'fo-iss');
+});
+
+def('ECLIPSE', () => {
+  // Rough eclipse check: ISS is in shadow when Sun-Earth-ISS angle < critical angle
+  // Use day-of-year based solar position approximation
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(),0,0))/(1000*60*60*24));
+  const sunLon = (dayOfYear/365.25)*360 - 180;
+  const angleDiff = Math.abs(iss.lon - sunLon) % 360;
+  const norm = angleDiff > 180 ? 360 - angleDiff : angleDiff;
+  const inEclipse = norm > 120 && iss.lat < 70;
+  stack.push(inEclipse ? 1 : 0);
+  if (inEclipse) {
+    emit(`  ECLIPSE → 1  (ISS in Earth shadow — no solar power)`,'fo-warn');
+    document.getElementById('eclipse-badge').textContent = 'ECLIPSE';
+    document.getElementById('eclipse-badge').className = 'tb-badge eclipse';
+  } else {
+    emit(`  ECLIPSE → 0  (ISS SUNLIT — solar arrays active)`,'fo-iss');
+    document.getElementById('eclipse-badge').textContent = 'SUNLIT';
+    document.getElementById('eclipse-badge').className = 'tb-badge sunlit';
+  }
+});
+
+def('DELTA.V', () => {
+  // Delta-V for reboost from current alt to 420 km (nominal)
+  const target = 420;
+  const r1 = R_EARTH + iss.alt;
+  const r2 = R_EARTH + target;
+  const v1 = Math.sqrt(MU/r1);
+  const v2 = Math.sqrt(MU/r2);
+  const dv = Math.abs(v2 - v1);
+  stack.push(dv);
+  emit(`  DELTA.V to 420km → ${dv.toFixed(4)} km/s  (${(dv*1000).toFixed(1)} m/s)`,'fo-iss');
+  if (iss.alt < 390) emit(`  ⚠ ALTITUDE WARNING: ${iss.alt.toFixed(1)} km — drag reboost needed`,'fo-warn');
+});
+
+// ── Ground station words ──────────────────────────────────────
+function haversine(lat1,lon1,lat2,lon2) {
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function elevAngle(gsLat, gsLon) {
+  const d = haversine(iss.lat, iss.lon, gsLat, gsLon);
+  const centralAngle = d / R_EARTH;
+  const elev = Math.atan((Math.cos(centralAngle) - R_EARTH/(R_EARTH+iss.alt)) / Math.sin(centralAngle)) * 180/Math.PI;
+  return elev;
+}
+
+def('DIST.SF',   () => { const d=haversine(iss.lat,iss.lon,GS.SF.lat,GS.SF.lon); stack.push(d); emit(`  DIST.SF   → ${d.toFixed(1)} km  (San Francisco)`,'fo-iss'); });
+def('DIST.JSC',  () => { const d=haversine(iss.lat,iss.lon,GS.JSC.lat,GS.JSC.lon); stack.push(d); emit(`  DIST.JSC  → ${d.toFixed(1)} km  (Houston — Johnson Space Center)`,'fo-iss'); });
+def('DIST.TSUP', () => { const d=haversine(iss.lat,iss.lon,GS.TSUP.lat,GS.TSUP.lon); stack.push(d); emit(`  DIST.TsUP → ${d.toFixed(1)} km  (Moscow — Russian Mission Control)`,'fo-iss'); });
+def('DIST.JAXA', () => { const d=haversine(iss.lat,iss.lon,GS.JAXA.lat,GS.JAXA.lon); stack.push(d); emit(`  DIST.JAXA → ${d.toFixed(1)} km  (Tsukuba — JAXA Control)`,'fo-iss'); });
+
+def('ELEV.SF',   () => {
+  const e=elevAngle(GS.SF.lat,GS.SF.lon);
+  stack.push(e);
+  if (e>0) emit(`  ELEV.SF → ${e.toFixed(1)}°  (ISS ABOVE HORIZON from SF — pass active)`,'fo-iss');
+  else     emit(`  ELEV.SF → ${e.toFixed(1)}°  (ISS below horizon from SF)`,'fo-ok');
+});
+
+// Unit conversions
 def('KM.TO.MI',  () => { stack.push(stack.pop()*0.621371); });
 def('KMH.TO.MS', () => { stack.push(stack.pop()/3.6); });
+def('KMH.TO.MACH',()=> { stack.push(stack.pop()/1234.8); });
 def('DEG.TO.RAD',() => { stack.push(stack.pop()*Math.PI/180); });
+def('RAD.TO.DEG',() => { stack.push(stack.pop()*180/Math.PI); });
+def('KM.TO.NM',  () => { stack.push(stack.pop()*0.539957); });  // nautical miles
 
-// Distance to SF ground station (37.7749°N, 122.4194°W)
-def('DIST.SF', () => {
-  const lat2=37.7749, lon2=-122.4194;
-  const R=6371;
-  const dLat=(lat2-iss.lat)*Math.PI/180;
-  const dLon=(lon2-iss.lon)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+Math.cos(iss.lat*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  const d=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-  stack.push(d);
-  emit(`  DIST.SF → ${d.toFixed(1)} km from San Francisco`, 'fo-iss');
-});
-
-// WORM from stack
+// WORM
 def('WORM.SEAL', () => {
   const v = stack[stack.length-1];
   wormSeal(`FORTH|${v}`).then(h => {
-    emit(`  WORM.SEAL → ${h.slice(0,20)}...`, 'fo-worm');
+    emit(`  WORM.SEAL → ${h.slice(0,24)}...`,'fo-worm');
     renderStack();
   });
 });
 
-// Words list
 def('WORDS', () => {
-  const words = Object.keys(dictionary).sort().join('  ');
-  emit('BUILT-IN: '+words, 'fo-ok');
+  const words = Object.keys(dictionary).sort();
+  const orbital  = words.filter(w=>['ORBITAL.PERIOD','VIS.VIVA','SEMI.MAJOR','MEAN.MOTION','APOGEE','PERIGEE','FOOTPRINT','ECLIPSE','DELTA.V'].includes(w));
+  const iss_w    = words.filter(w=>w.startsWith('ISS.')||w==='NORAD.ID');
+  const dist_w   = words.filter(w=>w.startsWith('DIST.')||w.startsWith('ELEV.'));
+  const other    = words.filter(w=>!orbital.includes(w)&&!iss_w.includes(w)&&!dist_w.includes(w));
+  emit('ORBITAL:  '+orbital.join('  '),'fo-iss');
+  emit('ISS:      '+iss_w.join('  '),'fo-iss');
+  emit('GS DIST:  '+dist_w.join('  '),'fo-iss');
+  emit('CORE:     '+other.join('  '),'fo-ok');
 });
 
 // ── Evaluator ────────────────────────────────────────────────
@@ -325,121 +546,110 @@ function evaluate(input) {
   for (const tok of tokens) {
     if (!tok) continue;
     const upper = tok.toUpperCase();
-
-    // Handle : word definition
-    if (upper === ':') { compiling=true; compileWord=null; compileBody=[]; continue; }
-    if (upper === ';') {
+    if (upper===':') { compiling=true; compileWord=null; compileBody=[]; continue; }
+    if (upper===';') {
       if (compileWord) {
-        const body = [...compileBody];
-        const wname = compileWord;
-        dictionary[wname] = () => {
-          for (const t of body) evaluate(t);
-        };
-        emit(`  : ${wname} ... ;  defined`, 'fo-def');
+        const body=[...compileBody], wname=compileWord;
+        dictionary[wname] = () => { for(const t of body) evaluate(t); };
+        emit(`  : ${wname} ... ;  defined`,'fo-def');
         wormSeal(`DEFINE|${wname}`);
       }
       compiling=false; compileWord=null; compileBody=[]; continue;
     }
-    if (compiling) {
-      if (!compileWord) { compileWord=upper; }
-      else { compileBody.push(tok); }
-      continue;
-    }
-
-    // Number literal
-    if (!isNaN(tok) && tok !== '') { stack.push(parseFloat(tok)); continue; }
-
-    // Dictionary lookup
-    if (dictionary[upper]) {
-      try {
-        dictionary[upper]();
-      } catch(e) {
-        emit(`  ERROR: ${upper} — ${e}`, 'fo-err');
-      }
-      continue;
-    }
-
-    emit(`  UNDEFINED: ${upper}`, 'fo-err');
+    if (compiling) { if (!compileWord) compileWord=upper; else compileBody.push(tok); continue; }
+    if (!isNaN(tok) && tok!=='') { stack.push(parseFloat(tok)); continue; }
+    if (dictionary[upper]) { try { dictionary[upper](); } catch(e) { emit(`  ERROR: ${upper} — ${e}`,'fo-err'); } continue; }
+    emit(`  UNDEFINED: ${upper}`,'fo-err');
   }
   renderStack();
 }
 
-function runWord(w) {
-  emit('FORTH> '+w, 'fo-prompt');
-  evaluate(w);
-}
+function runWord(w) { emit('FORTH> '+w,'fo-prompt'); evaluate(w); }
 
-// ── Input handling ────────────────────────────────────────────
+// ── Input ────────────────────────────────────────────────────
 const input = document.getElementById('forth-input');
-const history = [];
-let histIdx = -1;
-
+const history = []; let histIdx=-1;
 input.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const val = input.value.trim();
-    if (!val) return;
+  if (e.key==='Enter') {
+    const val=input.value.trim(); if (!val) return;
     history.unshift(val); histIdx=-1;
-    emit('FORTH> '+val, 'fo-prompt');
-    evaluate(val);
-    input.value = '';
+    emit('FORTH> '+val,'fo-prompt'); evaluate(val); input.value='';
   }
-  if (e.key === 'ArrowUp')   { if(histIdx<history.length-1){histIdx++;input.value=history[histIdx];} }
-  if (e.key === 'ArrowDown') { if(histIdx>0){histIdx--;input.value=history[histIdx];}else{histIdx=-1;input.value='';} }
+  if (e.key==='ArrowUp')   { if(histIdx<history.length-1){histIdx++;input.value=history[histIdx];} }
+  if (e.key==='ArrowDown') { if(histIdx>0){histIdx--;input.value=history[histIdx];}else{histIdx=-1;input.value='';} }
 });
 
 // ═══════════════════════════════════════════════════════════════
-// ISS LIVE TELEMETRY
+// LIVE ISS TELEMETRY — wheretheiss.at API
 // ═══════════════════════════════════════════════════════════════
-const track = [];  // recent ISS positions for trail
+const track=[];
+
+function updateOrbitHUD() {
+  const r=R_EARTH+iss.alt, a=r;
+  const vv=Math.sqrt(MU/r);
+  const T=2*Math.PI*Math.sqrt(a**3/MU);
+  const n=86400/T;
+  const apg=iss.alt*(1+ISS_ECC), per=iss.alt*(1-ISS_ECC);
+  const fp=R_EARTH*Math.acos(R_EARTH/r);
+  document.getElementById('h-sma').textContent    = r.toFixed(2)+' km';
+  document.getElementById('h-vv').textContent     = vv.toFixed(4)+' km/s';
+  document.getElementById('h-mm').textContent     = n.toFixed(4)+' rev/day';
+  document.getElementById('h-apogee').textContent = apg.toFixed(2)+' km';
+  document.getElementById('h-perigee').textContent= per.toFixed(2)+' km';
+  document.getElementById('h-foot').textContent   = fp.toFixed(0)+' km';
+  document.getElementById('h-sf').textContent     = 'SF:   '+haversine(iss.lat,iss.lon,GS.SF.lat,GS.SF.lon).toFixed(0)+' km';
+  document.getElementById('h-jsc').textContent    = 'JSC:  '+haversine(iss.lat,iss.lon,GS.JSC.lat,GS.JSC.lon).toFixed(0)+' km';
+  document.getElementById('h-mos').textContent    = 'TsUP: '+haversine(iss.lat,iss.lon,GS.TSUP.lat,GS.TSUP.lon).toFixed(0)+' km';
+  // Orbit count estimate (rough)
+  const missionStart = new Date('1998-11-20').getTime();
+  const orbitsSinceLaunch = Math.floor((Date.now()-missionStart)/(T*1000));
+  document.getElementById('revcount-badge').textContent = 'REV ~'+orbitsSinceLaunch.toLocaleString();
+  // Alt warning
+  const altEl = document.getElementById('h-alt');
+  if (iss.alt < 390) {
+    altEl.className = 'val-warn';
+    altEl.textContent = iss.alt.toFixed(1)+' km ⚠';
+  } else {
+    altEl.className = 'val';
+    altEl.textContent = iss.alt.toFixed(1)+' km';
+  }
+}
 
 async function fetchISS() {
   try {
     const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
     const d = await r.json();
-    iss.lat = d.latitude;
-    iss.lon = d.longitude;
-    iss.alt = d.altitude;
-    iss.vel = d.velocity;
-    iss.timestamp = d.timestamp;
-
-    track.push({lat:iss.lat, lon:iss.lon});
-    if (track.length > 120) track.shift();
-
+    iss.lat=d.latitude; iss.lon=d.longitude; iss.alt=d.altitude;
+    iss.vel=d.velocity; iss.timestamp=d.timestamp; iss.fetched=true;
+    track.push({lat:iss.lat,lon:iss.lon}); if(track.length>150)track.shift();
     document.getElementById('h-lat').textContent = iss.lat.toFixed(4)+'°';
     document.getElementById('h-lon').textContent = iss.lon.toFixed(4)+'°';
-    document.getElementById('h-alt').textContent = iss.alt.toFixed(1)+' km';
     document.getElementById('h-vel').textContent = iss.vel.toFixed(0)+' km/h';
-
-    const R=6371+iss.alt, mu=398600.4418;
-    const T=2*Math.PI*Math.sqrt(Math.pow(R,3)/mu)/60;
+    const T=2*Math.PI*Math.sqrt((R_EARTH+iss.alt)**3/MU)/60;
     document.getElementById('h-per').textContent = T.toFixed(2)+' min';
-
+    updateOrbitHUD();
     await wormSeal(`ISS|${iss.lat.toFixed(2)}|${iss.lon.toFixed(2)}|${iss.alt.toFixed(1)}`);
     drawGlobe();
-  } catch(e) {
-    console.warn('ISS fetch failed:', e);
-  }
+  } catch(e) { console.warn('ISS fetch failed:',e); }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // GLOBE RENDERER
 // ═══════════════════════════════════════════════════════════════
-const canvas = document.getElementById('globe');
-const ctx    = canvas.getContext('2d');
-let globeAngle = 0;
+const canvas=document.getElementById('globe');
+const ctx=canvas.getContext('2d');
+let globeAngle=0;
 
-function latLonToXY(lat, lon, cx, cy, r) {
-  const x = cx + r * Math.cos(lat*Math.PI/180) * Math.sin((lon+globeAngle)*Math.PI/180);
-  const y = cy - r * Math.sin(lat*Math.PI/180);
-  const vis = Math.cos((lon+globeAngle)*Math.PI/180)*Math.cos(lat*Math.PI/180);
-  return {x, y, vis};
+function latLonToXY(lat,lon,cx,cy,r){
+  const x=cx+r*Math.cos(lat*Math.PI/180)*Math.sin((lon+globeAngle)*Math.PI/180);
+  const y=cy-r*Math.sin(lat*Math.PI/180);
+  const vis=Math.cos((lon+globeAngle)*Math.PI/180)*Math.cos(lat*Math.PI/180);
+  return {x,y,vis};
 }
 
-function drawGlobe() {
-  const W=canvas.width, H=canvas.height;
-  const cx=W/2, cy=H/2;
+function drawGlobe(){
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
   const r=Math.min(W,H)*0.42;
-
   ctx.clearRect(0,0,W,H);
 
   // Space bg
@@ -447,126 +657,138 @@ function drawGlobe() {
   grad.addColorStop(0,'#02020a'); grad.addColorStop(1,'#000004');
   ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
 
-  // Stars
-  ctx.fillStyle='rgba(255,255,255,0.5)';
-  for(let i=0;i<200;i++){
-    const sx=(i*137.5)%W, sy=(i*79.3)%H;
-    ctx.fillRect(sx,sy,i%7===0?2:1,i%7===0?2:1);
+  // Stars (deterministic)
+  for(let i=0;i<250;i++){
+    const sx=(i*137.508)%W, sy=(i*79.31)%H;
+    ctx.fillStyle=`rgba(255,255,255,${0.2+((i%5)/5)*0.5})`;
+    ctx.fillRect(sx,sy,i%11===0?2:1,i%11===0?2:1);
   }
 
-  // Globe shadow
+  // Globe
   const shadow=ctx.createRadialGradient(cx+r*.2,cy-r*.2,r*.05,cx,cy,r);
-  shadow.addColorStop(0,'#0a1020'); shadow.addColorStop(1,'#010108');
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.fillStyle=shadow; ctx.fill();
+  shadow.addColorStop(0,'#0a1422'); shadow.addColorStop(1,'#010108');
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=shadow; ctx.fill();
 
-  // Atmosphere glow
-  const atm=ctx.createRadialGradient(cx,cy,r*.9,cx,cy,r*1.08);
-  atm.addColorStop(0,'rgba(0,80,180,0.0)'); atm.addColorStop(1,'rgba(0,120,255,0.12)');
-  ctx.beginPath(); ctx.arc(cx,cy,r*1.08,0,Math.PI*2);
-  ctx.fillStyle=atm; ctx.fill();
+  // Atmosphere
+  const atm=ctx.createRadialGradient(cx,cy,r*.88,cx,cy,r*1.1);
+  atm.addColorStop(0,'rgba(0,80,180,0.0)'); atm.addColorStop(1,'rgba(0,100,220,0.14)');
+  ctx.beginPath(); ctx.arc(cx,cy,r*1.1,0,Math.PI*2); ctx.fillStyle=atm; ctx.fill();
 
-  // Lat/lon grid
-  ctx.strokeStyle='rgba(0,60,120,0.25)'; ctx.lineWidth=0.5;
+  // Grid
+  ctx.strokeStyle='rgba(0,60,130,0.22)'; ctx.lineWidth=0.5;
   for(let lat=-75;lat<=75;lat+=15){
-    ctx.beginPath(); let first=true;
-    for(let lon=-180;lon<=180;lon+=4){
-      const p=latLonToXY(lat,lon,cx,cy,r);
-      if(p.vis>0){ first?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); first=false; }
-    }
+    ctx.beginPath(); let f=true;
+    for(let lon=-180;lon<=180;lon+=4){const p=latLonToXY(lat,lon,cx,cy,r);if(p.vis>0){f?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);f=false;}}
     ctx.stroke();
   }
   for(let lon=-180;lon<180;lon+=15){
-    ctx.beginPath(); let first=true;
-    for(let lat=-90;lat<=90;lat+=3){
-      const p=latLonToXY(lat,lon,cx,cy,r);
-      if(p.vis>0){ first?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); first=false; }
-    }
+    ctx.beginPath(); let f=true;
+    for(let lat=-90;lat<=90;lat+=3){const p=latLonToXY(lat,lon,cx,cy,r);if(p.vis>0){f?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);f=false;}}
     ctx.stroke();
   }
 
-  // Globe edge highlight
-  const edgeGrad=ctx.createRadialGradient(cx-r*.4,cy-r*.4,r*.1,cx,cy,r);
-  edgeGrad.addColorStop(0,'rgba(40,80,160,0.12)');
-  edgeGrad.addColorStop(0.7,'rgba(10,30,80,0.0)');
-  edgeGrad.addColorStop(1,'rgba(0,20,60,0.3)');
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.fillStyle=edgeGrad; ctx.fill();
+  // Inclination band (51.6°)
+  ctx.strokeStyle='rgba(0,180,255,0.08)'; ctx.lineWidth=1;
+  ctx.beginPath(); let f2=true;
+  for(let lon=-180;lon<=180;lon+=2){
+    const lat=ISS_INC*Math.sin(lon*Math.PI/180);
+    const p=latLonToXY(lat,lon,cx,cy,r);
+    if(p.vis>0){f2?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);f2=false;}else f2=true;
+  }
+  ctx.stroke();
 
-  // ISS orbital track
+  // Edge highlight
+  const edge=ctx.createRadialGradient(cx-r*.4,cy-r*.4,r*.1,cx,cy,r);
+  edge.addColorStop(0,'rgba(40,80,160,0.1)'); edge.addColorStop(1,'rgba(0,20,60,0.28)');
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=edge; ctx.fill();
+
+  // Orbital track
   if(track.length>1){
-    ctx.strokeStyle='rgba(0,255,136,0.3)'; ctx.lineWidth=1.5;
-    ctx.beginPath(); let tfirst=true;
-    for(const pt of track){
-      const p=latLonToXY(pt.lat,pt.lon,cx,cy,r);
-      if(p.vis>0){ tfirst?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); tfirst=false; }
-      else tfirst=true;
-    }
+    ctx.strokeStyle='rgba(0,255,136,0.28)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); let tf=true;
+    for(const pt of track){const p=latLonToXY(pt.lat,pt.lon,cx,cy,r);if(p.vis>0){tf?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);tf=false;}else tf=true;}
     ctx.stroke();
   }
 
   // ISS position
   const ip=latLonToXY(iss.lat,iss.lon,cx,cy,r);
   if(ip.vis>0){
-    // Glow
-    const glow=ctx.createRadialGradient(ip.x,ip.y,0,ip.x,ip.y,20);
-    glow.addColorStop(0,'rgba(255,215,0,0.5)'); glow.addColorStop(1,'rgba(255,215,0,0)');
-    ctx.beginPath(); ctx.arc(ip.x,ip.y,20,0,Math.PI*2);
-    ctx.fillStyle=glow; ctx.fill();
-    // Dot
-    ctx.beginPath(); ctx.arc(ip.x,ip.y,5,0,Math.PI*2);
-    ctx.fillStyle='#ffd700'; ctx.fill();
-    // Label
+    const glow=ctx.createRadialGradient(ip.x,ip.y,0,ip.x,ip.y,24);
+    glow.addColorStop(0,'rgba(255,215,0,0.45)'); glow.addColorStop(1,'rgba(255,215,0,0)');
+    ctx.beginPath(); ctx.arc(ip.x,ip.y,24,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+    ctx.beginPath(); ctx.arc(ip.x,ip.y,5,0,Math.PI*2); ctx.fillStyle='#ffd700'; ctx.fill();
     ctx.fillStyle='#ffd700'; ctx.font='bold 10px Courier New';
     ctx.fillText('ISS ◆',ip.x+8,ip.y-8);
-    // Alt line
-    ctx.strokeStyle='rgba(255,215,0,0.2)'; ctx.lineWidth=1;
-    ctx.setLineDash([3,3]);
-    ctx.beginPath(); ctx.moveTo(ip.x,ip.y); ctx.lineTo(ip.x,ip.y-18); ctx.stroke();
+    ctx.strokeStyle='rgba(255,215,0,0.18)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(ip.x,ip.y); ctx.lineTo(ip.x,ip.y-20); ctx.stroke();
     ctx.setLineDash([]);
   }
 
-  // SF ground station
-  const sf=latLonToXY(37.7749,-122.4194,cx,cy,r);
-  if(sf.vis>0){
-    ctx.beginPath(); ctx.arc(sf.x,sf.y,3,0,Math.PI*2);
-    ctx.fillStyle='#00d4cc'; ctx.fill();
-    ctx.fillStyle='#00d4cc'; ctx.font='9px Courier New';
-    ctx.fillText('SF',sf.x+5,sf.y+3);
-  }
+  // Ground stations
+  Object.values(GS).forEach(gs=>{
+    const gp=latLonToXY(gs.lat,gs.lon,cx,cy,r);
+    if(gp.vis>0){
+      ctx.beginPath(); ctx.arc(gp.x,gp.y,3,0,Math.PI*2); ctx.fillStyle=gs.color; ctx.fill();
+      ctx.fillStyle=gs.color; ctx.font='8px Courier New';
+      ctx.fillText(gs.name,gp.x+5,gp.y+3);
+      // Line to ISS if elevation positive
+      if(ip.vis>0 && iss.fetched){
+        const elev=elevAngle(gs.lat,gs.lon);
+        if(elev>0){
+          ctx.strokeStyle=gs.color+'44'; ctx.lineWidth=0.8; ctx.setLineDash([2,4]);
+          ctx.beginPath(); ctx.moveTo(gp.x,gp.y); ctx.lineTo(ip.x,ip.y); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+    }
+  });
 
-  // Rotate globe slowly
-  globeAngle = (globeAngle - 0.05) % 360;
+  globeAngle=(globeAngle-0.04)%360;
+}
+
+// ── MET clock ────────────────────────────────────────────────
+function updateMET(){
+  const elapsed=Math.floor((Date.now()-bootTime)/1000);
+  const h=Math.floor(elapsed/3600).toString().padStart(2,'0');
+  const m=Math.floor((elapsed%3600)/60).toString().padStart(2,'0');
+  const s=(elapsed%60).toString().padStart(2,'0');
+  document.getElementById('met-val').textContent=`T+${h}:${m}:${s}`;
 }
 
 // ── Resize ───────────────────────────────────────────────────
-function resize(){
-  canvas.width  = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  drawGlobe();
-}
-window.addEventListener('resize', resize);
-resize();
+function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; drawGlobe(); }
+window.addEventListener('resize',resize); resize();
 
 // ── Boot ─────────────────────────────────────────────────────
-wormSeal('BOB_VOYAGER_BOOT').then(()=>{
-  emit('BOB VOYAGER — FORTH ORBITAL KERNEL', 'fo-iss');
-  emit('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'fo-ok');
-  emit('"No syntax. Just a stack."', 'fo-ok');
-  emit('NASA Voyager runs Forth. So does BOB.', 'fo-ok');
-  emit('ISS telemetry live. WORM sealed.', 'fo-ok');
-  emit('', 'fo-ok');
-  emit('Try: ISS.STACK  .S  ORBITAL.PERIOD  .  WORM.SEAL', 'fo-ok');
-  emit('Or:  ISS.LAT ISS.LON - ABS  ( lat difference )', 'fo-ok');
-  emit('Or:  : ORBIT ISS.ALT 6371 + ;  ORBIT .', 'fo-ok');
-  emit('', 'fo-ok');
-  emit('WORDS — show all available words', 'fo-ok');
-  emit('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'fo-ok');
+wormSeal('BOB_VOYAGER_AEROSPACE_v2_BOOT').then(()=>{
+  emit('BOB VOYAGER — FORTH AEROSPACE KERNEL v2.0','fo-iss');
+  emit('══════════════════════════════════════════════','fo-ok');
+  emit('NORAD 25544 · ISS ZARYA · Live Telemetry · WORM Sealed','fo-sys');
+  emit('Apache License 2.0 · SnapKitty Collective · 2026','fo-sys');
+  emit('','fo-ok');
+  emit('"No syntax. Just a stack."','fo-ok');
+  emit('NASA Voyager runs Forth. So does BOB.','fo-ok');
+  emit('','fo-ok');
+  emit('── ORBITAL MECHANICS ───────────────────────','fo-ok');
+  emit('ORBITAL.PERIOD  VIS.VIVA  SEMI.MAJOR  MEAN.MOTION','fo-iss');
+  emit('APOGEE  PERIGEE  FOOTPRINT  ECLIPSE  DELTA.V','fo-iss');
+  emit('','fo-ok');
+  emit('── GROUND STATIONS ─────────────────────────','fo-ok');
+  emit('DIST.SF  DIST.JSC  DIST.TSUP  DIST.JAXA  ELEV.SF','fo-iss');
+  emit('','fo-ok');
+  emit('── UNIT CONVERSIONS ────────────────────────','fo-ok');
+  emit('KM.TO.MI  KMH.TO.MS  KMH.TO.MACH  KM.TO.NM','fo-ok');
+  emit('','fo-ok');
+  emit('Try: ISS.STACK  .S  ORBITAL.PERIOD  .  ECLIPSE','fo-ok');
+  emit('     VIS.VIVA .  DELTA.V .  ELEV.SF .','fo-ok');
+  emit('     : ORBIT ISS.ALT 6371 + ;  ORBIT  MEAN.MOTION','fo-ok');
+  emit('══════════════════════════════════════════════','fo-ok');
   fetchISS();
 });
 
-setInterval(fetchISS, 5000);
-setInterval(drawGlobe, 50);
+setInterval(fetchISS,5000);
+setInterval(drawGlobe,40);
+setInterval(updateMET,1000);
 </script>
 </body>
 </html>
