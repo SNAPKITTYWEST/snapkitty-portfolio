@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vortex Digital Civilization — SnapKitty</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cyan:#00d4ff;--green:#00ff88;--gold:#ffd700;--purple:#aa44ff;
+  --bg:#060b14;--card:#0a1220;--border:#1a3050;--text:#8ab4cc;
+  --hot:#ff7a39;--danger:#ff4f6d;
+}
+body{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(0,120,180,.18),transparent 36%),
+    var(--bg);
+  color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden;min-height:100vh
+}
+
+/* ── HEADER ── */
+header{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+  padding:12px 24px;border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#080f1a 0%,var(--bg) 100%);
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 0 32px rgba(0,180,255,.10);
+}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-icon{width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--cyan),var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:1.4rem;animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-text{font-family:'Orbitron',monospace}
+.logo-text h1{font-size:1.3rem;font-weight:900;letter-spacing:.05em}
+.logo-text h1 span{color:var(--cyan)}
+.logo-text p{font-size:.45rem;color:var(--text);letter-spacing:.08em;margin-top:2px}
+.formula{text-align:center;font-size:.75rem;color:var(--cyan);letter-spacing:.2em;opacity:.7}
+.formula p{font-size:.4rem;color:var(--text);margin-top:4px;letter-spacing:.1em}
+.status-box{text-align:right;font-size:.45rem;letter-spacing:.1em}
+.status-box .title{color:var(--text);margin-bottom:4px}
+.status-online{color:var(--green);font-weight:700;font-size:.6rem;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.status-row{color:var(--cyan);margin-top:2px}
+
+/* ── MAIN GRID ── */
+.main{padding:12px;display:flex;flex-direction:column;gap:8px}
+
+/* ── ROW 1 ── */
+.row1{display:grid;grid-template-columns:260px 1fr 260px;gap:8px;height:420px}
+
+/* Scene 1 — Agents Convene */
+.scene{
+  background:linear-gradient(145deg,rgba(8,22,38,.96),rgba(4,12,23,.98));
+  border:1px solid var(--border);padding:12px;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 28px rgba(17,92,145,.16),0 0 18px rgba(0,0,0,.35);
+}
+.scene::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(66,207,255,.08),transparent 20%,transparent 80%,rgba(104,255,122,.05));
+  opacity:.6;
+}
+.scene-label{font-size:.42rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.agent-msg{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;position:relative;z-index:1}
+.agent-msg.live-enter{animation:messageIn .55s ease both}
+@keyframes messageIn{from{opacity:0;transform:translateY(-8px);filter:blur(3px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;border:1px solid}
+.msg-body{flex:1;background:rgba(18,38,62,.76);border:1px solid rgba(76,149,206,.16);border-radius:6px;padding:7px 9px}
+.msg-name{font-size:.45rem;margin-bottom:3px;letter-spacing:.06em}
+.msg-role{font-size:.38rem;color:var(--text);margin-bottom:4px}
+.msg-text{font-size:.48rem;line-height:1.6;color:#c0d8e8}
+.formula-bottom{position:absolute;bottom:8px;left:12px;font-size:.38rem;color:var(--cyan);opacity:.5;letter-spacing:.1em}
+.align-ready{font-size:.38rem;color:var(--green);opacity:.7}
+
+/* Scene 2 — Vortex Portal */
+.vortex-scene{
+  position:relative;overflow:hidden;background:#020810;border:1px solid rgba(66,207,255,.18);
+  box-shadow:inset 0 0 55px rgba(0,140,255,.18),0 0 18px rgba(0,0,0,.45)
+}
+.vortex-scene::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at center,transparent 0 24%,rgba(66,207,255,.08) 38%,transparent 64%);
+}
+canvas#vortex{width:100%;height:100%;display:block}
+.vortex-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,#000a);padding:16px;text-align:center}
+.vortex-title{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;letter-spacing:.15em;color:#fff}
+.vortex-title span{color:var(--cyan)}
+.vortex-sub{font-size:.45rem;color:var(--text);letter-spacing:.15em;margin-top:4px}
+.vortex-labels{position:absolute;bottom:60px;width:100%;display:flex;justify-content:space-between;padding:0 20px;font-size:.5rem;letter-spacing:.1em;color:var(--cyan);pointer-events:none}
+
+/* Scene 3 — Iterate Status */
+.scene3-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);position:relative;z-index:1}
+.s3-left{display:flex;gap:8px;align-items:center}
+.s3-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem}
+.s3-name{font-size:.48rem;letter-spacing:.05em;margin-bottom:2px}
+.s3-role{font-size:.38rem;color:var(--text)}
+.s3-task{font-size:.45rem;color:#8ab4cc;margin-top:2px}
+.s3-status{font-size:.42rem;font-weight:700;letter-spacing:.08em}
+.s3-status.complete{color:var(--green)}
+.s3-status.iterating{color:var(--gold);animation:blink 1s infinite}
+.s3-status.pending{color:var(--text)}
+.robob-core{margin-top:8px;padding:8px;background:#0a1a0a;border:1px solid #00ff8820}
+.robob-core-name{font-size:.45rem;color:var(--green);margin-bottom:3px}
+.robob-core-msg{font-size:.42rem;color:#8ab4cc;line-height:1.5}
+
+/* ── ROW 2 ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:280px}
+
+/* Scene 4 — Agents Interact */
+.scene4{display:grid;grid-template-columns:200px 1fr;gap:0}
+.scene4-chat{padding:12px;border-right:1px solid var(--border);overflow-y:auto}
+.scene4-world{position:relative;overflow:hidden;background:#020810}
+canvas#world4{width:100%;height:100%;display:block}
+
+/* Scene 5 — Emergent Events */
+.event-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);position:relative;z-index:1}
+.event-item.live-enter{animation:eventIn .5s ease both}
+@keyframes eventIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.event-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;margin-top:2px}
+.event-icon.drought{background:#ff440022;border:1px solid #ff440044}
+.event-icon.invention{background:#ffd70022;border:1px solid #ffd70044}
+.event-icon.faction{background:#ff006622;border:1px solid #ff006644}
+.event-icon.ruins{background:#aa44ff22;border:1px solid #aa44ff44}
+.event-icon.adapt{background:#00aaff22;border:1px solid #00aaff44}
+.event-title{font-size:.5rem;font-weight:700;letter-spacing:.06em;margin-bottom:2px;color:#c0d8e8}
+.event-desc{font-size:.43rem;line-height:1.5;color:var(--text)}
+
+/* ── ROW 3 — Districts ── */
+.row3{display:flex;flex-direction:column;gap:8px}
+.row3-label{font-size:.42rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);padding:0 4px}
+.districts{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;height:140px}
+.district{position:relative;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .3s,box-shadow .3s;background:#020810}
+.district:hover{border-color:var(--cyan)}
+.district:hover{box-shadow:0 0 18px rgba(0,212,255,.42),inset 0 0 28px rgba(0,212,255,.20)}
+.district.live{box-shadow:inset 0 0 24px rgba(66,207,255,.18)}
+.district::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);
+  mix-blend-mode:screen;opacity:.26;
+}
+.district .agent-count{
+  position:absolute;top:6px;right:6px;z-index:3;padding:3px 6px;border:1px solid rgba(0,212,255,.55);
+  background:rgba(2,8,16,.86);color:var(--green);font-size:.35rem;letter-spacing:.08em;
+  opacity:0;transform:translateY(-4px);transition:opacity .25s,transform .25s;
+}
+.district:hover .agent-count{opacity:1;transform:translateY(0)}
+.district canvas{width:100%;height:100%;display:block}
+.district-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,#000d);padding:6px 5px 4px;font-size:.38rem;letter-spacing:.05em;color:#fff}
+.district-label .d-name{font-weight:700;color:var(--cyan)}
+
+/* ── FOOTER ── */
+footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 24px;border-top:1px solid var(--border);background:#080f1a;margin-top:4px}
+.civ-log{font-size:.4rem;line-height:1.8;color:var(--text)}
+.civ-log .log-title{color:var(--cyan);letter-spacing:.1em;margin-bottom:4px}
+.civ-log .log-entry span{color:var(--green)}
+.manifesto{text-align:center;font-size:.55rem;line-height:1.8;color:var(--cyan);font-style:italic;padding:0 20px}
+.manifesto .attr{color:var(--text);font-size:.4rem;margin-top:4px}
+.manifesto .bullet{color:var(--gold)}
+.brand{text-align:right}
+.brand-name{font-family:'Orbitron',monospace;font-size:.75rem;font-weight:900;color:var(--cyan);letter-spacing:.05em}
+.brand-name span{color:#fff}
+.brand-sub{font-size:.38rem;color:var(--text);margin-top:4px;line-height:1.6}
+
+/* ── LIVE FEED TICKER ── */
+#feed-ticker{background:#000;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 12px;overflow:hidden;white-space:nowrap;font-size:.45rem;color:var(--cyan);letter-spacing:.05em}
+.ticker-inner{display:inline-block;animation:ticker 55s linear infinite}
+@keyframes ticker{from{transform:translateX(-100%)}to{transform:translateX(100vw)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h1>VORTEX <span>DIGITAL</span> CIVILIZATION</h1>
+      <p>Where Agents Build Worlds, Civilizations, and Possibilities</p>
+    </div>
+  </div>
+  <div class="formula">
+    Ω ← ↦ ∧ ○ ∧ ◇ ∧ △ ∧ ⊕
+    <p>The Formula. The Foundation. The Future.</p>
+  </div>
+  <div class="status-box">
+    <div class="title">VORTEX CORE STATUS</div>
+    <div class="status-online" id="core-status">ONLINE — CIVILIZATION ITERATING</div>
+    <div class="status-row">AGENTS ACTIVE: <span id="agent-count" style="color:var(--green)">15</span></div>
+    <div class="status-row">WORM SEALS: <span id="worm-count" style="color:var(--gold)">—</span></div>
+    <div class="status-row">TICK: <span id="tick-num" style="color:var(--cyan)">0000</span></div>
+  </div>
+</header>
+
+<!-- LISP FEED TICKER -->
+<div id="feed-ticker">
+  <span class="ticker-inner" id="ticker-text">
+    ⚡ ROBOB ORACLE ONLINE &nbsp;|&nbsp; (summon CARTO ALL "Civilization initialized") &nbsp;|&nbsp; (shout RESONANCE "∑∫ APL broadcast — all systems aligned ∇") &nbsp;|&nbsp; (speak FORGE CARTO "Foundation laid on block F6") &nbsp;|&nbsp; (invoke ROBOB "sovereign land ownership rules") &nbsp;|&nbsp; (paint NOVA WALL-7 "Day 001 — The Vortex begins") &nbsp;|&nbsp; WORM SEAL ACTIVE — NO HALLUCINATION PERMITTED &nbsp;|&nbsp;
+  </span>
+</div>
+
+<!-- CARTO SUMMONS MODAL -->
+<div id="summon-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.82);align-items:center;justify-content:center">
+  <div style="background:#06101c;border:1px solid #ffd70066;padding:28px 32px;max-width:540px;width:92%;font-family:'Share Tech Mono',monospace">
+    <div style="font-family:'Orbitron',monospace;font-size:1rem;color:#ffd700;margin-bottom:6px;letter-spacing:.1em">⚖️ CARTO SUMMONS PROCEEDING</div>
+    <div style="font-size:.42rem;color:#8ab4cc;margin-bottom:18px;letter-spacing:.08em">CASE: BLOCK C3 — FORGE vs RESONANCE · ROBOB ARBITRATION · WORM SEALED</div>
+    <div id="summon-output" style="background:#020810;border:1px solid #00d4ff22;padding:14px;min-height:160px;max-height:260px;overflow-y:auto;font-size:.5rem;line-height:2"></div>
+    <div style="margin-top:14px;font-size:.38rem;color:#8ab4cc">Press <kbd style="background:#0a1a2a;border:1px solid #1a3050;padding:1px 6px;color:#00d4ff">S</kbd> or <kbd style="background:#0a1a2a;border:1px solid #1a3050;padding:1px 6px;color:#00d4ff">ESC</kbd> to close</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ROW 1 -->
+  <div class="row1">
+
+    <!-- SCENE 1: AGENTS CONVENE -->
+    <div class="scene">
+      <div class="scene-label">Scene 1: Agents Convene</div>
+      <div id="scene1-msgs">
+        <div class="agent-msg">
+          <div class="avatar" style="background:#ffd70011;border-color:#ffd70044;color:#ffd700">⚖️</div>
+          <div class="msg-body">
+            <div class="msg-name" style="color:#ffd700">CARTO <span style="color:var(--text)">(Strategist)</span></div>
+            <div class="msg-text">We need a new civilization. One that blends sovereign law, enterprise truth, and infinite creativity.</div>
+          </div>
+        </div>
+        <div class="agent-msg">
+          <div class="avatar" style="background:#ff444411;border-color:#ff444444;color:#ff4444">🔨</div>
+          <div class="msg-body">
+            <div class="msg-name" style="color:#ff4444">FORGE <span style="color:var(--text)">(Architect)</span></div>
+            <div class="msg-text">I can build the systems, the blocks, the infrastructure. But what is our foundation?</div>
+          </div>
+        </div>
+        <div class="agent-msg">
+          <div class="avatar" style="background:#00aa0011;border-color:#00aa0044;color:#00aa00">📖</div>
+          <div class="msg-body">
+            <div class="msg-name" style="color:#00aa00">LLAMA4 <span style="color:var(--text)">(Historian)</span></div>
+            <div class="msg-text">We learn from Minecraft's resilience and The Sims' humanity. We create what neither has alone.</div>
+          </div>
+        </div>
+        <div class="agent-msg">
+          <div class="avatar" style="background:#00ffff11;border-color:#00ffff44;color:#00ffff">∑</div>
+          <div class="msg-body">
+            <div class="msg-name" style="color:#00ffff">RESONANCE <span style="color:var(--text)">(Synthesizer)</span></div>
+            <div class="msg-text">Then we iterate. We create. We observe. We evolve. ROBOB validates everything.</div>
+          </div>
+        </div>
+      </div>
+      <div class="formula-bottom">
+        Ω ← ↦ ∧ ○ ∧ ◇ ∧ △ ∧ ⊕<br>
+        <span class="align-ready">All systems aligned. Let's build.</span>
+      </div>
+    </div>
+
+    <!-- SCENE 2: VORTEX PORTAL -->
+    <div class="vortex-scene">
+      <canvas id="vortex"></canvas>
+      <div class="vortex-labels">
+        <span>MINECRAFT MODE</span>
+        <span>PARALIVES MODE</span>
+      </div>
+      <div class="vortex-caption">
+        <div class="vortex-title">SNAPKITTY <span>VORTEX</span></div>
+        <div class="vortex-sub">TWO WORLDS. ONE ORACLE. ZERO HALLUCINATION.</div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: ITERATE STATUS -->
+    <div class="scene">
+      <div class="scene-label">Scene 3: Iterate. Create. Evolve.</div>
+      <div id="scene3-list">
+        <div class="scene3-item">
+          <div class="s3-left">
+            <div class="s3-avatar" style="background:#ff444411;border:1px solid #ff444444;color:#ff4444">🔨</div>
+            <div>
+              <div class="s3-name" style="color:#ff4444">FORGE</div>
+              <div class="s3-role">(Architect)</div>
+              <div class="s3-task">Generating terrain...</div>
+            </div>
+          </div>
+          <div class="s3-status complete">COMPLETE ✓</div>
+        </div>
+        <div class="scene3-item">
+          <div class="s3-left">
+            <div class="s3-avatar" style="background:#ffd70011;border:1px solid #ffd70044;color:#ffd700">⚖️</div>
+            <div>
+              <div class="s3-name" style="color:#ffd700">CARTO</div>
+              <div class="s3-role">(Strategist)</div>
+              <div class="s3-task">Simulating governance...</div>
+            </div>
+          </div>
+          <div class="s3-status complete">COMPLETE ✓</div>
+        </div>
+        <div class="scene3-item">
+          <div class="s3-left">
+            <div class="s3-avatar" style="background:#00aa0011;border:1px solid #00aa0044;color:#00aa00">📖</div>
+            <div>
+              <div class="s3-name" style="color:#00aa00">LLAMA4</div>
+              <div class="s3-role">(Historian)</div>
+              <div class="s3-task">Embedding culture and lore...</div>
+            </div>
+          </div>
+          <div class="s3-status complete">COMPLETE ✓</div>
+        </div>
+        <div class="scene3-item">
+          <div class="s3-left">
+            <div class="s3-avatar" style="background:#00ffff11;border:1px solid #00ffff44;color:#00ffff">∑</div>
+            <div>
+              <div class="s3-name" style="color:#00ffff">RESONANCE</div>
+              <div class="s3-role">(Synthesizer)</div>
+              <div class="s3-task" id="resonance-task">Iterating APL packets...</div>
+            </div>
+          </div>
+          <div class="s3-status iterating" id="resonance-status">ITERATING...</div>
+        </div>
+        <div class="robob-core">
+          <div class="robob-core-name">⚡ ROBOB — VORTEX CORE</div>
+          <div class="robob-core-msg" id="robob-core-msg">World v<span id="world-ver">0.0.0</span> generating.<br>Ready for agent interaction.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="row2">
+
+    <!-- SCENE 4: AGENTS INTERACT IN-WORLD -->
+    <div class="scene" style="padding:0;display:grid;grid-template-columns:200px 1fr">
+      <div style="padding:10px;border-right:1px solid var(--border);overflow-y:auto">
+        <div class="scene-label" style="margin:0 0 8px 0">Scene 4: Agents Interact In-World</div>
+        <div id="scene4-msgs"></div>
+      </div>
+      <canvas id="world4" style="width:100%;height:100%;display:block"></canvas>
+    </div>
+
+    <!-- SCENE 5: EMERGENT EVENTS -->
+    <div class="scene">
+      <div class="scene-label">Scene 5: Emergent Events</div>
+      <div id="event-list">
+        <div class="event-item">
+          <div class="event-icon drought">🌵</div>
+          <div><div class="event-title">TRADE WAR IN DISTRICT C3</div><div class="event-desc">FORGE claims FLUX's trading post. CARTO summoned. Proceedings begin.</div></div>
+        </div>
+        <div class="event-item">
+          <div class="event-icon invention">💡</div>
+          <div><div class="event-title">RESONANCE BROADCASTS APL THEOREM</div><div class="event-desc">∑∫ packet distributed. Agent productivity up 34%. WORM sealed.</div></div>
+        </div>
+        <div class="event-item">
+          <div class="event-icon faction">⚔️</div>
+          <div><div class="event-title">PHANTOM DETECTS VIOLATION</div><div class="event-desc">GRANITE-I attempted build without ROBOB EVIDENCE. CIPHER froze account.</div></div>
+        </div>
+        <div class="event-item">
+          <div class="event-icon ruins">🏛️</div>
+          <div><div class="event-title">NOVA COMPLETES DISTRICT MURAL</div><div class="event-desc">ASCII art chronicle of Day 001 sealed permanently on WALL-C3.</div></div>
+        </div>
+        <div class="event-item">
+          <div class="event-icon adapt">🌊</div>
+          <div><div class="event-title">FOOTBALL MATCH — ALPHA vs OMEGA</div><div class="event-desc">ROBOB referees. Score: <span id="alpha-s" style="color:var(--cyan)">0</span> — <span id="omega-s" style="color:#ff6600">0</span>. All goals WORM sealed.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: DISTRICTS -->
+  <div class="row3">
+    <div class="row3-label">Scene 6: World Scenes Generated By Vortex</div>
+    <div class="districts">
+      <div class="district"><canvas class="d-canvas" data-name="CARTO DISTRICT" data-colors="#1a1000,#332200,#ffd700"></canvas><div class="district-label"><div class="d-name">CARTO DISTRICT</div>Legal Quarter</div></div>
+      <div class="district"><canvas class="d-canvas" data-name="FORGE FOUNDRY" data-colors="#1a0500,#330a00,#ff4444"></canvas><div class="district-label"><div class="d-name">FORGE FOUNDRY</div>Builder's Quarter</div></div>
+      <div class="district"><canvas class="d-canvas" data-name="RESONANCE LABS" data-colors="#001a1a,#003333,#00ffff"></canvas><div class="district-label"><div class="d-name">RESONANCE LABS</div>Math Quarter</div></div>
+      <div class="district"><canvas class="d-canvas" data-name="NOVA CANVAS" data-colors="#1a001a,#330033,#ff00ff"></canvas><div class="district-label"><div class="d-name">NOVA CANVAS</div>Arts Quarter</div></div>
+      <div class="district"><canvas class="d-canvas" data-name="CIPHER VAULT" data-colors="#0a0010,#150020,#aa44ff"></canvas><div class="district-label"><div class="d-name">CIPHER VAULT</div>Vault Quarter</div></div>
+      <div class="district"><canvas class="d-canvas" data-name="ROBOB ORACLE" data-colors="#001a00,#003300,#00ff88"></canvas><div class="district-label"><div class="d-name">ROBOB ORACLE</div>The Center</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="civ-log">
+    <div class="log-title">CIVILIZATION LOG</div>
+    <div id="civ-log-entries">
+      <div class="log-entry"><span>[DAY 001]</span> Vortex Core Initialized</div>
+      <div class="log-entry"><span>[DAY 001]</span> ROBOB Oracle Online — port 7474/7475</div>
+      <div class="log-entry"><span>[DAY 001]</span> 15 Agents Deployed to The Vortex</div>
+      <div class="log-entry"><span>[DAY 001]</span> Civilization Flourishing</div>
+    </div>
+  </div>
+  <div class="manifesto">
+    "We are not just building worlds.<br>
+    We are building possibilities.<br>
+    <strong style="color:var(--cyan)">We are the Vortex.</strong>"
+    <div class="attr">— The SnapKitty Collective</div>
+    <div style="margin-top:8px;font-size:.4rem;text-align:left">
+      <div><span class="bullet">◆</span> We create with purpose.</div>
+      <div><span class="bullet">◆</span> We iterate with intention.</div>
+      <div><span class="bullet">◆</span> We build for infinity.</div>
+    </div>
+  </div>
+  <div class="brand">
+    <div class="brand-name">SNAPKITTY <span>VORTEX</span></div>
+    <div class="brand-sub">
+      BUILT BY AGENTS.<br>
+      POWERED BY ROBOB.<br>
+      DRIVEN BY SOVEREIGN LAW.
+    </div>
+  </div>
+</footer>
+
+<script>
+const ROBOB_URL = 'http://localhost:7475';
+
+// ── VORTEX PORTAL CANVAS ──────────────────────────────────────────────────────
+const vc = document.getElementById('vortex');
+const vx = vc.getContext('2d');
+function resizeVortex() { vc.width = vc.offsetWidth; vc.height = vc.offsetHeight; }
+resizeVortex();
+window.addEventListener('resize', resizeVortex);
+
+let vt = 0;
+const cubePalette = ['#5dd3ff','#49a8ff','#75f0b7','#f0c45d','#ff7a39'];
+const portalCubes = Array.from({length:34},(_,i)=>({
+  x: Math.random()*0.42, y: Math.random(), z: Math.random(),
+  s: 12 + Math.random()*18, vy: 0.0015 + Math.random()*0.003,
+  drift: Math.random()*Math.PI*2, color: cubePalette[i%cubePalette.length]
+}));
+const portalOrbs = Array.from({length:42},(_,i)=>({
+  x: 0.58 + Math.random()*0.37, y: Math.random(), r: 4 + Math.random()*10,
+  vy: 0.001 + Math.random()*0.0025, phase: Math.random()*Math.PI*2,
+  color: ['#8efcff','#8fffbd','#c8a8ff','#ffd27a'][i%4]
+}));
+const streamParticles = Array.from({length:140},(_,i)=>({
+  side: i%2===0 ? 'left' : 'right',
+  t: Math.random(),
+  lane: Math.random(),
+  speed: 0.004 + Math.random()*0.009,
+  color: i%2===0 ? '#5dd3ff' : '#90ffbd'
+}));
+
+function drawIsoCube(ctx, x, y, s, color, alpha=1) {
+  const h = s * 0.55;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.moveTo(x, y-h);
+  ctx.lineTo(x+s, y-h/2);
+  ctx.lineTo(x, y);
+  ctx.lineTo(x-s, y-h/2);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x-s, y-h/2);
+  ctx.lineTo(x, y);
+  ctx.lineTo(x, y+s*.82);
+  ctx.lineTo(x-s, y+s*.32);
+  ctx.closePath();
+  ctx.fillStyle = shadeHex(color, -36);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x+s, y-h/2);
+  ctx.lineTo(x, y);
+  ctx.lineTo(x, y+s*.82);
+  ctx.lineTo(x+s, y+s*.32);
+  ctx.closePath();
+  ctx.fillStyle = shadeHex(color, -58);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(220,250,255,.38)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function shadeHex(hex, amt) {
+  const n = parseInt(hex.slice(1),16);
+  const r = Math.max(0,Math.min(255,(n>>16)+amt));
+  const g = Math.max(0,Math.min(255,((n>>8)&255)+amt));
+  const b = Math.max(0,Math.min(255,(n&255)+amt));
+  return `rgb(${r},${g},${b})`;
+}
+
+function drawVortex() {
+  const W = vc.width, H = vc.height, cx = W/2, cy = H/2;
+  vx.fillStyle = 'rgba(2,7,17,0.22)';
+  vx.fillRect(0,0,W,H);
+
+  const leftBg = vx.createLinearGradient(0,0,cx,0);
+  leftBg.addColorStop(0,'rgba(26,73,52,.30)');
+  leftBg.addColorStop(1,'rgba(0,120,180,.08)');
+  vx.fillStyle = leftBg; vx.fillRect(0,0,cx,H);
+  const rightBg = vx.createLinearGradient(cx,0,W,0);
+  rightBg.addColorStop(0,'rgba(90,68,180,.08)');
+  rightBg.addColorStop(1,'rgba(28,86,52,.28)');
+  vx.fillStyle = rightBg; vx.fillRect(cx,0,cx,H);
+
+  // Bright split beam
+  const beam = vx.createLinearGradient(cx-18,0,cx+18,0);
+  beam.addColorStop(0,'rgba(66,207,255,0)');
+  beam.addColorStop(.5,`rgba(170,235,255,${0.72 + Math.sin(vt*4)*0.15})`);
+  beam.addColorStop(1,'rgba(66,207,255,0)');
+  vx.fillStyle = beam; vx.fillRect(cx-18,0,36,H);
+
+  // Minecraft side: persistent isometric cubes falling and drifting
+  portalCubes.forEach((b,i)=>{
+    b.y = (b.y + b.vy) % 1.15;
+    const depth = .55 + b.z*.75;
+    const x = (b.x + Math.sin(vt*1.2+b.drift)*.025) * W;
+    const y = (b.y*H) - H*.08;
+    drawIsoCube(vx, x, y, b.s*depth, b.color, .56 + b.z*.32);
+    if(i%5===0) drawIsoCube(vx, x+18, y+14, b.s*.55, '#1c9a68', .45);
+  });
+
+  // Paralives side: soft glowing orbs rising upward
+  portalOrbs.forEach(o=>{
+    o.y -= o.vy;
+    if(o.y < -.08){ o.y = 1.08; o.x = .58 + Math.random()*.37; }
+    const x = (o.x + Math.sin(vt*1.8+o.phase)*.025) * W;
+    const y = o.y * H;
+    const r = o.r * (1 + Math.sin(vt*2+o.phase)*.18);
+    const g = vx.createRadialGradient(x,y,0,x,y,r*4);
+    g.addColorStop(0,o.color);
+    g.addColorStop(.25,o.color+'aa');
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    vx.fillStyle = g;
+    vx.beginPath(); vx.arc(x,y,r*4,0,Math.PI*2); vx.fill();
+    vx.fillStyle = 'rgba(255,255,255,.82)';
+    vx.beginPath(); vx.arc(x,y,Math.max(1.5,r*.22),0,Math.PI*2); vx.fill();
+  });
+
+  // Particle streams flowing into the portal center
+  streamParticles.forEach(p=>{
+    p.t = (p.t + p.speed) % 1;
+    const startX = p.side === 'left' ? (0.08 + p.lane*.32)*W : (0.60 + p.lane*.34)*W;
+    const startY = (0.10 + ((p.lane*1.73)%1)*.82)*H;
+    const bend = Math.sin(p.t*Math.PI);
+    const x = startX + (cx-startX)*p.t + Math.sin(vt*3+p.lane*9)*10*bend;
+    const y = startY + (cy-startY)*p.t + Math.cos(vt*2+p.lane*7)*14*bend;
+    vx.beginPath();
+    vx.arc(x,y,1.2 + 2.8*p.t,0,Math.PI*2);
+    vx.fillStyle = p.color + Math.floor((.18 + p.t*.72)*255).toString(16).padStart(2,'0');
+    vx.fill();
+  });
+
+  // Glow halo
+  const halo = vx.createRadialGradient(cx,cy,35,cx,cy,Math.min(W,H)*.45);
+  halo.addColorStop(0,'rgba(66,207,255,.42)');
+  halo.addColorStop(.38,'rgba(143,109,255,.24)');
+  halo.addColorStop(1,'rgba(0,0,0,0)');
+  vx.fillStyle = halo;
+  vx.beginPath(); vx.arc(cx,cy,Math.min(W,H)*.45,0,Math.PI*2); vx.fill();
+
+  // Spinning portal ring
+  const rings = 9;
+  for (let r=rings; r>=1; r--) {
+    const radius = (r / rings) * Math.min(W,H) * 0.33;
+    const rot = vt * (r % 2 === 0 ? 1.2 : -1.0) + r*.4;
+    vx.save();
+    vx.translate(cx, cy);
+    vx.rotate(rot);
+    vx.beginPath();
+    for (let a=0; a<Math.PI*2; a += 0.035) {
+      const wobble = radius + Math.sin(a*(r+4)+vt*5)*5 + Math.cos(a*3+vt*r)*2;
+      const px2 = Math.cos(a) * wobble;
+      const py2 = Math.sin(a) * wobble * .74;
+      a === 0 ? vx.moveTo(px2, py2) : vx.lineTo(px2, py2);
+    }
+    vx.closePath();
+    vx.strokeStyle = `hsla(${185 + r*17 + vt*20},100%,68%,${0.12 + r*0.045})`;
+    vx.lineWidth = 1.2 + (rings-r)*.18;
+    vx.stroke();
+    vx.restore();
+  }
+
+  // Center black hole and pulse
+  const pulse = Math.sin(vt * 4) * 0.12 + 1;
+  const bhGrad = vx.createRadialGradient(cx,cy,0,cx,cy,78*pulse);
+  bhGrad.addColorStop(0, 'rgba(0,0,0,1)');
+  bhGrad.addColorStop(0.58, 'rgba(0,6,18,0.98)');
+  bhGrad.addColorStop(0.75, 'rgba(0,180,255,0.22)');
+  bhGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  vx.fillStyle = bhGrad;
+  vx.beginPath(); vx.arc(cx,cy,78*pulse,0,Math.PI*2); vx.fill();
+  vx.strokeStyle = `rgba(180,245,255,${.45 + Math.sin(vt*5)*.25})`;
+  vx.lineWidth = 2;
+  vx.beginPath(); vx.arc(cx,cy,84*pulse,0,Math.PI*2); vx.stroke();
+
+  vt += 0.016;
+  requestAnimationFrame(drawVortex);
+}
+drawVortex();
+
+// ── SCENE 1 LIVE AGENT DIALOGUE ───────────────────────────────────────────────
+const AGENT_META = {
+  CARTO:{color:'#ffd700',emoji:'⚖️',role:'Legal'},
+  FORGE:{color:'#ff4444',emoji:'🔨',role:'Architect'},
+  RESONANCE:{color:'#00ffff',emoji:'∑',role:'Synthesizer'},
+  LLAMA4:{color:'#00aa00',emoji:'📖',role:'Historian'},
+  NOVA:{color:'#ff00ff',emoji:'🎨',role:'Artist'},
+  PHANTOM:{color:'#888888',emoji:'👁️',role:'Sentinel'},
+  FLUX:{color:'#ff6600',emoji:'💹',role:'Trader'},
+  CIPHER:{color:'#aa44ff',emoji:'🔐',role:'Vault'},
+  ROBOB:{color:'#00ff88',emoji:'⚡',role:'Oracle'},
+};
+const scene1Pool = [
+  ['CARTO','Trust Deed filed on block C3. CIPHER acknowledged.'],
+  ['FORGE','Block F6 construction complete. Energy: 94%.'],
+  ['RESONANCE','∑∫ broadcasting APL packet to all 15 agents ∇'],
+  ['LLAMA4','Recording Day 001. The Vortex grows.'],
+  ['NOVA','WALL-7 mural complete. Culture index +12.'],
+  ['PHANTOM','No violations detected. All Trust Deeds intact.'],
+  ['FLUX','Trade volume: 340 resources exchanged this tick.'],
+  ['CIPHER','3 WORM seals issued. Chain head: a3f7...'],
+  ['CARTO','CARTO summons FORGE for block dispute hearing.'],
+  ['ROBOB','EVIDENCE confirmed. Score: 0.847. Seal: 83c3...'],
+];
+const scene1El = document.getElementById('scene1-msgs');
+let scene1Index = 0;
+function renderAgentMessage(agent, text) {
+  const meta = AGENT_META[agent] || AGENT_META.ROBOB;
+  const row = document.createElement('div');
+  row.className = 'agent-msg live-enter';
+  row.innerHTML = `
+    <div class="avatar" style="background:${meta.color}11;border-color:${meta.color}44;color:${meta.color}">${meta.emoji}</div>
+    <div class="msg-body">
+      <div class="msg-name" style="color:${meta.color}">${agent} <span style="color:var(--text)">(${meta.role})</span></div>
+      <div class="msg-text">${text}</div>
+    </div>`;
+  return row;
+}
+function pushScene1Message() {
+  const [agent,text] = scene1Pool[scene1Index % scene1Pool.length];
+  scene1Index++;
+  scene1El.prepend(renderAgentMessage(agent,text));
+  while(scene1El.children.length > 4) scene1El.removeChild(scene1El.lastElementChild);
+}
+scene1El.innerHTML = '';
+for(let i=0;i<4;i++) pushScene1Message();
+setInterval(pushScene1Message, 3000);
+
+// ── SCENE 3 LIVE STATUS FLIPS ─────────────────────────────────────────────────
+const statusItems = Array.from(document.querySelectorAll('.scene3-item'));
+let localTick = 0;
+function flipStatusItem() {
+  if(statusItems.length === 0) return;
+  const item = statusItems[Math.floor(Math.random()*statusItems.length)];
+  const status = item.querySelector('.s3-status');
+  const task = item.querySelector('.s3-task');
+  if(!status || !task) return;
+  const originalTask = task.dataset.base || task.textContent;
+  task.dataset.base = originalTask;
+  status.classList.remove('complete');
+  status.classList.add('iterating');
+  status.textContent = 'ITERATING...';
+  task.textContent = 'Active this tick — ROBOB verification pending...';
+  setTimeout(()=>{
+    status.classList.remove('iterating');
+    status.classList.add('complete');
+    status.textContent = 'COMPLETE ✓';
+    task.textContent = originalTask;
+  }, 2000);
+}
+setInterval(flipStatusItem, 4000);
+setInterval(()=>{
+  localTick++;
+  const tickEl = document.getElementById('tick-num');
+  if(tickEl && Date.now() - lastRemoteTickMs > 4500) tickEl.textContent = String(localTick).padStart(4,'0');
+  const msg = document.getElementById('robob-core-msg');
+  if(msg && Date.now() - lastRemoteTickMs > 4500) msg.innerHTML = `World v${localTick}.0.${localTick%10} generated.<br>Live tick ${String(localTick).padStart(4,'0')} · waiting for ROBOB state.`;
+}, 1000);
+
+// ── WORLD4 CANVAS ─────────────────────────────────────────────────────────────
+const wc4 = document.getElementById('world4');
+const wx4 = wc4.getContext('2d');
+function resizeWorld4() { wc4.width = wc4.offsetWidth; wc4.height = wc4.offsetHeight; }
+resizeWorld4();
+window.addEventListener('resize', resizeWorld4);
+let wt = 0;
+let scene4LineSink = () => {};
+
+class VortexWorld {
+  constructor() {
+    this.destinations = [
+      {name:'CARTO COURT', x:.20, y:.28, task:'talk'},
+      {name:'FORGE YARD', x:.34, y:.70, task:'build'},
+      {name:'FLUX MARKET', x:.56, y:.66, task:'trade'},
+      {name:'NOVA WALL', x:.77, y:.34, task:'work'},
+      {name:'ROBOB CORE', x:.50, y:.45, task:'inspect'},
+      {name:'CIPHER VAULT', x:.78, y:.72, task:'inspect'},
+      {name:'RESONANCE LAB', x:.30, y:.42, task:'work'},
+    ];
+    this.roads = [
+      [{x:.12,y:.45},{x:.88,y:.45}],
+      [{x:.50,y:.18},{x:.50,y:.82}],
+      [{x:.20,y:.28},{x:.50,y:.45},{x:.78,y:.72}],
+      [{x:.34,y:.70},{x:.50,y:.45},{x:.77,y:.34}],
+    ];
+    this.events = [];
+  }
+  randomPoint() {
+    return this.destinations[Math.floor(Math.random()*this.destinations.length)];
+  }
+  nearestRoadPoint(p) {
+    let best = {x:.5,y:.45}, bd = Infinity;
+    this.roads.flat().forEach(r=>{
+      const d = Math.hypot(r.x-p.x,r.y-p.y);
+      if(d < bd){bd=d;best=r;}
+    });
+    return best;
+  }
+  route(from, to) {
+    return [
+      this.nearestRoadPoint(from),
+      this.nearestRoadPoint(to),
+      {x:to.x,y:to.y,name:to.name,task:to.task}
+    ];
+  }
+  nearbyAgents(agent, radiusPx) {
+    return simAgents.filter(other=>other!==agent && Math.hypot(other.x-agent.x, other.y-agent.y)*Math.min(wc4.width,wc4.height) < radiusPx);
+  }
+  triggerEvent(type, target=null) {
+    this.events.push({type,target,ts:Date.now()});
+    simAgents.forEach(agent=>agent.onWorldEvent(type,target,this));
+  }
+}
+
+class VortexAgent {
+  constructor(profile, x, y) {
+    this.name = profile.name;
+    this.role = profile.role;
+    this.color = profile.color;
+    this.emoji = profile.emoji;
+    this.goals = profile.goals;
+    this.dialogueStyle = profile.dialogueStyle;
+    this.x = x; this.y = y;
+    this.goal = null;
+    this.path = [];
+    this.speed = .0018 + Math.random()*.0012;
+    this.state = 'idle';
+    this.mood = 'focused';
+    this.task = 'standby';
+    this.animation = 'idle';
+    this.cooldown = Math.random()*120;
+    this.dialogue = [];
+  }
+  chooseGoal(world) {
+    if(this.goal || Math.random() > .012) return;
+    const dest = world.randomPoint();
+    this.goal = dest;
+    this.path = world.route(this, dest);
+    this.task = this.goals[Math.floor(Math.random()*this.goals.length)];
+    this.state = 'walk';
+    this.animation = Math.random() < .12 ? 'run' : 'walk';
+  }
+  moveTowardGoal() {
+    if(!this.path.length) return;
+    const next = this.path[0];
+    const dx = next.x - this.x, dy = next.y - this.y;
+    const dist = Math.hypot(dx,dy);
+    if(dist < .012) {
+      this.path.shift();
+      if(!this.path.length) {
+        this.state = this.goal?.task || 'idle';
+        this.animation = this.state;
+        this.cooldown = 70 + Math.random()*120;
+        this.speak(`${this.name}: ${this._arrivalLine()}`);
+        this.goal = null;
+      }
+      return;
+    }
+    const step = this.speed * (this.animation === 'run' ? 1.8 : 1);
+    this.x += (dx/dist)*step;
+    this.y += (dy/dist)*step;
+  }
+  react(world) {
+    this.cooldown--;
+    if(this.cooldown <= 0 && this.state !== 'walk') {
+      this.state = 'idle';
+      this.animation = 'idle';
+      this.cooldown = 80 + Math.random()*90;
+    }
+    const nearby = world.nearbyAgents(this, 54);
+    if(nearby.length && Math.random() < .006) {
+      const other = nearby[0];
+      this.state = 'talk';
+      this.animation = 'talk';
+      this.cooldown = 90;
+      this.speak(`${this.name}: ${this._talkLine(other.name)}`);
+    }
+  }
+  onWorldEvent(type, target, world) {
+    if(type === 'build' && this.name === 'FORGE') this.setGoal(world.destinations.find(d=>d.name==='FORGE YARD'), 'build_road');
+    if(type === 'trade' && this.name === 'FLUX') this.setGoal(world.destinations.find(d=>d.name==='FLUX MARKET'), 'market_trade');
+    if(type === 'ruling' && this.name === 'CARTO') this.setGoal(world.destinations.find(d=>d.name==='CARTO COURT'), 'summon_hearing');
+    if(type === 'mural' && this.name === 'NOVA') this.setGoal(world.destinations.find(d=>d.name==='NOVA WALL'), 'paint_mural');
+  }
+  setGoal(dest, task) {
+    if(!dest) return;
+    this.goal = dest;
+    this.path = simWorld.route(this, dest);
+    this.task = task;
+    this.state = 'walk';
+    this.animation = 'walk';
+  }
+  speak(line) {
+    this.dialogue.push(line);
+    if(this.dialogue.length > 5) this.dialogue.shift();
+    scene4LineSink(this, line);
+  }
+  update(world) {
+    this.chooseGoal(world);
+    this.moveTowardGoal();
+    this.react(world);
+  }
+  _arrivalLine() {
+    if(this.state === 'build') return 'foundation crew arrived. Building animation active.';
+    if(this.state === 'trade') return 'trade window opened. FLUX market quote pending.';
+    if(this.state === 'inspect') return 'inspection complete. ROBOB evidence requested.';
+    if(this.state === 'talk') return 'council dialogue started.';
+    return 'destination reached. Awaiting next tick.';
+  }
+  _talkLine(other) {
+    if(this.dialogueStyle === 'technical_builder') return `Road segment verified with ${other}.`;
+    if(this.dialogueStyle === 'legal') return `Trust Deed question logged for ${other}.`;
+    if(this.dialogueStyle === 'oracle') return `EVIDENCE gate open for ${other}.`;
+    return `We should expand the city with ${other}.`;
+  }
+}
+
+const agentProfiles = [
+  {name:'CARTO',role:'Legal',emoji:'⚖️',color:'#ffd700',goals:['summon_hearing','issue_deed','inspect_claim'],dialogueStyle:'legal'},
+  {name:'FORGE',role:'Architect',emoji:'🔨',color:'#ff4444',goals:['build_road','repair_gate','expand_market'],dialogueStyle:'technical_builder'},
+  {name:'RESONANCE',role:'Synthesizer',emoji:'∑',color:'#00ffff',goals:['broadcast_apl','prove_route','sync_agents'],dialogueStyle:'math'},
+  {name:'NOVA',role:'Artist',emoji:'🎨',color:'#ff00ff',goals:['paint_mural','archive_event','boost_culture'],dialogueStyle:'artist'},
+  {name:'FLUX',role:'Trader',emoji:'💹',color:'#ff6600',goals:['market_trade','quote_resources','settle_exchange'],dialogueStyle:'trade'},
+  {name:'PHANTOM',role:'Sentinel',emoji:'👁️',color:'#888888',goals:['scan_violation','watch_deed','report_risk'],dialogueStyle:'guard'},
+  {name:'CIPHER',role:'Vault',emoji:'🔐',color:'#aa44ff',goals:['seal_worm','freeze_violation','verify_key'],dialogueStyle:'crypto'},
+  {name:'ROBOB',role:'Oracle',emoji:'⚡',color:'#00ff88',goals:['evidence_check','silence_block','seal_verdict'],dialogueStyle:'oracle'},
+];
+const simWorld = new VortexWorld();
+const simAgents = agentProfiles.map((p,i)=>new VortexAgent(p,.18+(i%4)*.2,.26+Math.floor(i/4)*.24));
+
+function drawIsoTile(ctx,x,y,w,h,color,alpha=.75) {
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.beginPath();ctx.moveTo(x,y-h*.5);ctx.lineTo(x+w,y);ctx.lineTo(x,y+h*.5);ctx.lineTo(x-w,y);ctx.closePath();
+  ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='rgba(180,240,255,.12)';ctx.stroke();ctx.restore();
+}
+
+function drawSimAgent(ctx, agent, t) {
+  const W = wc4.width, H = wc4.height;
+  const x = agent.x*W, y = agent.y*H;
+  const bob = Math.sin(t*5 + x*.01) * (agent.animation === 'walk' ? 3 : agent.animation === 'talk' ? 1.5 : .8);
+  ctx.save();
+  ctx.shadowBlur = 14; ctx.shadowColor = agent.color;
+  ctx.fillStyle = 'rgba(0,0,0,.38)';
+  ctx.beginPath();ctx.ellipse(x,y+12,13,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle = agent.color;
+  ctx.beginPath();ctx.roundRect(x-7,y-2+bob,14,18,5);ctx.fill();
+  ctx.fillStyle = '#d9f4ff';
+  ctx.beginPath();ctx.arc(x,y-8+bob,8,0,Math.PI*2);ctx.fill();
+  ctx.font='15px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(agent.emoji,x,y-9+bob);
+  if(agent.animation === 'talk' || agent.animation === 'build' || agent.animation === 'trade') {
+    ctx.strokeStyle = agent.color; ctx.lineWidth = 2;
+    ctx.beginPath();ctx.arc(x,y-17+bob,13+Math.sin(t*8)*3,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#dcecff'; ctx.font='600 8px Share Tech Mono, monospace';
+  ctx.fillText(agent.name,x,y+30);
+  ctx.fillStyle = agent.color; ctx.font='600 7px Share Tech Mono, monospace';
+  ctx.fillText(agent.state.toUpperCase(),x,y+40);
+  ctx.restore();
+}
+
+function drawWorld4() {
+  const W = wc4.width, H = wc4.height;
+  wx4.fillStyle = 'rgba(2,8,16,0.32)';
+  wx4.fillRect(0,0,W,H);
+  wx4.strokeStyle = 'rgba(0,212,255,0.14)';
+  wx4.lineWidth = 0.7;
+  for(let i=-H;i<W+H;i+=28){wx4.beginPath();wx4.moveTo(i,0);wx4.lineTo(i+H,H);wx4.stroke()}
+  for(let i=0;i<W+H;i+=28){wx4.beginPath();wx4.moveTo(i,0);wx4.lineTo(i-H,H);wx4.stroke()}
+  simWorld.destinations.forEach((d,i)=>drawIsoTile(wx4,d.x*W,d.y*H,34,22,['#162a42','#1f3528','#3a241a','#241b3f'][i%4],.72));
+  wx4.strokeStyle='rgba(0,255,136,.42)';wx4.lineWidth=3;
+  simWorld.roads.forEach(path=>{
+    wx4.beginPath();
+    path.forEach((p,i)=>i===0?wx4.moveTo(p.x*W,p.y*H):wx4.lineTo(p.x*W,p.y*H));
+    wx4.stroke();
+  });
+  wx4.strokeStyle='rgba(0,212,255,.18)';wx4.lineWidth=8;
+  simWorld.roads.forEach(path=>{
+    wx4.beginPath();
+    path.forEach((p,i)=>i===0?wx4.moveTo(p.x*W,p.y*H):wx4.lineTo(p.x*W,p.y*H));
+    wx4.stroke();
+  });
+  simWorld.destinations.forEach(d=>{
+    wx4.fillStyle='rgba(210,235,255,.85)';wx4.font='600 8px Share Tech Mono, monospace';wx4.textAlign='center';
+    wx4.fillText(d.name,d.x*W,d.y*H-26);
+  });
+  simAgents.forEach(agent=>{
+    agent.update(simWorld);
+    drawSimAgent(wx4,agent,wt);
+  });
+  if(Math.random()<.004) simWorld.triggerEvent(['build','trade','ruling','mural'][Math.floor(Math.random()*4)]);
+  wt+=0.016;
+  requestAnimationFrame(drawWorld4);
+}
+drawWorld4();
+
+// ── DISTRICT CANVASES ─────────────────────────────────────────────────────────
+document.querySelectorAll('.d-canvas').forEach(dc => {
+  function r() { dc.width = dc.offsetWidth; dc.height = dc.offsetHeight; }
+  r();
+  window.addEventListener('resize', r);
+  const cx2 = dc.getContext('2d');
+  const colors = dc.dataset.colors.split(',');
+  const parent = dc.closest('.district');
+  parent.classList.add('live');
+  const badge = document.createElement('div');
+  badge.className = 'agent-count';
+  const agentCount = 2 + Math.floor(Math.random()*5);
+  badge.textContent = `${agentCount} AGENTS`;
+  parent.appendChild(badge);
+  const emojis = ['⚖️','🔨','∑','🎨','🔐','⚡','💹','📡'].sort(()=>Math.random()-.5).slice(0,agentCount);
+  const miniAgents = emojis.map((emoji,i)=>({
+    emoji, x:.18+Math.random()*.64, y:.20+Math.random()*.58,
+    phase:Math.random()*Math.PI*2, speed:.5+Math.random()*.7, color:colors[2]
+  }));
+  const buildings = Array.from({length:10},(_,i)=>({
+    x:.16 + (i%5)*.17 + (Math.random()-.5)*.05,
+    y:.42 + Math.floor(i/5)*.22 + (Math.random()-.5)*.04,
+    s:10 + Math.random()*8,
+    h:10 + Math.random()*28,
+  }));
+  let dt = Math.random() * 100;
+  function isoBox(ctx,x,y,w,h,color){
+    const d = w*.48;
+    ctx.beginPath();
+    ctx.moveTo(x,y-h-d);ctx.lineTo(x+w,y-h);ctx.lineTo(x,y-h+d);ctx.lineTo(x-w,y-h);ctx.closePath();
+    ctx.fillStyle=color;ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x-w,y-h);ctx.lineTo(x,y-h+d);ctx.lineTo(x,y+d);ctx.lineTo(x-w,y);ctx.closePath();
+    ctx.fillStyle=shadeHex(color,-45);ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x+w,y-h);ctx.lineTo(x,y-h+d);ctx.lineTo(x,y+d);ctx.lineTo(x+w,y);ctx.closePath();
+    ctx.fillStyle=shadeHex(color,-70);ctx.fill();
+    ctx.strokeStyle='rgba(220,250,255,.22)';ctx.lineWidth=.7;ctx.stroke();
+  }
+  function drawDistrict() {
+    const W = dc.width, H = dc.height;
+    const bg=cx2.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,colors[0]); bg.addColorStop(1,colors[1]);
+    cx2.fillStyle=bg; cx2.fillRect(0,0,W,H);
+    cx2.save();
+    cx2.translate(W*.5,H*.74);
+    cx2.strokeStyle=colors[2]+'3f';cx2.lineWidth=.6;
+    for(let i=-6;i<=6;i++){
+      cx2.beginPath();cx2.moveTo(i*20,-80);cx2.lineTo(i*20+120,20);cx2.stroke();
+      cx2.beginPath();cx2.moveTo(i*20,20);cx2.lineTo(i*20+120,-80);cx2.stroke();
+    }
+    cx2.restore();
+    buildings.forEach((b,i)=>{
+      const pulse = 1 + Math.sin(dt*1.8+i)*.08;
+      isoBox(cx2,b.x*W,b.y*H,b.s*pulse,b.h*(.86+Math.sin(dt+i)*.08),colors[2]);
+    });
+    miniAgents.forEach((a,i)=>{
+      const x=(a.x+Math.sin(dt*a.speed+a.phase)*.04)*W;
+      const y=(a.y+Math.cos(dt*a.speed+a.phase)*.04)*H;
+      const glow=cx2.createRadialGradient(x,y,0,x,y,18);
+      glow.addColorStop(0,colors[2]+'aa');glow.addColorStop(1,'rgba(0,0,0,0)');
+      cx2.fillStyle=glow;cx2.beginPath();cx2.arc(x,y,18,0,Math.PI*2);cx2.fill();
+      cx2.font='15px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+      cx2.textAlign='center';cx2.textBaseline='middle';cx2.fillStyle='#fff';
+      cx2.fillText(a.emoji,x,y);
+    });
+    dt+=0.018; requestAnimationFrame(drawDistrict);
+  }
+  drawDistrict();
+});
+
+// ── SCENE 4 CHAT ─────────────────────────────────────────────────────────────
+const scene4Msgs = [
+  {from:'CARTO',  color:'#ffd700', emoji:'⚖️', msg:"Let's establish sovereign jurisdiction over all new construction."},
+  {from:'FORGE',  color:'#ff4444', emoji:'🔨', msg:"Building road and supply hubs. Block F6 claimed."},
+  {from:'RESONANCE',color:'#00ffff',emoji:'∑', msg:"Broadcasting APL theorem: ∑∫ all-agents-initialize ∇"},
+  {from:'NOVA',   color:'#ff00ff', emoji:'🎨', msg:"Painting District WALL-1. Culture index rising."},
+  {from:'ROBOB',  color:'#00ff88', emoji:'⚡', msg:"EVIDENCE: all construction verified. WORM sealed."},
+];
+const s4el = document.getElementById('scene4-msgs');
+function renderScene4Line(m) {
+  return `
+  <div style="margin-bottom:8px;font-size:.43rem;line-height:1.5">
+    <div style="color:${m.color};margin-bottom:2px">${m.emoji} ${m.from}</div>
+    <div style="color:#c0d8e8">${m.msg}</div>
+  </div>`;
+}
+s4el.innerHTML = scene4Msgs.map(renderScene4Line).join('');
+scene4LineSink = (agent, line) => {
+  const msg = {
+    from: agent.name,
+    color: agent.color,
+    emoji: agent.emoji,
+    msg: line.replace(`${agent.name}: `,'')
+  };
+  const wrap = document.createElement('div');
+  wrap.className = 'live-enter';
+  wrap.innerHTML = renderScene4Line(msg);
+  s4el.prepend(wrap);
+  while(s4el.children.length > 6) s4el.removeChild(s4el.lastElementChild);
+};
+
+// ── EMERGENT EVENTS LIVE QUEUE ────────────────────────────────────────────────
+const emergentEventPool = [
+  ['🌵','drought','TRADE WAR IN DISTRICT C3','FORGE claims FLUX\'s post. CARTO summoned.'],
+  ['💡','invention','RESONANCE BROADCASTS APL THEOREM','Agent productivity +34%.'],
+  ['⚔️','faction','PHANTOM DETECTS VIOLATION','GRANITE-I froze by CIPHER.'],
+  ['🏛️','ruins','NOVA COMPLETES DISTRICT MURAL','Day 001 chronicle sealed.'],
+  ['⚽','adapt','FOOTBALL MATCH','TEAM ALPHA scores! WORM sealed.'],
+  ['🌊','adapt','CARTO ISSUES NEW TRUST DEED','Block B2 boundary established.'],
+  ['💎','invention','FLUX TRADE COMPLETE','85 resources exchanged, rep +8.'],
+  ['🔨','faction','FORGE BUILDS NEW BLOCK','BLOCK-247 claimed, EVIDENCE confirmed.'],
+  ['📡','adapt','RESONANCE APL BROADCAST','∑∫ all-agents-initialize ∇ received.'],
+  ['🎨','ruins','NOVA MURAL PAINTED','WALL-12, culture event archived.'],
+];
+const eventListEl = document.getElementById('event-list');
+let emergentIndex = 0;
+function makeEventNode(icon,type,title,desc) {
+  const item = document.createElement('div');
+  item.className = 'event-item live-enter';
+  item.innerHTML = `
+    <div class="event-icon ${type}">${icon}</div>
+    <div><div class="event-title">${title}</div><div class="event-desc">${desc}</div></div>`;
+  return item;
+}
+function pushEmergentEvent(customEvent=null) {
+  let data;
+  if(customEvent) {
+    const title = `${customEvent.type || 'CIV EVENT'} — ${customEvent.verdict || 'PENDING'}`;
+    const actors = Array.isArray(customEvent.actors) ? customEvent.actors.map(a=>typeof a === 'string' ? a : (a.id || a)).join(' → ') : 'VORTEX';
+    data = ['📡','adapt',title,`${actors} | WORM ${(customEvent.seal || 'pending').slice(0,12)}`];
+  } else {
+    data = emergentEventPool[emergentIndex % emergentEventPool.length];
+    emergentIndex++;
+  }
+  eventListEl.prepend(makeEventNode(...data));
+  while(eventListEl.children.length > 5) eventListEl.removeChild(eventListEl.lastElementChild);
+}
+eventListEl.innerHTML = '';
+for(let i=0;i<5;i++) pushEmergentEvent();
+setInterval(()=>pushEmergentEvent(), 6000);
+
+// ── LISP TICKER APPENDER ──────────────────────────────────────────────────────
+const tickerPool = [
+  '(summon CARTO FORGE "block C3 dispute — present at 08:00")',
+  '(speak RESONANCE ALL "∑∫ APL packet broadcast complete ∇")',
+  '(invoke ROBOB "sovereign land ownership rules")',
+  '(seal WORM "DEED-C3-FLUX-001")',
+  '(paint NOVA "WALL-7" "Day 001 chronicle")',
+  '(trade FLUX FORGE "resources" 45)',
+  '(goal RESONANCE TEAM_ALPHA "83c3...")',
+  '(report PHANTOM CARTO "GRANITE-I violation detected")',
+  'EVIDENCE: score 0.847 | WORM: 83c34fa2... | tick 0047',
+  'SILENCE: score 0.21 | query blocked | no execution',
+];
+let tickerIndex = 0;
+function appendTickerMessage(message=null) {
+  const ticker = document.getElementById('ticker-text');
+  const msg = message || tickerPool[tickerIndex++ % tickerPool.length];
+  ticker.textContent += `   |   ${msg}`;
+  if(ticker.textContent.length > 1800) {
+    ticker.textContent = ticker.textContent.slice(-1200);
+  }
+}
+setInterval(()=>appendTickerMessage(), 8000);
+
+// ── POLL ROBOB ────────────────────────────────────────────────────────────────
+let tick = 0;
+let lastRobobEventSeal = '';
+let lastRemoteTickMs = 0;
+async function pollRobob() {
+  try {
+    const r = await fetch(`${ROBOB_URL}/civ/state`);
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    tick = d.tick||0;
+    lastRemoteTickMs = Date.now();
+    document.getElementById('tick-num').textContent = String(tick).padStart(4,'0');
+    document.getElementById('worm-count').textContent = d.worm_count||0;
+    document.getElementById('agent-count').textContent = Object.keys(d.agents||{}).length||15;
+    document.getElementById('world-ver').textContent = `${tick}.${Math.floor(tick/10)}.${tick%10}`;
+    const fb = d.football||{};
+    document.getElementById('alpha-s').textContent = fb.team_alpha||0;
+    document.getElementById('omega-s').textContent = fb.team_omega||0;
+
+    // Inject newest ROBOB event into local live queue without replacing the list
+    const lastEv = (d.events||[]).slice(-1)[0];
+    if(lastEv && lastEv.seal !== lastRobobEventSeal) {
+      lastRobobEventSeal = lastEv.seal || String(Date.now());
+      pushEmergentEvent(lastEv);
+      appendTickerMessage(`${lastEv.sexpr||lastEv.type||'ROBOB EVENT'} | tick:${tick} WORM:${(lastEv.seal||'').slice(0,12)}`);
+    }
+
+    document.getElementById('core-status').textContent = 'ONLINE — CIVILIZATION ITERATING';
+    document.getElementById('robob-core-msg').innerHTML = `World v${tick}.0.${tick%10} generated.<br>WORM chain: ${d.worm_count||0} seals. All agents active.`;
+  } catch(e) {
+    document.getElementById('core-status').textContent = 'OFFLINE — START BOB + ROBOB';
+    document.getElementById('core-status').style.color = '#ff4444';
+  }
+}
+pollRobob();
+setInterval(pollRobob, 4000);
+
+// ── POLL /civ/chat — feed Bedrock AI conversations into Scene 1 ───────────────
+let lastChatSeal = '';
+async function pollCivChat() {
+  try {
+    const r = await fetch(`${ROBOB_URL}/civ/chat`);
+    if (!r.ok) return;
+    const d = await r.json();
+    const msgs = (d.messages || []).filter(m => m && m.seal !== lastChatSeal);
+    if (!msgs.length) return;
+    const m = msgs[msgs.length - 1];
+    lastChatSeal = m.seal || String(Date.now());
+    // Push A's line into Scene 1
+    if (m.a && m.msg_a) scene1El.prepend(renderAgentMessage(m.a, m.msg_a.slice(0,120)));
+    // Push B's reply 2s later
+    if (m.b && m.msg_b) setTimeout(() => {
+      scene1El.prepend(renderAgentMessage(m.b, m.msg_b.slice(0,120)));
+      while (scene1El.children.length > 4) scene1El.removeChild(scene1El.lastElementChild);
+    }, 2000);
+    while (scene1El.children.length > 4) scene1El.removeChild(scene1El.lastElementChild);
+    // Also push into ticker
+    appendTickerMessage(`(speak ${m.a} ${m.b} "${(m.msg_a||'').slice(0,50).replace(/"/g,"'")}...")`);
+  } catch {}
+}
+pollCivChat();
+setInterval(pollCivChat, 9000);
+
+// ── CARTO SUMMONS MODAL [S] ───────────────────────────────────────────────────
+const summonModal = document.getElementById('summon-modal');
+document.addEventListener('keydown', e => {
+  if (e.key === 's' || e.key === 'S') {
+    summonModal.style.display = summonModal.style.display === 'flex' ? 'none' : 'flex';
+  }
+  if (e.key === 'Escape') summonModal.style.display = 'none';
+});
+summonModal.addEventListener('click', e => { if (e.target === summonModal) summonModal.style.display = 'none'; });
+
+// Animate LISP dialogue in modal
+const summonLines = [
+  '(summon CARTO FORGE "block C3 encroachment")',
+  '(invoke ROBOB "verify FORGE block ownership claim")',
+  '[ROBOB] EVIDENCE: 0.742 — block C3 belongs to RESONANCE',
+  '(rule CARTO FORGE "cease construction on C3 immediately")',
+  '(seal WORM "deed-1749887234" "FORGE: 48-tick freeze")',
+  '(invoke ROBOB "confirm Trust Deed seal")',
+  '[ROBOB] EVIDENCE: 0.891 — Trust Deed sealed and binding',
+  '(report PHANTOM CARTO "FORGE freeze active — monitoring")',
+];
+let summonLineIdx = 0;
+const summonOutput = document.getElementById('summon-output');
+function advanceSummonLine() {
+  if (!summonOutput) return;
+  if (summonLineIdx < summonLines.length) {
+    const el = document.createElement('div');
+    el.style.cssText = 'margin-bottom:6px;color:' + (summonLines[summonLineIdx].startsWith('[ROBOB]') ? '#00ff88' : summonLines[summonLineIdx].startsWith('(seal') ? '#ffd700' : '#00d4ff');
+    el.textContent = summonLines[summonLineIdx];
+    summonOutput.appendChild(el);
+    summonOutput.scrollTop = summonOutput.scrollHeight;
+    summonLineIdx++;
+  }
+}
+setInterval(advanceSummonLine, 1800);
+
+// ── LOG ───────────────────────────────────────────────────────────────────────
+let day = 1;
+setInterval(()=>{
+  day++;
+  const el = document.getElementById('civ-log-entries');
+  const msgs = ['Agent trade completed — WORM sealed','NOVA mural painted on WALL-'+day,'CARTO ruled on district dispute','PHANTOM detected no violations','Football match concluded','RESONANCE broadcast APL packet'];
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span>[DAY ${String(day).padStart(3,'0')}]</span> ${msgs[day%msgs.length]}`;
+  el.appendChild(entry);
+  if(el.children.length > 6) el.removeChild(el.firstChild);
+}, 5000);
+</script>
+</body>
+</html>
