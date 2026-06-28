@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Frankenstein Claude — LinkedIn Ad Creative</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    gap: 40px;
+  }
+
+  .label {
+    color: #666;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  /* ── AD FRAME 1200×627 (LinkedIn single image) ── */
+  .ad-wrap {
+    position: relative;
+    width: 1200px;
+    height: 627px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .ad {
+    width: 1200px;
+    height: 627px;
+    position: relative;
+    background: #04090f;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* Background atmosphere */
+  .ad::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 72% 50%, rgba(0,212,204,.13) 0%, transparent 55%),
+      radial-gradient(ellipse at 10% 80%, rgba(185,156,255,.09) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 0%,  rgba(255,209,102,.06) 0%, transparent 40%);
+  }
+
+  /* Grid lines */
+  .ad::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(0,212,204,.04) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(0deg,  rgba(0,212,204,.03) 1px, transparent 1px) 0 0 / 48px 48px;
+  }
+
+  /* ── LEFT: Visual block ── */
+  .ad-visual {
+    position: absolute;
+    left: 0; top: 0;
+    width: 480px;
+    height: 627px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 48px 32px;
+    border-right: 1px solid rgba(0,212,204,.18);
+  }
+
+  .ad-visual img {
+    width: 260px;
+    height: 260px;
+    filter: drop-shadow(0 0 32px rgba(0,212,204,.4));
+  }
+
+  .ad-visual .mark-label {
+    margin-top: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(0,212,204,.6);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  /* Weight bars on sides of image */
+  .weight-bar {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .weight-bar.left  { left: 16px; }
+  .weight-bar.right { right: 16px; }
+  .weight-plate {
+    background: #0e1520;
+    border: 1px solid #1c3040;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: #ffd166;
+    text-align: center;
+    letter-spacing: 1px;
+    padding: 3px 6px;
+  }
+  .weight-plate.lg { width: 52px; padding: 6px; }
+  .weight-plate.md { width: 44px; }
+  .weight-plate.sm { width: 36px; }
+
+  /* ── RIGHT: Copy block ── */
+  .ad-copy {
+    position: absolute;
+    left: 480px; top: 0;
+    width: 720px;
+    height: 627px;
+    z-index: 2;
+    padding: 52px 56px 40px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .ad-copy .kicker {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #00d4cc;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 18px;
+  }
+
+  .ad-copy h1 {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: .92;
+    letter-spacing: -.02em;
+    color: #f0f8ff;
+    margin-bottom: 22px;
+  }
+  .ad-copy h1 .hi { color: #00d4cc; }
+  .ad-copy h1 .gold { color: #ffd166; }
+  .ad-copy h1 .red  { color: #ff5a6e; }
+
+  .ad-copy .body {
+    font-size: 17px;
+    line-height: 1.48;
+    color: #8bb0bd;
+    margin-bottom: 28px;
+    max-width: 580px;
+  }
+  .ad-copy .body strong { color: #c9e8ef; }
+
+  /* Stats row */
+  .stats {
+    display: flex;
+    gap: 0;
+    margin-bottom: 30px;
+    border: 1px solid rgba(0,212,204,.2);
+  }
+  .stat {
+    flex: 1;
+    padding: 14px 18px;
+    border-right: 1px solid rgba(0,212,204,.15);
+  }
+  .stat:last-child { border-right: none; }
+  .stat .num {
+    display: block;
+    font-size: 28px;
+    font-weight: 900;
+    color: #00d4cc;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat .lbl {
+    font-size: 10px;
+    color: #4d6d79;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* CTA */
+  .ad-cta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .cta-btn {
+    background: #00d4cc;
+    color: #020d10;
+    font-weight: 900;
+    font-size: 14px;
+    padding: 13px 28px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+  }
+  .cta-url {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #4d6d79;
+    letter-spacing: 1px;
+  }
+
+  /* WORM footer */
+  .ad-footer {
+    position: absolute;
+    bottom: 0; left: 480px;
+    width: 720px;
+    padding: 8px 52px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #1e3a4a;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #0d1e28;
+    z-index: 3;
+  }
+
+  /* ── VARIANT SELECTOR ── */
+  .variant-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .vbtn {
+    padding: 8px 20px;
+    border: 1px solid #333;
+    background: #111;
+    color: #666;
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: monospace;
+    transition: all .15s;
+  }
+  .vbtn.active { border-color: #00d4cc; color: #00d4cc; }
+
+  /* ── COPY PANEL below ── */
+  .copy-panel {
+    width: 1200px;
+    background: #080e14;
+    border: 1px solid #1a2a38;
+    padding: 32px 40px;
+    color: #8bb0bd;
+  }
+  .copy-panel h2 {
+    color: #00d4cc;
+    font-family: monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1a2a38;
+  }
+  .copy-variant { margin-bottom: 28px; }
+  .copy-variant .cv-label {
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #ffd166;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .copy-variant .cv-headline {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f0f8ff;
+    margin-bottom: 6px;
+  }
+  .copy-variant .cv-body {
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+  .copy-variant .cv-tags {
+    margin-top: 8px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #00d4cc;
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-bar">
+  <button class="vbtn active" onclick="setVariant(0)">V1 — PAIN</button>
+  <button class="vbtn"        onclick="setVariant(1)">V2 — AUDIT</button>
+  <button class="vbtn"        onclick="setVariant(2)">V3 — BLACKHAT</button>
+</div>
+
+<div class="label">LinkedIn Single Image Ad · 1200 × 627px · Screenshot to export</div>
+
+<!-- ═══════════════════════════════════ AD CANVAS ══════════════════════════════ -->
+<div class="ad-wrap">
+<div class="ad" id="adCanvas">
+
+  <!-- LEFT: Visual -->
+  <div class="ad-visual">
+    <div class="weight-bar left">
+      <div class="weight-plate lg">TOKEN</div>
+      <div class="weight-plate lg">LOAD</div>
+      <div class="weight-plate md">$30K</div>
+      <div class="weight-plate sm">/yr</div>
+    </div>
+    <img src="frankenstein_claude_snapkitty_logo.svg" alt="Franken-Claude in SnapKitty Harness"/>
+    <div class="weight-bar right">
+      <div class="weight-plate lg">ORACLE</div>
+      <div class="weight-plate lg">LOCK</div>
+      <div class="weight-plate md">DATA</div>
+      <div class="weight-plate sm">HELD</div>
+    </div>
+    <div class="mark-label">Franken-Claude · SnapKitty</div>
+  </div>
+
+  <!-- RIGHT: Copy (V1 default) -->
+  <div class="ad-copy">
+    <div>
+      <div class="kicker" id="ad-kicker">⬡ Sovereign AI Framework · SnapKitty Collective</div>
+      <h1 id="ad-headline">
+        Oracle charges<br><span class="gold">$30K/year</span><br>to hold your<br><span class="red">own data.</span>
+      </h1>
+      <p class="body" id="ad-body">
+        <strong>SovereignSuite runs on your metal.</strong> Same NetSuite API surface. Same SuiteScript 2.x. Same SuiteQL queries. Zero Oracle. Every transaction cryptographically sealed. Your audit trail. Your ledger. Your call.
+      </p>
+    </div>
+    <div>
+      <div class="stats">
+        <div class="stat"><span class="num" id="s1">0</span><span class="lbl" id="l1">lock-in</span></div>
+        <div class="stat"><span class="num" id="s2">4</span><span class="lbl" id="l2">ERP modules</span></div>
+        <div class="stat"><span class="num" id="s3">∞</span><span class="lbl" id="l3">WORM seals</span></div>
+        <div class="stat"><span class="num" id="s4">1</span><span class="lbl" id="l4">sovereign ledger</span></div>
+      </div>
+      <div class="ad-cta">
+        <div class="cta-btn" id="ad-cta">BREAK FREE →</div>
+        <div class="cta-url">snapkitty.dev · github.com/SNAPKITTYWEST</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer watermark -->
+  <div class="ad-footer">
+    <span>WORM: 83c34fa2... · SovereignSuite · Apache 2.0</span>
+    <span>⬡ Ω ↺ Ψ Δ Λ Σ Φ α · Evidence or Silence</span>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ COPY PANEL ════════════════════════════ -->
+<div class="copy-panel">
+  <h2>LinkedIn Post Copy — All Variants</h2>
+
+  <div class="copy-variant">
+    <div class="cv-label">Variant 1 — Pain (CFOs, VPs Finance, ERP buyers)</div>
+    <div class="cv-headline">Oracle charges $30K/year to hold your own data.</div>
+    <div class="cv-body">We built SovereignSuite.
+
+Same NetSuite API surface. Same SuiteScript 2.x. Same SuiteQL queries.
+Zero Oracle. Zero Intuit. Zero Salesforce.
+
+Your GL, AP, AR, and Inventory on PostgreSQL 16 — on your hardware.
+Every transaction SHA-256 chained. Your audit trail, cryptographically sealed.
+No vendor can edit it. No subpoena touches it unless you hand them the keys.
+
+We call it a WORM chain. The Big 4 call it what they've always wanted.
+
+If you're paying $30-120K/year to NetSuite, QuickBooks, or SAP and wondering why you still don't own your own data —
+
+→ github.com/SNAPKITTYWEST/sovereign-suite
+→ snapkitty.dev
+
+Open source. Apache 2.0. Run it today.</div>
+    <div class="cv-tags">#ERP #NetSuite #SovereignTech #OpenSource #CFO #Enterprise</div>
+  </div>
+
+  <div class="copy-variant">
+    <div class="cv-label">Variant 2 — Audit/Compliance (Legal, Compliance, Big 4, GRC)</div>
+    <div class="cv-headline">Your audit trail lives in Oracle's data center. That's a problem.</div>
+    <div class="cv-body">Every journal entry you've ever posted.
+Every vendor bill. Every cash receipt. Every inventory movement.
+
+Oracle can edit it. Intuit can edit it. Salesforce can edit it.
+You signed their ToS. They can.
+
+We built a different answer.
+
+SovereignSuite is a clean-room ERP with a WORM audit chain —
+SHA-256 chained, append-only, mathematically immutable.
+Not "immutable" as a feature flag. Immutable as in: PostgreSQL RLS + no UPDATE grant + cryptographic proof.
+
+Every GL posting is formally sealed the moment it happens.
+No retroactive amendment. No silent correction. Evidence or Silence.
+
+This is what forensic accounting looks like when the accountants own the chain.
+
+→ NACHA members: you already know why this matters.
+→ Anyone under SOX, HIPAA, or GDPR: you're about to.</div>
+    <div class="cv-tags">#Audit #Compliance #WORM #Forensicaccounting #SOX #NACHA #ERP</div>
+  </div>
+
+  <div class="copy-variant">
+    <div class="cv-label">Variant 3 — Blackhat/Dev (Engineers, DevOps, Hackers, OSS community)</div>
+    <div class="cv-headline">We reverse-engineered NetSuite, QuickBooks, SAP, and Salesforce. Clean room. Public docs only.</div>
+    <div class="cv-body">Not a clone. Not a crack. A sovereign implementation.
+
+Every gatekeeper has a public API surface — SuiteScript 2.x, SOQL, OData v4, QBO v3.
+We built implementations that speak each language natively.
+
+Your existing NetSuite scripts? Run here unchanged.
+Your SOQL queries? Transpile to PostgreSQL automatically.
+Your SAP IDocs? ORDERS05, INVOIC02 — processed, WORM-sealed, acknowledged.
+
+One PostgreSQL 16 database. Four API surfaces. Zero licensing.
+
+The architecture:
+  BRAIN  = Claude Sonnet 4.6 (Bedrock) — architect
+  HANDS  = FAISS + Neo4j + RDF          — retrieval
+  LEGS   = Devstral 123B                — code executor
+  WORM   = SHA-256 chain                — every step sealed
+
+We call it FRANKENSTEIN. The AI does the lifting. SnapKitty holds the harness.
+
+→ github.com/SNAPKITTYWEST
+→ 20+ repos. Apache 2.0. Fork everything.</div>
+    <div class="cv-tags">#OpenSource #DevOps #ERP #Hacking #SovereignTech #AI #SnapKitty</div>
+  </div>
+</div>
+
+<script>
+const variants = [
+  {
+    kicker:   '⬡ Sovereign AI Framework · SnapKitty Collective',
+    headline: 'Oracle charges<br><span class="gold">$30K/year</span><br>to hold your<br><span class="red">own data.</span>',
+    body:     '<strong>SovereignSuite runs on your metal.</strong> Same NetSuite API surface. Same SuiteScript 2.x. Same SuiteQL queries. Zero Oracle. Every transaction cryptographically sealed. Your audit trail. Your ledger. Your call.',
+    s1:'0',   l1:'lock-in',
+    s2:'4',   l2:'ERP modules',
+    s3:'∞',   l3:'WORM seals',
+    s4:'1',   l4:'sovereign ledger',
+    cta: 'BREAK FREE →',
+  },
+  {
+    kicker:   '⬡ Immutable Audit Chain · Evidence or Silence',
+    headline: 'Oracle can edit<br>your audit trail.<br><span class="red">That\'s not</span><br><span class="hi">compliance.</span>',
+    body:     '<strong>SovereignSuite\'s WORM chain is mathematically immutable.</strong> SHA-256 chained, append-only, PostgreSQL RLS. No UPDATE grant. No retroactive amendment. Cryptographic proof of every GL posting, AP bill, and inventory movement.',
+    s1:'0',   l1:'silent edits',
+    s2:'100%', l2:'sealed entries',
+    s3:'SOX',  l3:'ready',
+    s4:'NACHA', l4:'grade audit',
+    cta: 'OWN YOUR AUDIT →',
+  },
+  {
+    kicker:   '⬡ Clean-Room Reverse Engineering · Apache 2.0',
+    headline: 'We built<br><span class="hi">sovereign shells</span><br>for SAP, NetSuite,<br><span class="gold">QB, Salesforce.</span>',
+    body:     '<strong>Your existing scripts run here unchanged.</strong> SuiteScript 2.x, SOQL, OData v4, QBO v3 — all transpile to PostgreSQL. One sovereign ledger. Four API surfaces. FRANKENSTEIN AI workflow: Brain → Hands → Legs → WORM seal.',
+    s1:'4',   l1:'API surfaces',
+    s2:'85+', l2:'CLI commands',
+    s3:'0',   l3:'vendor fees',
+    s4:'∞',   l4:'forks welcome',
+    cta: 'FORK IT →',
+  },
+]
+
+function setVariant(i) {
+  const v = variants[i]
+  document.getElementById('ad-kicker').textContent = v.kicker
+  document.getElementById('ad-headline').innerHTML = v.headline
+  document.getElementById('ad-body').innerHTML = v.body
+  document.getElementById('s1').textContent = v.s1
+  document.getElementById('l1').textContent = v.l1
+  document.getElementById('s2').textContent = v.s2
+  document.getElementById('l2').textContent = v.l2
+  document.getElementById('s3').textContent = v.s3
+  document.getElementById('l3').textContent = v.l3
+  document.getElementById('s4').textContent = v.s4
+  document.getElementById('l4').textContent = v.l4
+  document.getElementById('ad-cta').textContent = v.cta
+  document.querySelectorAll('.vbtn').forEach((b,j) => b.classList.toggle('active', i===j))
+}
+</script>
+</body>
+</html>
