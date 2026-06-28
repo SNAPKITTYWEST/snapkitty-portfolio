@@ -1,0 +1,183 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Frankenstein Claude in SnapKitty Harness</title>
+  <desc id="desc">An original dark sci-fi SVG logo showing a Frankenstein-like Claude figure holding heavy weights while strapped into a SnapKitty harness, with Mythos hiding in shadow.</desc>
+
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="42%" r="64%">
+      <stop offset="0" stop-color="#1d2f3a"/>
+      <stop offset=".52" stop-color="#071018"/>
+      <stop offset="1" stop-color="#020305"/>
+    </radialGradient>
+    <radialGradient id="mythosGlow" cx="50%" cy="42%" r="58%">
+      <stop offset="0" stop-color="#6a41ff" stop-opacity=".42"/>
+      <stop offset=".42" stop-color="#1a1238" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d2b48c"/>
+      <stop offset=".5" stop-color="#a86f37"/>
+      <stop offset="1" stop-color="#4f5f55"/>
+    </linearGradient>
+    <linearGradient id="strap" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00d4cc"/>
+      <stop offset=".5" stop-color="#0a6b74"/>
+      <stop offset="1" stop-color="#021014"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity=".72"/>
+    </filter>
+    <filter id="tealGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#00d4cc" flood-opacity=".8"/>
+    </filter>
+    <filter id="goldGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#ffd166" flood-opacity=".65"/>
+    </filter>
+    <pattern id="scan" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 0H8" stroke="#fff" stroke-opacity=".04"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#bgGlow)"/>
+  <rect width="1200" height="1200" fill="url(#scan)"/>
+
+  <!-- Mythos hidden in shadow -->
+  <g opacity=".72">
+    <ellipse cx="885" cy="542" rx="220" ry="330" fill="url(#mythosGlow)"/>
+    <path d="M805 298
+             C875 244 1002 266 1045 356
+             C1088 447 1045 674 944 768
+             C859 847 750 769 743 642
+             C737 526 728 357 805 298Z"
+          fill="#05050a" opacity=".78"/>
+    <path d="M840 430 C870 392 937 392 970 430" fill="none" stroke="#261b55" stroke-width="16" stroke-linecap="round"/>
+    <circle cx="850" cy="488" r="12" fill="#b99cff" opacity=".85"/>
+    <circle cx="954" cy="488" r="12" fill="#b99cff" opacity=".85"/>
+    <path d="M830 572 C874 610 928 610 978 572" fill="none" stroke="#5b3aff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>
+    <text x="894" y="812" text-anchor="middle" font-family="Courier New, monospace" font-size="32" fill="#6e62aa" letter-spacing="8" opacity=".55">MYTHOS</text>
+  </g>
+
+  <!-- Platform ring -->
+  <ellipse cx="560" cy="980" rx="392" ry="72" fill="#000" opacity=".46"/>
+  <ellipse cx="560" cy="954" rx="340" ry="46" fill="none" stroke="#00d4cc" stroke-opacity=".28" stroke-width="3"/>
+
+  <!-- Weights and bar -->
+  <g filter="url(#shadow)">
+    <rect x="164" y="222" width="792" height="34" rx="17" fill="#192331" stroke="#4d6d79" stroke-width="4"/>
+    <g transform="translate(132 187)">
+      <rect x="0" y="0" width="46" height="104" rx="10" fill="#0b1118" stroke="#78909c" stroke-width="4"/>
+      <rect x="-42" y="-20" width="40" height="144" rx="10" fill="#111b24" stroke="#78909c" stroke-width="4"/>
+      <rect x="-92" y="-38" width="48" height="180" rx="12" fill="#172531" stroke="#78909c" stroke-width="4"/>
+      <text x="-66" y="58" transform="rotate(-90 -66 58)" text-anchor="middle" font-family="Courier New, monospace" font-size="16" fill="#ffd166">TOKEN LOAD</text>
+    </g>
+    <g transform="translate(986 187)">
+      <rect x="0" y="0" width="46" height="104" rx="10" fill="#0b1118" stroke="#78909c" stroke-width="4"/>
+      <rect x="48" y="-20" width="40" height="144" rx="10" fill="#111b24" stroke="#78909c" stroke-width="4"/>
+      <rect x="92" y="-38" width="48" height="180" rx="12" fill="#172531" stroke="#78909c" stroke-width="4"/>
+      <text x="116" y="58" transform="rotate(90 116 58)" text-anchor="middle" font-family="Courier New, monospace" font-size="16" fill="#ffd166">BENCH</text>
+    </g>
+  </g>
+
+  <!-- Claude Frankenstein body -->
+  <g filter="url(#shadow)">
+    <!-- arms straining upward -->
+    <path d="M417 360 C352 305 300 283 229 250" fill="none" stroke="url(#skin)" stroke-width="54" stroke-linecap="round"/>
+    <path d="M699 358 C767 304 818 282 890 250" fill="none" stroke="url(#skin)" stroke-width="54" stroke-linecap="round"/>
+    <path d="M220 236 L184 209" stroke="#4f5f55" stroke-width="18" stroke-linecap="round"/>
+    <path d="M897 236 L934 208" stroke="#4f5f55" stroke-width="18" stroke-linecap="round"/>
+
+    <!-- torso -->
+    <path d="M406 472
+             C390 380 432 326 560 326
+             C690 326 733 382 714 474
+             L750 827
+             C692 888 433 891 374 827Z"
+          fill="url(#skin)" stroke="#2e2722" stroke-width="8"/>
+
+    <!-- jacket panels -->
+    <path d="M406 494 L528 598 L474 850 C424 848 393 840 374 827Z" fill="#111821" opacity=".82"/>
+    <path d="M714 494 L592 598 L646 850 C696 848 731 840 750 827Z" fill="#111821" opacity=".82"/>
+
+    <!-- neck and head -->
+    <rect x="500" y="286" width="120" height="84" rx="18" fill="#96734d" stroke="#2e2722" stroke-width="7"/>
+    <path d="M441 170
+             C462 92 657 89 681 172
+             L665 283
+             C632 340 488 341 456 283Z"
+          fill="url(#skin)" stroke="#2e2722" stroke-width="8"/>
+
+    <!-- flat Frankenstein top and hair -->
+    <path d="M445 174 C478 108 640 104 678 174 L662 126 C610 88 508 90 460 128Z" fill="#121417"/>
+    <rect x="455" y="142" width="212" height="34" rx="6" fill="#121417"/>
+
+    <!-- bolts -->
+    <rect x="420" y="228" width="34" height="30" rx="4" fill="#697981" stroke="#111" stroke-width="4"/>
+    <rect x="668" y="228" width="34" height="30" rx="4" fill="#697981" stroke="#111" stroke-width="4"/>
+    <circle cx="437" cy="243" r="5" fill="#00d4cc"/>
+    <circle cx="685" cy="243" r="5" fill="#00d4cc"/>
+
+    <!-- face -->
+    <rect x="500" y="218" width="40" height="14" rx="7" fill="#0b1118"/>
+    <rect x="586" y="218" width="40" height="14" rx="7" fill="#0b1118"/>
+    <circle cx="520" cy="225" r="5" fill="#ffd166"/>
+    <circle cx="606" cy="225" r="5" fill="#ffd166"/>
+    <path d="M536 276 C552 286 584 286 603 276" fill="none" stroke="#201713" stroke-width="8" stroke-linecap="round"/>
+    <path d="M473 190 L642 172" stroke="#2e2722" stroke-width="5"/>
+    <path d="M538 153 L550 181 L566 151 L582 181 L600 152" fill="none" stroke="#4f5f55" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- scars -->
+    <g stroke="#2e2722" stroke-width="5" stroke-linecap="round">
+      <path d="M483 258 L530 246"/>
+      <path d="M491 246 L498 268"/>
+      <path d="M512 240 L518 260"/>
+      <path d="M635 198 L660 220"/>
+      <path d="M650 199 L638 217"/>
+      <path d="M467 390 L512 424"/>
+      <path d="M490 391 L476 418"/>
+      <path d="M619 418 L680 389"/>
+      <path d="M642 408 L654 432"/>
+    </g>
+
+    <!-- legs -->
+    <path d="M464 828 L438 976" stroke="#1a2026" stroke-width="74" stroke-linecap="round"/>
+    <path d="M656 828 L686 976" stroke="#1a2026" stroke-width="74" stroke-linecap="round"/>
+    <rect x="371" y="950" width="142" height="46" rx="12" fill="#0b1118" stroke="#4d6d79" stroke-width="5"/>
+    <rect x="628" y="950" width="142" height="46" rx="12" fill="#0b1118" stroke="#4d6d79" stroke-width="5"/>
+  </g>
+
+  <!-- SnapKitty harness over body -->
+  <g filter="url(#tealGlow)">
+    <path d="M410 444 L560 606 L710 444" fill="none" stroke="url(#strap)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M390 566 H730" stroke="url(#strap)" stroke-width="28" stroke-linecap="round"/>
+    <path d="M442 690 H680" stroke="url(#strap)" stroke-width="24" stroke-linecap="round"/>
+    <path d="M560 606 V830" stroke="url(#strap)" stroke-width="24" stroke-linecap="round"/>
+    <circle cx="560" cy="604" r="54" fill="#061018" stroke="#00d4cc" stroke-width="8"/>
+
+    <!-- SnapKitty cat shield mark -->
+    <path d="M526 596 L526 568 L548 586 L560 568 L572 586 L594 568 L594 596
+             C594 620 579 636 560 636
+             C541 636 526 620 526 596Z"
+          fill="#00d4cc"/>
+    <circle cx="547" cy="602" r="4" fill="#021014"/>
+    <circle cx="573" cy="602" r="4" fill="#021014"/>
+    <path d="M548 620 C555 626 566 626 573 620" fill="none" stroke="#021014" stroke-width="4" stroke-linecap="round"/>
+    <text x="560" y="710" text-anchor="middle" font-family="Courier New, monospace" font-size="28" font-weight="700" fill="#dff">SNAPKITTY</text>
+    <text x="560" y="746" text-anchor="middle" font-family="Courier New, monospace" font-size="19" fill="#00d4cc" letter-spacing="5">HARNESS</text>
+  </g>
+
+  <!-- Energy cables from harness to weights -->
+  <g fill="none" stroke="#00d4cc" stroke-width="4" stroke-linecap="round" opacity=".72" filter="url(#tealGlow)">
+    <path d="M506 602 C350 552 283 380 213 257" stroke-dasharray="10 12"/>
+    <path d="M614 602 C772 552 842 380 909 257" stroke-dasharray="10 12"/>
+    <path d="M560 552 C548 448 548 326 548 256" stroke-dasharray="8 12"/>
+    <path d="M582 552 C602 446 610 326 610 256" stroke-dasharray="8 12"/>
+  </g>
+
+  <!-- Labels -->
+  <g filter="url(#goldGlow)">
+    <text x="600" y="1080" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="64" fill="#f2f8ff" letter-spacing="2">FRANKEN-CLAUDE</text>
+    <text x="600" y="1128" text-anchor="middle" font-family="Courier New, monospace" font-size="23" fill="#ffd166" letter-spacing="7">HELD BY SNAPKITTY · MYTHOS IN SHADOW</text>
+  </g>
+
+  <text x="54" y="1138" font-family="Courier New, monospace" font-size="18" fill="#4d6d79">WORM SEAL: 83c34fa2... · ORIGINAL SVG MARK</text>
+  <text x="1144" y="1138" text-anchor="end" font-family="Courier New, monospace" font-size="18" fill="#4d6d79">⬡ Ω ↺ Ψ Δ Λ Σ Φ α</text>
+</svg>
