@@ -1,0 +1,1040 @@
+<!--
+Apache License
+Version 2.0, January 2004
+https://www.apache.org/licenses/
+
+Copyright 2026 SnapKitty Collective
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOVEREIGNBRIDGE - Clean Room Connector Layer</title>
+<style>
+  :root {
+    --bg: #05080c;
+    --panel: #0a121b;
+    --panel2: #0d1a26;
+    --line: #183247;
+    --line2: #2e6682;
+    --text: #d8f4ff;
+    --muted: #78a4b6;
+    --dim: #496b7a;
+    --teal: #00d4cc;
+    --green: #70ffa8;
+    --gold: #ffd166;
+    --red: #ff5267;
+    --blue: #72a7ff;
+    --violet: #bd93ff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 20% 16%, rgba(0,212,204,.13), transparent 32%),
+      radial-gradient(circle at 80% 24%, rgba(189,147,255,.11), transparent 34%),
+      linear-gradient(90deg, rgba(0,212,204,.045) 1px, transparent 1px) 0 0 / 58px 58px,
+      linear-gradient(0deg, rgba(0,212,204,.035) 1px, transparent 1px) 0 0 / 58px 58px;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.026) 0 1px, transparent 1px 4px);
+    opacity: .34;
+    mix-blend-mode: screen;
+  }
+  button, input, select {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .app {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-rows: 64px 1fr 34px;
+  }
+  .topbar {
+    display: grid;
+    grid-template-columns: 330px 1fr 420px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    background: rgba(5, 10, 16, .94);
+  }
+  .brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-left: 18px;
+    min-width: 0;
+  }
+  .brandmark {
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(0,212,204,.72);
+    display: grid;
+    place-items: center;
+    color: var(--teal);
+    box-shadow: inset 0 0 20px rgba(0,212,204,.18), 0 0 20px rgba(0,212,204,.16);
+  }
+  .brand h1 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: .18em;
+  }
+  .brand small {
+    display: block;
+    color: var(--muted);
+    margin-top: 4px;
+    font-size: 10px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+  .pattern {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    background: rgba(10, 25, 37, .75);
+    color: #bdebf2;
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .status-grid {
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-left: 1px solid var(--line);
+  }
+  .stat {
+    border-left: 1px solid rgba(24,50,71,.8);
+    padding: 10px 12px 0;
+    min-width: 0;
+  }
+  .stat:first-child { border-left: 0; }
+  .stat label {
+    display: block;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .stat strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--green);
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .workspace {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 270px 1fr 385px;
+  }
+  .rail, .right {
+    min-height: 0;
+    background: rgba(6, 15, 24, .88);
+    border-right: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .right {
+    border-right: 0;
+    border-left: 1px solid var(--line);
+    display: grid;
+    grid-template-rows: 310px 1fr;
+  }
+  .panel-head {
+    height: 42px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 13px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  .connector-list {
+    height: calc(100% - 42px);
+    overflow: auto;
+    padding: 9px;
+  }
+  .connector {
+    width: 100%;
+    min-height: 66px;
+    display: grid;
+    grid-template-columns: 40px 1fr 16px;
+    gap: 10px;
+    align-items: center;
+    text-align: left;
+    border: 1px solid transparent;
+    background: rgba(10, 25, 37, .72);
+    padding: 9px;
+    margin-bottom: 7px;
+  }
+  .connector.active,
+  .connector:hover {
+    border-color: var(--line2);
+    background: rgba(13, 36, 53, .96);
+    box-shadow: inset 3px 0 0 var(--teal);
+  }
+  .cicon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(0,212,204,.28);
+    background: #061019;
+    color: var(--teal);
+    font-weight: 700;
+  }
+  .ccopy b {
+    display: block;
+    font-size: 12px;
+  }
+  .ccopy span {
+    display: block;
+    color: var(--muted);
+    margin-top: 4px;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+  .led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+  }
+  .led.warn { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+  .main {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: 272px 1fr;
+    overflow: hidden;
+  }
+  .hero {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 1fr 370px;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .detail, .flow, .object-panel, .log-panel, .contract-panel, .governance-panel {
+    border: 1px solid var(--line);
+    background: rgba(8, 20, 31, .9);
+    box-shadow: 0 16px 46px rgba(0,0,0,.32);
+    min-width: 0;
+  }
+  .detail {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 18px;
+  }
+  .kicker {
+    color: var(--teal);
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+  .detail h2 {
+    margin: 8px 0 8px;
+    font-size: clamp(26px, 3.2vw, 46px);
+    line-height: 1.02;
+  }
+  .detail p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 840px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 15px;
+  }
+  .chip {
+    border: 1px solid rgba(0,212,204,.28);
+    background: rgba(0,212,204,.07);
+    color: #bdfaf6;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .action {
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--line2);
+    background: rgba(0,212,204,.08);
+    color: var(--text);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .action.primary {
+    background: var(--teal);
+    color: #041014;
+    font-weight: 700;
+  }
+  .scorebox {
+    border-left: 1px solid var(--line);
+    padding-left: 16px;
+    display: grid;
+    align-content: center;
+    gap: 14px;
+  }
+  .scorebox label {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  .score {
+    font-size: 38px;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .bar {
+    height: 9px;
+    border: 1px solid var(--line);
+    background: #051019;
+    overflow: hidden;
+  }
+  .bar span {
+    display: block;
+    width: var(--w, 80%);
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--green));
+  }
+  .flow {
+    overflow: hidden;
+  }
+  .flow-canvas {
+    height: calc(100% - 42px);
+    position: relative;
+    padding: 16px;
+  }
+  .lane {
+    height: 42px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    border: 1px solid var(--line2);
+    background: rgba(0,212,204,.06);
+    margin-bottom: 10px;
+    color: #d8f4ff;
+    font-size: 11px;
+    letter-spacing: .03em;
+    position: relative;
+  }
+  .lane::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -11px;
+    width: 1px;
+    height: 10px;
+    background: var(--line2);
+  }
+  .lane:last-child::after { display: none; }
+  .lane.active {
+    border-color: var(--green);
+    box-shadow: 0 0 18px rgba(112,255,168,.16);
+  }
+  .lower {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr .82fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  .object-panel, .log-panel {
+    display: grid;
+    grid-template-rows: 42px 1fr;
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(24,50,71,.75);
+    white-space: nowrap;
+  }
+  th {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    background: rgba(8, 20, 31, .94);
+  }
+  td:nth-child(2) { color: var(--teal); }
+  .badge {
+    color: var(--green);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .badge.warn { color: var(--gold); }
+  .badge.alert { color: var(--red); }
+  .logs {
+    overflow: hidden;
+    padding: 10px 12px;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .log {
+    border-left: 2px solid var(--teal);
+    padding: 7px 0 7px 10px;
+    color: #bfe8ef;
+    animation: in .35s ease both;
+  }
+  .log small {
+    display: block;
+    color: var(--dim);
+    margin-top: 3px;
+  }
+  @keyframes in {
+    from { opacity: 0; transform: translateY(-7px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .contract-panel {
+    margin: 12px 12px 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 42px 1fr;
+  }
+  .code {
+    padding: 12px;
+    overflow: hidden;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #bfe8ef;
+    white-space: pre-wrap;
+  }
+  .governance-panel {
+    margin: 12px;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 42px 1fr;
+    min-height: 0;
+  }
+  .gov-body {
+    padding: 12px;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: 1fr 96px;
+    gap: 12px;
+  }
+  .rings {
+    position: relative;
+    min-height: 210px;
+  }
+  .ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(0,212,204,.28);
+    border-radius: 50%;
+    animation: spin 24s linear infinite;
+  }
+  .r1 { width: 230px; height: 230px; }
+  .r2 { width: 162px; height: 162px; animation-direction: reverse; animation-duration: 17s; }
+  .r3 { width: 92px; height: 92px; display: grid; place-items: center; color: var(--teal); background: rgba(0,212,204,.08); font-size: 11px; font-weight: 700; text-align: center; letter-spacing: .08em; }
+  .sat {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    background: #061019;
+    border: 1px solid var(--line2);
+    color: var(--text);
+    font-size: 11px;
+  }
+  .s1 { left: 22px; top: -17px; }
+  .s2 { right: -17px; top: 80px; }
+  .s3 { left: 67px; bottom: -17px; }
+  .s4 { left: -17px; top: 93px; }
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .deed {
+    border: 1px solid var(--line);
+    background: rgba(6, 16, 25, .88);
+    padding: 11px;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .footer {
+    border-top: 1px solid var(--line);
+    background: rgba(5, 10, 16, .95);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    color: var(--muted);
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+  }
+  .ticker {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: ticker 36s linear infinite;
+  }
+  @keyframes ticker { to { transform: translateX(-100%); } }
+  @media (max-width: 1020px) {
+    html, body { overflow: auto; }
+    .app { position: relative; min-height: 100vh; grid-template-rows: auto auto auto; }
+    .topbar, .workspace, .hero, .lower, .right { grid-template-columns: 1fr; }
+    .topbar { gap: 10px; padding: 10px; }
+    .brand { padding-left: 0; }
+    .status-grid { border-left: 0; grid-template-columns: repeat(2, 1fr); }
+    .rail, .right, .main { overflow: visible; }
+    .connector-list { height: auto; max-height: 380px; }
+    .detail { grid-template-columns: 1fr; }
+    .scorebox { border-left: 0; border-top: 1px solid var(--line); padding: 14px 0 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brandmark">SB</div>
+      <div>
+        <h1>SOVEREIGNBRIDGE</h1>
+        <small>clean-room connector shell suite</small>
+      </div>
+    </div>
+    <div class="pattern">PUBLIC API SURFACE → SOVEREIGN IMPLEMENTATION → WORM AUDIT → TRUST DEED → BISOFT LAYER</div>
+    <div class="status-grid">
+      <div class="stat"><label>Adapters</label><strong id="adapterCount">10 READY</strong></div>
+      <div class="stat"><label>Tick</label><strong id="tick">0001</strong></div>
+      <div class="stat"><label>Chain</label><strong id="chain">GENESIS</strong></div>
+      <div class="stat"><label>License</label><strong>APACHE 2.0</strong></div>
+    </div>
+  </header>
+
+  <section class="workspace">
+    <nav class="rail">
+      <div class="panel-head"><span>Gatekeeper Surfaces</span><span>Clean Room</span></div>
+      <div id="connectorList" class="connector-list"></div>
+    </nav>
+
+    <main class="main">
+      <section class="hero">
+        <article class="detail">
+          <div>
+            <div class="kicker" id="surfaceType">Enterprise API Surface</div>
+            <h2 id="surfaceName">Bisoft Universal Object Bridge</h2>
+            <p id="surfaceDesc">A bi-directional connector layer that translates public enterprise API objects into sovereign Bisoft records, then writes every state transition into a WORM-sealed audit chain governed by Trust Deeds.</p>
+            <div id="chips" class="chips"></div>
+            <div class="actions">
+              <button class="action primary" id="syncBtn">Run Bridge Sync</button>
+              <button class="action" id="mapBtn">Generate Mapping</button>
+              <button class="action" id="deedBtn">Seal Trust Deed</button>
+            </div>
+          </div>
+          <aside class="scorebox">
+            <div>
+              <label>Compatibility</label>
+              <div class="score" id="compat">98</div>
+            </div>
+            <div>
+              <label>Open Stack Coverage</label>
+              <div class="bar"><span id="coverage" style="--w: 88%"></span></div>
+            </div>
+            <div>
+              <label>Governance Mode</label>
+              <div id="mode" style="color:var(--gold);font-size:13px;">Trust Deed enforced</div>
+            </div>
+          </aside>
+        </article>
+        <aside class="flow">
+          <div class="panel-head"><span id="flowTitle">Connector Flow</span><span id="flowState">ONLINE</span></div>
+          <div id="flowCanvas" class="flow-canvas"></div>
+        </aside>
+      </section>
+
+      <section class="lower">
+        <article class="object-panel">
+          <div class="panel-head"><span>Unified Bisoft Objects</span><span id="objectCount">6 mapped</span></div>
+          <div style="overflow:auto;">
+            <table>
+              <thead><tr><th>Source Object</th><th>Bisoft Object</th><th>Direction</th><th>Seal</th><th>Status</th></tr></thead>
+              <tbody id="objectRows"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="log-panel">
+          <div class="panel-head"><span>Bridge Event Stream</span><span>WORM LIVE</span></div>
+          <div id="logs" class="logs"></div>
+        </article>
+      </section>
+    </main>
+
+    <aside class="right">
+      <section class="contract-panel">
+        <div class="panel-head"><span>Adapter Contract</span><span id="contractName">bisoft</span></div>
+        <code id="contract" class="code"></code>
+      </section>
+      <section class="governance-panel">
+        <div class="panel-head"><span>Governance Mesh</span><span>Trust Deed</span></div>
+        <div class="gov-body">
+          <div class="rings">
+            <div class="ring r1"><div class="sat s1">API</div><div class="sat s2">WORM</div><div class="sat s3">DEED</div><div class="sat s4">BI</div></div>
+            <div class="ring r2"><div class="sat s1">ROBOB</div><div class="sat s2">BOB</div><div class="sat s3">CARTO</div><div class="sat s4">NOVA</div></div>
+            <div class="ring r3">BISOFT<br>LAYER</div>
+          </div>
+          <div class="deed" id="deed">
+            TRUST_DEED: enforced<br>
+            CLEAN_ROOM: public API docs only<br>
+            PROPRIETARY_SOURCE: never copied<br>
+            AUDIT: sha256 WORM chain
+          </div>
+        </div>
+      </section>
+    </aside>
+  </section>
+
+  <footer class="footer">
+    <div class="ticker"><span id="ticker">(bridge SAP-LIKE purchase-order -> bisoft.procurement.order) · (bridge CRM account -> bisoft.party.account) · (seal WORM adapter-state) ·</span></div>
+    <div>SOVEREIGNBRIDGE COMPONENT 1 · BISOFT CONNECTOR</div>
+    <div style="text-align:right;" id="clock">--:--:--</div>
+  </footer>
+</div>
+
+<script>
+const surfaces = [
+  {
+    id: "bisoft",
+    icon: "BI",
+    name: "Bisoft Universal Object Bridge",
+    type: "Bi-directional Sovereign Bridge",
+    short: "Canonical objects, sync, governance.",
+    desc: "A bi-directional connector layer that translates public enterprise API objects into sovereign Bisoft records, then writes every state transition into a WORM-sealed audit chain governed by Trust Deeds.",
+    compat: 98,
+    coverage: 88,
+    mode: "Trust Deed enforced",
+    chips: ["canonical schema", "delta sync", "webhooks", "idempotency", "WORM chain", "Trust Deed"],
+    flow: ["Read public API object", "Normalize to Bisoft", "Validate evidence", "Apply Trust Deed", "Write sovereign state", "Emit WORM receipt"],
+    rows: [
+      ["purchaseOrder", "bisoft.procurement.order", "inbound/outbound", "required", "ready"],
+      ["invoice", "bisoft.finance.invoice", "inbound/outbound", "required", "ready"],
+      ["worker", "bisoft.people.worker", "inbound", "required", "consent gate"],
+      ["case", "bisoft.service.case", "inbound/outbound", "required", "ready"],
+      ["asset", "bisoft.asset.record", "inbound", "required", "ready"],
+      ["event", "bisoft.audit.event", "append-only", "required", "sealed"]
+    ],
+    endpoint: "/bridge/bisoft/v1/sync",
+    adapter: "bisoft.connector"
+  },
+  {
+    id: "erp",
+    icon: "ERP",
+    name: "ERP Gatekeeper Adapter",
+    type: "S4-like / Oracle-like / NetSuite-like",
+    short: "Finance, procurement, orders.",
+    desc: "Clean-room ERP bridge for public objects such as ledgers, journals, suppliers, purchase orders, invoices, inventory, sales orders, and project records.",
+    compat: 96,
+    coverage: 82,
+    mode: "Ledger seal required",
+    chips: ["OData-style", "REST resources", "ledger", "supplier", "PO", "invoice"],
+    flow: ["Fetch business object", "Map account dimensions", "Check ledger rules", "Seal journal impact", "Post sovereign mirror", "Return receipt"],
+    rows: [
+      ["journalEntry", "bisoft.finance.journal", "inbound/outbound", "required", "ready"],
+      ["vendor", "bisoft.party.supplier", "inbound/outbound", "required", "ready"],
+      ["material", "bisoft.inventory.item", "inbound", "required", "ready"],
+      ["salesOrder", "bisoft.sales.order", "inbound/outbound", "required", "ready"],
+      ["project", "bisoft.project.node", "inbound", "required", "mapped"],
+      ["assetMaster", "bisoft.asset.record", "inbound", "required", "mapped"]
+    ],
+    endpoint: "/bridge/erp/v1/business-objects",
+    adapter: "gatekeeper.erp.public_api"
+  },
+  {
+    id: "crm",
+    icon: "CRM",
+    name: "CRM Gatekeeper Adapter",
+    type: "Salesforce-like / Dynamics-like / HubSpot-like",
+    short: "Accounts, opportunities, cases.",
+    desc: "Clean-room CRM bridge for account, contact, lead, opportunity, quote, campaign, service case, consent, and subscription objects.",
+    compat: 95,
+    coverage: 79,
+    mode: "Consent-first customer graph",
+    chips: ["REST", "bulk jobs", "webhooks", "account", "opportunity", "case"],
+    flow: ["Receive CRM delta", "Resolve party identity", "Apply consent", "Map pipeline state", "Seal customer event", "Sync response"],
+    rows: [
+      ["account", "bisoft.party.account", "inbound/outbound", "required", "ready"],
+      ["contact", "bisoft.party.contact", "inbound/outbound", "required", "consent gate"],
+      ["opportunity", "bisoft.sales.opportunity", "inbound", "required", "ready"],
+      ["quote", "bisoft.sales.quote", "inbound/outbound", "required", "ready"],
+      ["case", "bisoft.service.case", "inbound/outbound", "required", "active"],
+      ["campaign", "bisoft.market.signal", "inbound", "required", "limited"]
+    ],
+    endpoint: "/bridge/crm/v1/objects",
+    adapter: "gatekeeper.crm.public_api"
+  },
+  {
+    id: "hcm",
+    icon: "HCM",
+    name: "Workforce Gatekeeper Adapter",
+    type: "Workday-like / SuccessFactors-like",
+    short: "Workers, payroll, skills, learning.",
+    desc: "Clean-room workforce bridge for worker profiles, org structure, job data, payroll events, skills, learning records, benefits, and performance signals.",
+    compat: 94,
+    coverage: 76,
+    mode: "PII minimization active",
+    chips: ["worker", "org", "payroll", "skills", "learning", "benefits"],
+    flow: ["Request worker scope", "Minimize PII", "Verify consent", "Map employment event", "Seal access reason", "Publish Bisoft record"],
+    rows: [
+      ["worker", "bisoft.people.worker", "inbound", "required", "consent gate"],
+      ["position", "bisoft.people.position", "inbound", "required", "ready"],
+      ["payrollResult", "bisoft.payroll.event", "inbound", "required", "restricted"],
+      ["learningRecord", "bisoft.learning.proof", "inbound/outbound", "required", "ready"],
+      ["skill", "bisoft.skill.claim", "inbound/outbound", "required", "ready"],
+      ["benefitElection", "bisoft.benefit.election", "inbound", "required", "restricted"]
+    ],
+    endpoint: "/bridge/workforce/v1/events",
+    adapter: "gatekeeper.hcm.public_api"
+  },
+  {
+    id: "itsm",
+    icon: "IT",
+    name: "Service Gatekeeper Adapter",
+    type: "ServiceNow-like / Jira Service-like",
+    short: "Tickets, assets, changes, CMDB.",
+    desc: "Clean-room service-management bridge for incidents, requests, problems, changes, assets, configuration items, knowledge, and SLA events.",
+    compat: 97,
+    coverage: 84,
+    mode: "Change approval enforced",
+    chips: ["incident", "request", "change", "CMDB", "asset", "SLA"],
+    flow: ["Capture ticket event", "Classify impact", "Check change policy", "Map service object", "Seal decision", "Notify systems"],
+    rows: [
+      ["incident", "bisoft.service.incident", "inbound/outbound", "required", "ready"],
+      ["changeRequest", "bisoft.service.change", "inbound/outbound", "required", "approval"],
+      ["problem", "bisoft.service.problem", "inbound", "required", "ready"],
+      ["cmdb_ci", "bisoft.asset.configuration", "inbound", "required", "ready"],
+      ["knowledge", "bisoft.knowledge.article", "inbound/outbound", "required", "mapped"],
+      ["sla", "bisoft.service.sla_event", "inbound", "required", "ready"]
+    ],
+    endpoint: "/bridge/service/v1/tickets",
+    adapter: "gatekeeper.itsm.public_api"
+  },
+  {
+    id: "identity",
+    icon: "ID",
+    name: "Identity Gatekeeper Adapter",
+    type: "Okta-like / Entra-like",
+    short: "Users, groups, auth, access.",
+    desc: "Clean-room identity bridge for users, groups, roles, access grants, auth events, SCIM-style lifecycle, and policy decisions.",
+    compat: 96,
+    coverage: 81,
+    mode: "Zero-trust claims only",
+    chips: ["SCIM-style", "OIDC-style", "groups", "roles", "policy", "auth events"],
+    flow: ["Receive identity event", "Map principal", "Check Trust Deed", "Calculate access", "Seal auth reason", "Emit claim"],
+    rows: [
+      ["user", "bisoft.identity.principal", "inbound/outbound", "required", "ready"],
+      ["group", "bisoft.identity.group", "inbound/outbound", "required", "ready"],
+      ["role", "bisoft.identity.role", "inbound", "required", "ready"],
+      ["grant", "bisoft.identity.access_grant", "append-only", "required", "ready"],
+      ["authEvent", "bisoft.audit.auth_event", "append-only", "required", "sealed"],
+      ["policy", "bisoft.governance.policy", "inbound/outbound", "required", "active"]
+    ],
+    endpoint: "/bridge/identity/v1/lifecycle",
+    adapter: "gatekeeper.identity.public_api"
+  },
+  {
+    id: "productivity",
+    icon: "365",
+    name: "Productivity Gatekeeper Adapter",
+    type: "Graph-like / Workspace-like",
+    short: "Mail, files, calendar, messages.",
+    desc: "Clean-room productivity bridge for mail metadata, files, calendars, chat messages, meetings, tasks, and collaboration audit events.",
+    compat: 93,
+    coverage: 73,
+    mode: "Metadata-only default",
+    chips: ["mail metadata", "files", "calendar", "chat", "tasks", "audit"],
+    flow: ["Scope permission", "Fetch metadata", "Redact content", "Map collaboration object", "Seal access", "Publish event"],
+    rows: [
+      ["message", "bisoft.collab.message_meta", "inbound", "required", "redacted"],
+      ["driveItem", "bisoft.content.file", "inbound/outbound", "required", "ready"],
+      ["event", "bisoft.calendar.event", "inbound/outbound", "required", "ready"],
+      ["task", "bisoft.work.task", "inbound/outbound", "required", "ready"],
+      ["team", "bisoft.collab.space", "inbound", "required", "ready"],
+      ["auditLog", "bisoft.audit.collab_event", "append-only", "required", "sealed"]
+    ],
+    endpoint: "/bridge/productivity/v1/metadata",
+    adapter: "gatekeeper.productivity.public_api"
+  },
+  {
+    id: "data",
+    icon: "DB",
+    name: "Data Cloud Gatekeeper Adapter",
+    type: "Snowflake-like / Databricks-like / BigQuery-like",
+    short: "Tables, queries, lineage, models.",
+    desc: "Clean-room data bridge for tables, jobs, semantic models, lineage, feature data, query logs, and governed data products.",
+    compat: 95,
+    coverage: 80,
+    mode: "Lineage mandatory",
+    chips: ["tables", "jobs", "lineage", "features", "queries", "semantic model"],
+    flow: ["Register dataset", "Extract schema", "Attach lineage", "Apply data policy", "Seal model update", "Expose Bisoft metric"],
+    rows: [
+      ["table", "bisoft.data.table", "inbound", "required", "ready"],
+      ["queryJob", "bisoft.data.query_job", "append-only", "required", "sealed"],
+      ["lineage", "bisoft.data.lineage", "append-only", "required", "ready"],
+      ["feature", "bisoft.ai.feature", "inbound/outbound", "required", "mapped"],
+      ["model", "bisoft.ai.model_card", "inbound", "required", "approval"],
+      ["metric", "bisoft.analytics.metric", "inbound/outbound", "required", "ready"]
+    ],
+    endpoint: "/bridge/data/v1/products",
+    adapter: "gatekeeper.data.public_api"
+  },
+  {
+    id: "payments",
+    icon: "PAY",
+    name: "Payments Gatekeeper Adapter",
+    type: "Stripe-like / Adyen-like",
+    short: "Customers, charges, invoices.",
+    desc: "Clean-room payments bridge for customers, payment intents, charges, invoices, subscriptions, payouts, disputes, and webhook events.",
+    compat: 97,
+    coverage: 85,
+    mode: "Financial audit sealed",
+    chips: ["customer", "charge", "invoice", "subscription", "payout", "dispute"],
+    flow: ["Receive payment event", "Verify signature", "Map financial object", "Check ledger impact", "Seal audit", "Emit settlement state"],
+    rows: [
+      ["customer", "bisoft.party.customer", "inbound/outbound", "required", "ready"],
+      ["paymentIntent", "bisoft.payment.intent", "inbound/outbound", "required", "ready"],
+      ["charge", "bisoft.payment.charge", "append-only", "required", "sealed"],
+      ["invoice", "bisoft.finance.invoice", "inbound/outbound", "required", "ready"],
+      ["subscription", "bisoft.subscription.contract", "inbound/outbound", "required", "ready"],
+      ["dispute", "bisoft.risk.dispute", "inbound/outbound", "required", "review"]
+    ],
+    endpoint: "/bridge/payments/v1/events",
+    adapter: "gatekeeper.payments.public_api"
+  },
+  {
+    id: "devops",
+    icon: "DEV",
+    name: "DevOps Gatekeeper Adapter",
+    type: "GitHub-like / GitLab-like / Atlassian-like",
+    short: "Repos, issues, builds, releases.",
+    desc: "Clean-room engineering bridge for repositories, commits, pull requests, issues, CI runs, deployments, releases, and software supply-chain attestations.",
+    compat: 96,
+    coverage: 83,
+    mode: "Build provenance required",
+    chips: ["repo", "commit", "PR", "issue", "CI", "release", "attestation"],
+    flow: ["Capture repo event", "Verify actor", "Map work item", "Attach provenance", "Seal release", "Publish audit"],
+    rows: [
+      ["repository", "bisoft.dev.repository", "inbound", "required", "ready"],
+      ["commit", "bisoft.dev.commit", "append-only", "required", "sealed"],
+      ["pullRequest", "bisoft.dev.change_request", "inbound/outbound", "required", "ready"],
+      ["issue", "bisoft.work.issue", "inbound/outbound", "required", "ready"],
+      ["workflowRun", "bisoft.dev.ci_run", "append-only", "required", "sealed"],
+      ["release", "bisoft.dev.release", "inbound/outbound", "required", "attested"]
+    ],
+    endpoint: "/bridge/devops/v1/events",
+    adapter: "gatekeeper.devops.public_api"
+  }
+];
+
+const logs = [
+  '(bridge bisoft "purchaseOrder" -> "bisoft.procurement.order") -> MAPPED',
+  '(worm append "adapter-state") -> SHA256:83c34fa2',
+  '(trust-deed enforce "PII minimization") -> PASS',
+  '(sync crm "case delta") -> BISOFT SERVICE CASE',
+  '(bridge identity "authEvent") -> APPEND ONLY',
+  '(governance CARTO "external API scope") -> EVIDENCE',
+  '(bridge payments "dispute") -> RISK REVIEW',
+  '(data lineage "semantic metric") -> MODEL CARD SEALED',
+  '(devops release "supply chain attestation") -> WORM RECEIPT',
+  '(erp invoice "three-way match") -> LEDGER MIRROR'
+];
+
+let active = surfaces[0];
+let tick = 1;
+let logIndex = 0;
+let chain = "GENESIS";
+
+const $ = (id) => document.getElementById(id);
+
+function renderConnectors() {
+  $("adapterCount").textContent = `${surfaces.length} READY`;
+  $("connectorList").innerHTML = surfaces.map(s => `
+    <button class="connector ${s.id === active.id ? "active" : ""}" data-id="${s.id}">
+      <span class="cicon">${s.icon}</span>
+      <span class="ccopy"><b>${s.name}</b><span>${s.short}</span></span>
+      <span class="led ${s.compat < 95 ? "warn" : ""}"></span>
+    </button>
+  `).join("");
+  document.querySelectorAll(".connector").forEach(btn => {
+    btn.addEventListener("click", () => selectSurface(btn.dataset.id));
+  });
+}
+
+function renderActive() {
+  $("surfaceType").textContent = active.type;
+  $("surfaceName").textContent = active.name;
+  $("surfaceDesc").textContent = active.desc;
+  $("chips").innerHTML = active.chips.map(c => `<span class="chip">${c}</span>`).join("");
+  $("compat").textContent = active.compat;
+  $("coverage").style.setProperty("--w", `${active.coverage}%`);
+  $("mode").textContent = active.mode;
+  $("flowTitle").textContent = `${active.name} flow`;
+  $("flowCanvas").innerHTML = active.flow.map((f, i) => `<div class="lane ${i === tick % active.flow.length ? "active" : ""}">${f}</div>`).join("");
+  $("objectCount").textContent = `${active.rows.length} mapped`;
+  $("objectRows").innerHTML = active.rows.map(r => {
+    const c = r[4].includes("gate") || r[4].includes("approval") || r[4].includes("review") ? "warn" : r[4].includes("restricted") ? "alert" : "";
+    return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="badge ${c}">${r[4]}</span></td></tr>`;
+  }).join("");
+  $("contractName").textContent = active.id;
+  $("contract").textContent = contractFor(active);
+  $("deed").innerHTML = `TRUST_DEED: enforced<br>CLEAN_ROOM: public API docs only<br>ADAPTER: ${active.adapter}<br>ENDPOINT: ${active.endpoint}<br>AUDIT: sha256 WORM chain`;
+}
+
+function contractFor(s) {
+  return `// SOVEREIGNBRIDGE clean-room adapter contract
+// No proprietary source code. Public API surface only.
+
+POST ${s.endpoint}
+Content-Type: application/json
+X-Sovereign-Adapter: ${s.adapter}
+X-WORM-Required: true
+X-Trust-Deed: enforced
+
+{
+  "direction": "inbound | outbound | append-only",
+  "source_surface": "${s.type}",
+  "source_object": "public_api_object",
+  "target_object": "bisoft.canonical.object",
+  "evidence": {
+    "oracle": "ROBOB",
+    "verdict": "EVIDENCE | SILENCE"
+  },
+  "audit": {
+    "worm_chain_head": "${chain}",
+    "hash": "sha256(payload + previous)"
+  }
+}`;
+}
+
+function selectSurface(id) {
+  active = surfaces.find(s => s.id === id) || surfaces[0];
+  renderConnectors();
+  renderActive();
+  pushLog(`(select adapter "${active.id}") -> ${active.type}`);
+}
+
+function pushLog(text) {
+  const el = document.createElement("div");
+  el.className = "log";
+  el.innerHTML = `${text}<small>${new Date().toLocaleTimeString()} · clean-room · WORM candidate</small>`;
+  $("logs").prepend(el);
+  while ($("logs").children.length > 10) $("logs").lastElementChild.remove();
+}
+
+async function sha256(input) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function advanceChain(reason) {
+  chain = await sha256(`${chain}|${active.id}|${reason}|${tick}|${Date.now()}`);
+  $("chain").textContent = `${chain.slice(0, 8)}...`;
+  renderActive();
+}
+
+async function action(kind) {
+  const text = {
+    sync: `(sync ${active.id.toUpperCase()} "public API surface") -> BISOFT DELTA`,
+    map: `(mapping ${active.id.toUpperCase()} "public object -> canonical object") -> GENERATED`,
+    deed: `(seal TRUST_DEED "${active.id}-${String(tick).padStart(4, "0")}") -> WORM`
+  }[kind];
+  pushLog(text);
+  await advanceChain(kind);
+}
+
+async function beat() {
+  tick += 1;
+  $("tick").textContent = String(tick).padStart(4, "0");
+  $("clock").textContent = new Date().toLocaleTimeString();
+  renderActive();
+  pushLog(logs[logIndex % logs.length]);
+  logIndex += 1;
+  if (tick % 3 === 0) await advanceChain("tick");
+}
+
+$("syncBtn").addEventListener("click", () => action("sync"));
+$("mapBtn").addEventListener("click", () => action("map"));
+$("deedBtn").addEventListener("click", () => action("deed"));
+
+renderConnectors();
+renderActive();
+logs.slice(0, 5).reverse().forEach(pushLog);
+setInterval(beat, 3600);
+</script>
+</body>
+</html>

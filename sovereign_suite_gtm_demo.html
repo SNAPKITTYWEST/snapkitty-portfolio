@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sovereign Suite GTM Demo Deck</title>
+<style>
+  :root {
+    --bg: #05080d;
+    --panel: #0a1420;
+    --panel2: #0e1e2b;
+    --line: #1c4058;
+    --line2: #2c7691;
+    --text: #e6f8ff;
+    --muted: #8bb0bd;
+    --dim: #4d6d79;
+    --teal: #00d4cc;
+    --green: #78ffa8;
+    --gold: #ffd166;
+    --red: #ff5a6e;
+    --violet: #b99cff;
+    --paper: #f5f0e0;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #030509;
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(0,212,204,.16), transparent 28%),
+      radial-gradient(circle at 80% 28%, rgba(185,156,255,.12), transparent 28%),
+      radial-gradient(circle at 62% 84%, rgba(255,209,102,.10), transparent 30%),
+      linear-gradient(90deg, rgba(0,212,204,.045) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(0deg, rgba(0,212,204,.035) 1px, transparent 1px) 0 0 / 56px 56px;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.026) 0 1px, transparent 1px 4px);
+    mix-blend-mode: screen;
+    opacity: .33;
+  }
+  .deck {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+  }
+  .slide {
+    width: 100vw;
+    height: 100vh;
+    min-width: 0;
+    min-height: 0;
+    padding: 42px 52px 36px;
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide.active { display: grid; }
+  .split { grid-template-columns: 1.05fr .95fr; gap: 30px; align-items: center; }
+  .three { grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: stretch; }
+  .top-bottom { grid-template-rows: auto 1fr; gap: 22px; }
+  .kicker {
+    color: var(--teal);
+    font-size: 12px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  h1, h2, h3, p { margin: 0; }
+  h1 {
+    font-size: clamp(48px, 7vw, 98px);
+    line-height: .9;
+    letter-spacing: -.03em;
+  }
+  h2 {
+    font-size: clamp(34px, 4.7vw, 64px);
+    line-height: .95;
+    letter-spacing: -.025em;
+  }
+  h3 {
+    font-size: 19px;
+    color: #fff;
+  }
+  .lead {
+    margin-top: 22px;
+    max-width: 780px;
+    font-size: clamp(19px, 2vw, 27px);
+    line-height: 1.34;
+    color: #c9e8ef;
+  }
+  .sub {
+    margin-top: 16px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 15px;
+    max-width: 760px;
+  }
+  .wordmark {
+    color: var(--teal);
+    text-shadow: 0 0 24px rgba(0,212,204,.32);
+  }
+  .gold { color: var(--gold); }
+  .red { color: var(--red); }
+  .violet { color: var(--violet); }
+  .panel {
+    border: 1px solid var(--line);
+    background: rgba(8, 20, 31, .86);
+    box-shadow: 0 18px 60px rgba(0,0,0,.34);
+  }
+  .card {
+    border: 1px solid var(--line);
+    background: rgba(8, 20, 31, .82);
+    padding: 20px;
+    min-height: 120px;
+  }
+  .card b {
+    display: block;
+    color: var(--text);
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .card span {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.42;
+  }
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 28px;
+    max-width: 760px;
+  }
+  .metric {
+    border: 1px solid rgba(0,212,204,.28);
+    background: rgba(0,212,204,.06);
+    padding: 15px;
+  }
+  .metric strong {
+    display: block;
+    color: var(--green);
+    font-size: 29px;
+    line-height: 1;
+  }
+  .metric label {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .stack {
+    padding: 22px;
+    display: grid;
+    gap: 12px;
+  }
+  .stack-layer {
+    border: 1px solid var(--line2);
+    background: rgba(0,212,204,.06);
+    min-height: 58px;
+    display: grid;
+    grid-template-columns: 142px 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 14px;
+  }
+  .stack-layer label {
+    color: var(--teal);
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+  .stack-layer div {
+    color: var(--text);
+    font-size: 15px;
+  }
+  .flow {
+    height: 100%;
+    min-height: 460px;
+    position: relative;
+    padding: 24px;
+  }
+  .node {
+    position: absolute;
+    min-width: 150px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid var(--line2);
+    background: rgba(8, 20, 31, .94);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.2;
+    box-shadow: 0 0 24px rgba(0,212,204,.08);
+  }
+  .node.hot {
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 28px rgba(255,209,102,.16);
+  }
+  .node.green {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--green));
+    transform-origin: left center;
+    opacity: .8;
+  }
+  .pulse {
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: .55; filter: drop-shadow(0 0 14px currentColor); } }
+  .modules {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .module {
+    border: 1px solid var(--line);
+    background: rgba(8,20,31,.82);
+    padding: 18px 14px;
+    min-height: 138px;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 9px;
+  }
+  .module .icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(0,212,204,.35);
+    color: var(--teal);
+    font-family: "Courier New", monospace;
+  }
+  .module b { font-size: 14px; }
+  .module span { color: var(--muted); font-size: 12px; line-height: 1.35; }
+  .pivot {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+  .side {
+    border: 1px solid var(--line);
+    background: rgba(8,20,31,.84);
+    padding: 24px;
+  }
+  .side.before { border-color: rgba(255,90,110,.45); }
+  .side.after { border-color: rgba(120,255,168,.48); }
+  .side h3 {
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+  .side.before h3 { color: var(--red); }
+  .side.after h3 { color: var(--green); }
+  .bullet {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    margin: 12px 0;
+    color: #c9e8ef;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .bullet i {
+    font-style: normal;
+    color: var(--teal);
+  }
+  .arrow {
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+    font-size: 44px;
+  }
+  .pricing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .price {
+    border: 1px solid var(--line);
+    background: rgba(8,20,31,.86);
+    padding: 24px;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: 430px;
+  }
+  .price.featured {
+    border-color: var(--teal);
+    box-shadow: 0 0 40px rgba(0,212,204,.16);
+  }
+  .price h3 { margin-bottom: 10px; }
+  .price .amount {
+    color: var(--green);
+    font-size: 34px;
+    margin-bottom: 20px;
+  }
+  .price ul {
+    padding-left: 18px;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.75;
+    font-size: 14px;
+  }
+  .tag {
+    display: inline-block;
+    color: #031014;
+    background: var(--teal);
+    padding: 8px 10px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+  .screen {
+    border: 1px solid var(--line2);
+    background: #07111a;
+    min-height: 460px;
+    display: grid;
+    grid-template-rows: 42px 1fr;
+    overflow: hidden;
+  }
+  .screen-head {
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    color: var(--muted);
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+  }
+  .screen-body {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 14px;
+  }
+  .rail {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+  .rail div {
+    border: 1px solid var(--line);
+    background: rgba(0,212,204,.04);
+    padding: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .rail div.active {
+    border-color: var(--teal);
+    color: var(--text);
+    box-shadow: inset 3px 0 0 var(--teal);
+  }
+  .dashboard {
+    display: grid;
+    grid-template-rows: 130px 1fr;
+    gap: 12px;
+  }
+  .dash-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .dash-card {
+    border: 1px solid var(--line);
+    background: rgba(8,20,31,.85);
+    padding: 14px;
+  }
+  .dash-card strong {
+    display: block;
+    font-size: 25px;
+    color: var(--green);
+  }
+  .dash-card span {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .terminal {
+    border: 1px solid var(--line);
+    background: #05090d;
+    padding: 14px;
+    font-family: "Courier New", monospace;
+    color: #bff2e9;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .footer {
+    position: absolute;
+    left: 52px;
+    right: 52px;
+    bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--dim);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .pager {
+    position: fixed;
+    right: 18px;
+    bottom: 14px;
+    z-index: 5;
+    color: var(--muted);
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+  }
+  .seal {
+    font-family: "Courier New", monospace;
+    color: var(--gold);
+  }
+  @media (max-width: 900px) {
+    .slide { padding: 26px; overflow: auto; }
+    .slide.active, .split, .three, .top-bottom, .pivot, .pricing, .screen-body { display: block; }
+    .card, .price, .side, .screen { margin-bottom: 14px; }
+    .modules { grid-template-columns: repeat(2, 1fr); }
+    .footer { position: static; margin-top: 22px; }
+  }
+</style>
+</head>
+<body>
+<main class="deck" id="deck">
+  <section class="slide split active" data-title="Open">
+    <div>
+      <div class="kicker">Sovereign Suite GTM Demo</div>
+      <h1><span class="wordmark">Sovereign Suite</span><br>replaces lock-in with evidence.</h1>
+      <p class="lead">A clean-room enterprise stack: ERP, CRM, workforce, data, integrations, WORM audit, and Trust Deed governance on one sovereign ledger.</p>
+      <div class="metric-grid">
+        <div class="metric"><strong>1 DB</strong><label>shared PostgreSQL ledger</label></div>
+        <div class="metric"><strong>4 shells</strong><label>SAP/QBO/SF/NetSuite-shaped</label></div>
+        <div class="metric"><strong>0 lock-in</strong><label>self-hosted open stack</label></div>
+      </div>
+    </div>
+    <div class="panel stack">
+      <div class="stack-layer"><label>Law</label><div>Evidence or Silence · Trust Deed governance</div></div>
+      <div class="stack-layer"><label>Audit</label><div>SHA-256 WORM chain for every mutation</div></div>
+      <div class="stack-layer"><label>Bridge</label><div>Bisoft connector maps public API surfaces</div></div>
+      <div class="stack-layer"><label>Suite</label><div>Finance · AP · AR · Inventory · CRM · HCM</div></div>
+      <div class="stack-layer"><label>Core</label><div>PostgreSQL 16 · Redis · MinIO · Fastify</div></div>
+    </div>
+    <div class="footer"><span>SnapKitty · Bel Esprit D'Accord Trust</span><span class="seal">WORM: genesis</span></div>
+  </section>
+
+  <section class="slide top-bottom" data-title="Problem">
+    <div>
+      <div class="kicker">The Market Problem</div>
+      <h2>Enterprise software became a toll booth for your own facts.</h2>
+      <p class="sub">Customers pay twice: first to operate the business, then again to extract, audit, migrate, explain, and govern the data they already created.</p>
+    </div>
+    <div class="three">
+      <div class="card"><b>API access is permissioned</b><span>Gatekeepers expose public surfaces but keep implementation, workflow, and audit leverage closed.</span></div>
+      <div class="card"><b>Audit trails are fragmented</b><span>Finance, sales, support, workforce, and procurement disagree until reconciliation becomes its own department.</span></div>
+      <div class="card"><b>AI raises the stakes</b><span>If the system cannot prove why it acted, the automation becomes liability instead of leverage.</span></div>
+      <div class="card"><b>Migration risk kills change</b><span>The buyer wants sovereignty, but not a 24-month rip-and-replace cliff.</span></div>
+      <div class="card"><b>Compliance is bolted on</b><span>Policy arrives after action. Sovereign Suite makes governance part of execution.</span></div>
+      <div class="card"><b>Data gravity traps teams</b><span>Every module stores a private copy of truth. The ledger should be shared.</span></div>
+    </div>
+    <div class="footer"><span>GTM thesis</span><span class="seal">sell the bridge before the replacement</span></div>
+  </section>
+
+  <section class="slide split" data-title="Stack Demo">
+    <div>
+      <div class="kicker">Stack Demo</div>
+      <h2>Public API shape on the outside. Sovereign ledger on the inside.</h2>
+      <p class="lead">SOVEREIGNBRIDGE lets buyers keep familiar integration contracts while moving execution, audit, and governance to an open implementation.</p>
+      <div class="sub">Pattern: public API surface → sovereign implementation → WORM-sealed audit trail → Trust Deed governance → unified Bisoft layer.</div>
+    </div>
+    <div class="flow panel">
+      <div class="node hot" style="left:28px;top:34px;">SAP / QBO / SF / NetSuite<br>API surface</div>
+      <div class="line" style="left:184px;top:66px;width:112px;"></div>
+      <div class="node" style="left:296px;top:34px;">Bisoft<br>Connector</div>
+      <div class="line" style="left:452px;top:66px;width:94px;"></div>
+      <div class="node green" style="left:546px;top:34px;">SovereignSuite<br>records</div>
+      <div class="node" style="left:52px;top:180px;">ROBOB<br>Evidence</div>
+      <div class="line" style="left:202px;top:212px;width:118px;"></div>
+      <div class="node green pulse" style="left:320px;top:180px;">WORM<br>Seal</div>
+      <div class="line" style="left:476px;top:212px;width:104px;"></div>
+      <div class="node" style="left:580px;top:180px;">Trust Deed<br>Gate</div>
+      <div class="node" style="left:176px;top:330px;">PostgreSQL 16<br>one ledger</div>
+      <div class="line" style="left:332px;top:362px;width:126px;"></div>
+      <div class="node hot" style="left:458px;top:330px;">Unified Bisoft<br>objects</div>
+    </div>
+    <div class="footer"><span>Demo path</span><span class="seal">POST /bridge/:target/:resource</span></div>
+  </section>
+
+  <section class="slide top-bottom" data-title="Product">
+    <div>
+      <div class="kicker">Product Surface</div>
+      <h2>One suite. Every operating system module a business expects.</h2>
+      <p class="sub">The wedge is connectors, but the destination is a sovereign enterprise operating suite.</p>
+    </div>
+    <div class="modules">
+      <div class="module"><div class="icon">FI</div><b>Finance Core</b><span>GL, AP, AR, journal entries, close, reporting.</span></div>
+      <div class="module"><div class="icon">PO</div><b>Procurement</b><span>Vendors, sourcing, POs, bills, match logic.</span></div>
+      <div class="module"><div class="icon">CRM</div><b>Customer</b><span>Accounts, contacts, pipeline, cases, consent.</span></div>
+      <div class="module"><div class="icon">HCM</div><b>Workforce</b><span>Workers, roles, learning, payroll signals.</span></div>
+      <div class="module"><div class="icon">SCM</div><b>Supply Chain</b><span>Inventory, warehouse, transport, planning.</span></div>
+      <div class="module"><div class="icon">QBO</div><b>QuickBooks Shell</b><span>QBO REST v3-shaped open implementation.</span></div>
+      <div class="module"><div class="icon">SF</div><b>Salesforce Shell</b><span>REST, SOQL, SOSL, composite, trigger hooks.</span></div>
+      <div class="module"><div class="icon">SAP</div><b>SAP Shell</b><span>OData, BAPI, IDoc-shaped sovereign routes.</span></div>
+      <div class="module"><div class="icon">W</div><b>WORM Audit</b><span>Append-only proof chain for every mutation.</span></div>
+      <div class="module"><div class="icon">Ω</div><b>Trust Deeds</b><span>Governance gates before execution.</span></div>
+    </div>
+    <div class="footer"><span>Advertise</span><span class="seal">familiar APIs · sovereign execution</span></div>
+  </section>
+
+  <section class="slide split" data-title="Live Demo">
+    <div>
+      <div class="kicker">Live Demo Script</div>
+      <h2>Show a buyer the thing working in 90 seconds.</h2>
+      <p class="lead">A QuickBooks invoice, Salesforce opportunity, and SAP journal entry land in the same sovereign ledger, receive the same WORM seal, and obey the same governance rule.</p>
+      <div class="metric-grid">
+        <div class="metric"><strong>QBO</strong><label>invoice → AR invoice</label></div>
+        <div class="metric"><strong>SF</strong><label>opportunity → pipeline invoice</label></div>
+        <div class="metric"><strong>SAP</strong><label>BAPI → journal entry</label></div>
+      </div>
+    </div>
+    <div class="screen">
+      <div class="screen-head"><span>Sovereign Suite cockpit</span><span>ONLINE</span></div>
+      <div class="screen-body">
+        <div class="rail">
+          <div class="active">Bisoft Bridge</div>
+          <div>QuickBooks Shell</div>
+          <div>Salesforce Shell</div>
+          <div>SAP Shell</div>
+          <div>WORM Chain</div>
+          <div>Trust Deed Gate</div>
+        </div>
+        <div class="dashboard">
+          <div class="dash-cards">
+            <div class="dash-card"><strong>0042</strong><span>bridge tick</span></div>
+            <div class="dash-card"><strong>98.7%</strong><span>evidence score</span></div>
+            <div class="dash-card"><strong>1</strong><span>ledger</span></div>
+          </div>
+          <div class="terminal">
+            <div>&gt; POST /bridge/quickbooks/invoice</div>
+            <div>AR invoice mapped · WORM sealed · hash 83c34fa2...</div>
+            <div>&gt; POST /services/data/v60.0/query</div>
+            <div>SOQL transpiled · fields JSONB scanned · governance PASS</div>
+            <div>&gt; POST /sap/bapi/BAPI_ACC_DOCUMENT_POST</div>
+            <div>journal entry routed · Evidence or Silence enforced</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Demo close</span><span class="seal">one source of truth, many familiar surfaces</span></div>
+  </section>
+
+  <section class="slide top-bottom" data-title="GTM Pivot">
+    <div>
+      <div class="kicker">GTM Pivot</div>
+      <h2>Do not sell “replace SAP” first. Sell the bridge that makes replacement inevitable.</h2>
+      <p class="sub">The bridge wedge lowers fear, creates immediate audit value, and quietly moves business truth into the sovereign ledger.</p>
+    </div>
+    <div class="pivot">
+      <div class="side before">
+        <h3>Before: Suite Replacement Pitch</h3>
+        <div class="bullet"><i>×</i><span>Sounds like a multi-year transformation.</span></div>
+        <div class="bullet"><i>×</i><span>Triggers CIO risk reflex and vendor politics.</span></div>
+        <div class="bullet"><i>×</i><span>Requires buyers to believe before they see proof.</span></div>
+        <div class="bullet"><i>×</i><span>Competes head-on with incumbents on their terrain.</span></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="side after">
+        <h3>After: Sovereign Bridge Wedge</h3>
+        <div class="bullet"><i>✓</i><span>Starts as audit, migration, integration, and AI governance.</span></div>
+        <div class="bullet"><i>✓</i><span>Connects to systems they already have.</span></div>
+        <div class="bullet"><i>✓</i><span>Builds the sovereign ledger alongside production.</span></div>
+        <div class="bullet"><i>✓</i><span>Expands module by module once truth is already ours.</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Positioning</span><span class="seal">“connect first, govern always, replace when ready”</span></div>
+  </section>
+
+  <section class="slide top-bottom" data-title="Buyer">
+    <div>
+      <div class="kicker">Ideal Customer + Wedge</div>
+      <h2>Sell to teams trapped between AI urgency and audit fear.</h2>
+      <p class="sub">The buyer is not just “ERP user.” It is the executive who needs automation but cannot let unproven systems mutate business records.</p>
+    </div>
+    <div class="three">
+      <div class="card"><b>Primary buyer</b><span>CFO / Controller / Head of Finance Transformation. Wants clean ledger, faster close, and migration leverage.</span></div>
+      <div class="card"><b>Technical buyer</b><span>CIO / Enterprise Architect. Wants open stack, public API compatibility, and fewer vendor traps.</span></div>
+      <div class="card"><b>Risk buyer</b><span>Compliance / Internal Audit / Legal Ops. Wants evidence before execution and immutable history.</span></div>
+      <div class="card"><b>Beachhead offer</b><span>“Sovereign Audit Mirror” for QuickBooks, Salesforce, SAP, and NetSuite-shaped records.</span></div>
+      <div class="card"><b>Expansion motion</b><span>Bridge → WORM audit → reporting → module replacement → full Sovereign Suite.</span></div>
+      <div class="card"><b>Proof moment</b><span>Show one invoice, one opportunity, one journal entry, one WORM seal, one governance rule.</span></div>
+    </div>
+    <div class="footer"><span>GTM audience</span><span class="seal">AI governance + ERP migration + audit mirror</span></div>
+  </section>
+
+  <section class="slide top-bottom" data-title="Packaging">
+    <div>
+      <div class="kicker">Packaging</div>
+      <h2>Three offers that move from wedge to platform.</h2>
+      <p class="sub">Keep the first sale concrete. Let the platform reveal itself through proof.</p>
+    </div>
+    <div class="pricing">
+      <div class="price">
+        <h3>Bridge Audit Mirror</h3>
+        <div class="amount">$12k/mo</div>
+        <ul>
+          <li>2 connector surfaces</li>
+          <li>WORM audit trail</li>
+          <li>Trust Deed policy checks</li>
+          <li>Read-only ledger mirror</li>
+          <li>30-day launch</li>
+        </ul>
+        <span class="tag">wedge</span>
+      </div>
+      <div class="price featured">
+        <h3>Sovereign Operations Core</h3>
+        <div class="amount">$38k/mo</div>
+        <ul>
+          <li>4 connector surfaces</li>
+          <li>Bi-directional sync</li>
+          <li>Finance + AP + AR modules</li>
+          <li>ROBOB Evidence gate</li>
+          <li>Migration readiness reports</li>
+        </ul>
+        <span class="tag">target</span>
+      </div>
+      <div class="price">
+        <h3>Full Sovereign Suite</h3>
+        <div class="amount">Enterprise</div>
+        <ul>
+          <li>ERP + CRM + HCM + SCM</li>
+          <li>Private deployment</li>
+          <li>Custom Trust Deeds</li>
+          <li>Dedicated implementation cell</li>
+          <li>Vendor exit roadmap</li>
+        </ul>
+        <span class="tag">expansion</span>
+      </div>
+    </div>
+    <div class="footer"><span>Revenue motion</span><span class="seal">land with audit · expand into operations</span></div>
+  </section>
+
+  <section class="slide split" data-title="Ad">
+    <div>
+      <div class="kicker">Campaign Message</div>
+      <h2>Your enterprise stack should answer to you.</h2>
+      <p class="lead">Sovereign Suite gives teams the familiar API surfaces they need, the open implementation they control, and the immutable proof chain auditors can trust.</p>
+      <p class="sub">No proprietary code copied. No black-box authority. No action without evidence.</p>
+      <div class="actions" style="margin-top:28px;">
+        <span class="tag">Book the audit mirror demo</span>
+        <span class="tag" style="background:var(--gold);">Evidence or Silence</span>
+      </div>
+    </div>
+    <div class="panel stack">
+      <div class="stack-layer"><label>Advertise</label><div>“Familiar APIs. Sovereign execution.”</div></div>
+      <div class="stack-layer"><label>Proof</label><div>Every bridge call WORM-sealed.</div></div>
+      <div class="stack-layer"><label>Control</label><div>Self-hosted on PostgreSQL, Redis, MinIO, Node.</div></div>
+      <div class="stack-layer"><label>Govern</label><div>Trust Deeds decide before software acts.</div></div>
+      <div class="stack-layer"><label>Exit</label><div>Start with audit. End with vendor independence.</div></div>
+    </div>
+    <div class="footer"><span>Sovereign Suite</span><span class="seal">⬡ Ω ↺ Ψ Δ Λ Σ Φ α</span></div>
+  </section>
+</main>
+<div class="pager" id="pager"></div>
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+let current = Number(new URLSearchParams(location.search).get('slide') || 0);
+current = Math.max(0, Math.min(slides.length - 1, current));
+
+function show(index, updateUrl = false) {
+  current = (index + slides.length) % slides.length;
+  slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+  document.getElementById('pager').textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')} · ${slides[current].dataset.title}`;
+  if (updateUrl) history.replaceState(null, '', `?slide=${current}`);
+}
+
+addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowRight' || event.key === ' ') show(current + 1, true);
+  if (event.key === 'ArrowLeft') show(current - 1, true);
+});
+
+show(current);
+</script>
+</body>
+</html>
